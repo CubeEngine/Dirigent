@@ -54,6 +54,14 @@
                 <role>Project Lead</role>
             </roles>
         </developer>
+        <developer>
+            <id>Faithcaio</id>
+            <name>Anselm Brehme</name>
+            <email>faithcaio@cubeisland.de</email>
+            <roles>
+                <role>Contributor</role>
+            </roles>
+        </developer>
     </developers>
 
     <properties>
