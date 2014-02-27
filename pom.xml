@@ -7,7 +7,6 @@
     <version>0.0.1-SNAPSHOT</version>
 
     <name>Formatter</name>
-    <name>Formatter</name>
     <description>A compact formatting library</description>
     <url>engine.cubeisland.de</url>
 
@@ -67,6 +66,15 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.11</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
     <build>
         <defaultGoal>clean install</defaultGoal>
@@ -179,5 +187,5 @@
             </build>
         </profile>
     </profiles>
-    
+
 </project>

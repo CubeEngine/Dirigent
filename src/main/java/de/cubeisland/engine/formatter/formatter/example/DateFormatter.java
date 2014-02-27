@@ -20,16 +20,49 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package de.cubeisland.engine.formatter.formatter.reflected;
+package de.cubeisland.engine.formatter.formatter.example;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import de.cubeisland.engine.formatter.context.FormatContext;
+import de.cubeisland.engine.formatter.formatter.AbstractFormatter;
+import de.cubeisland.engine.formatter.context.MappedData;
 
-@Target(ElementType.METHOD)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Format
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashSet;
+
+public class DateFormatter extends AbstractFormatter<Date>
 {
-    Class value();
+    static
+    {
+        FormatContext.register(DateFormatter.class, new DateData());
+    }
+
+    public DateFormatter()
+    {
+        super(new HashSet<String>(Arrays.asList("", "")));
+    }
+
+    @Override
+    public String format(Date object, FormatContext flags)
+    {
+        return flags.getMapped("format", SimpleDateFormat.class).format(object);
+    }
+
+
+    public static class DateData implements MappedData<SimpleDateFormat>
+    {
+
+        @Override
+        public SimpleDateFormat getData(String raw)
+        {
+            return new SimpleDateFormat(raw);
+        }
+
+        @Override
+        public String getKey()
+        {
+            return "format";
+        }
+    }
 }
