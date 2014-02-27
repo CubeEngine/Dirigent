@@ -43,7 +43,6 @@ public class DateFormatter extends AbstractFormatter<Date>
         super(new HashSet<String>(Arrays.asList("", "")));
     }
 
-    @Override
     public String format(Date object, FormatContext flags)
     {
         return flags.getMapped("format", SimpleDateFormat.class).format(object);
@@ -52,14 +51,11 @@ public class DateFormatter extends AbstractFormatter<Date>
 
     public static class DateData implements MappedData<SimpleDateFormat>
     {
-
-        @Override
         public SimpleDateFormat getData(String raw)
         {
             return new SimpleDateFormat(raw);
         }
 
-        @Override
         public String getKey()
         {
             return "format";

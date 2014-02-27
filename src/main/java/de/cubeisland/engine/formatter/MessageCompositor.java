@@ -23,7 +23,14 @@
 package de.cubeisland.engine.formatter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import de.cubeisland.engine.formatter.context.FormatContext;
+import de.cubeisland.engine.formatter.formatter.Formatter;
 
 public class MessageCompositor
 {
@@ -41,7 +48,7 @@ public class MessageCompositor
         FLAGS
     }
 
-    public String composeMessage(String sourceMessage, Object... args)
+    public final String composeMessage(String sourceMessage, Object... args)
     {
         State state = State.NONE;
         boolean escape = false;
@@ -106,10 +113,8 @@ public class MessageCompositor
                     state = State.NONE;
                     finalString.append(MACRO_BEGIN).append(curChar);
                     break;
-                // TODO OR this? throw new IllegalStateException("Illegal start of expression!");
                 case MACRO_END:
-                    // TODO do we want simple String replace ? {} -> String.valueOf(arg[curArg])
-                    finalString.append(String.valueOf(args[curPos]));
+                    finalString.append(this.format(null, null, args[curPos]));
                     curPos++;
                     state = State.NONE;
                     break;
@@ -130,7 +135,6 @@ public class MessageCompositor
                         state = State.NONE;
                         finalString.append(MACRO_BEGIN).append(curChar);
                         break;
-                        // TODO OR this? throw new IllegalStateException("Illegal start of expression! Position or Type is expected!");
                     }
                     break;
                 }
@@ -142,14 +146,12 @@ public class MessageCompositor
                 case MACRO_ESCAPE:
                     state = State.NONE;
                     finalString.append(MACRO_BEGIN).append(posBuffer).append(curChar);
-                    // TODO OR this? throw new IllegalStateException("A position cannot contain non-numbers!");
                     break;
                 case MACRO_SEPARATOR:
                     state = State.TYPE;
                     break;
                 case MACRO_END:
-                    // TODO do we want simple String replace ? {<number>} -> String.valueOf(arg[curArg])
-                    finalString.append(String.valueOf(args[Integer.valueOf(posBuffer)]));
+                    finalString.append(this.format(null, null, args[Integer.valueOf(posBuffer)]));
                     state = State.NONE;
                     break;
                 default:
@@ -161,7 +163,6 @@ public class MessageCompositor
                     {
                         state = State.NONE;
                         finalString.append(MACRO_BEGIN).append(posBuffer).append(curChar);
-                        // TODO OR this? throw new IllegalStateException("A position cannot contain non-numbers!");
                     }
                     break;
                 }
@@ -174,12 +175,19 @@ public class MessageCompositor
                     state = State.NONE;
                     finalString.append(MACRO_BEGIN).append(posBuffer).append(posBuffer.isEmpty() ? MACRO_SEPARATOR : "")
                                .append(typeBuffer).append(curChar);
-                    // TODO OR this? throw new IllegalStateException("A position cannot contain non-numbers!");
                     break;
                 case MACRO_SEPARATOR:
                     if (typeBuffer.isEmpty())
                     {
-                        throw new IllegalStateException("Empty Type"); // TODO or go to none and print stuff from before
+                        finalString.append(MACRO_BEGIN);
+                        if (!posBuffer.isEmpty())
+                        {
+                            finalString.append(posBuffer).append(MACRO_SEPARATOR);
+                        }
+                        finalString.append(curChar);
+                        state = State.NONE;
+                        posBuffer = "";
+                        break;
                     }
                     state = State.FLAGS;
                     flags = new ArrayList<String>();
@@ -188,7 +196,15 @@ public class MessageCompositor
                 case MACRO_END:
                     if (typeBuffer.isEmpty())
                     {
-                        throw new IllegalStateException("Empty Type"); // TODO or go to none and print stuff from before
+                        finalString.append(MACRO_BEGIN);
+                        if (!posBuffer.isEmpty())
+                        {
+                            finalString.append(posBuffer).append(MACRO_SEPARATOR);
+                        }
+                        finalString.append(curChar);
+                        state = State.NONE;
+                        posBuffer = "";
+                        break;
                     }
                     int pos = curPos;
                     if (posBuffer.isEmpty())
@@ -212,7 +228,15 @@ public class MessageCompositor
                     }
                     else
                     {
-                        throw new IllegalStateException("Only letters a-z A-Z and numbers 0-9 are allowed for type-names");
+                        finalString.append(MACRO_BEGIN);
+                        if (!posBuffer.isEmpty())
+                        {
+                            finalString.append(posBuffer).append(MACRO_SEPARATOR);
+                        }
+                        finalString.append(curChar);
+                        state = State.NONE;
+                        posBuffer = "";
+                        break;
                     }
                 }
                 break;
@@ -252,7 +276,6 @@ public class MessageCompositor
                         {
                             pos = Integer.valueOf(posBuffer); // Specified arg pos, NO increment counting pos.
                         }
-                        // TODO message coloring before & after formatted object
                         flags.add(flagsBuffer);
                         finalString.append(this.format(typeBuffer, flags, args[pos]));
                         state = State.NONE;
@@ -267,10 +290,31 @@ public class MessageCompositor
         return finalString.toString();
     }
 
-    private String format(String type, List<String> flags, Object arg)
+    private Map<String, List<Formatter>> formatters = new HashMap<String, List<Formatter>>();
+    private Set<Formatter> defaultFormatters = new HashSet<Formatter>();
+
+    // override in CE to append color at the end of format
+    protected String format(String type, List<String> flags, Object arg)
     {
-        // TODO find & use the formatters
-        // TODO generate FormatContext for given flags
+        if (type == null)
+        {
+            return String.valueOf(arg); // TODO register default class formatter
+        }
+        List<Formatter> formatterList = this.formatters.get(type);
+        for (Formatter formatter : formatterList)
+        {
+            if (formatter.isApplicable(arg.getClass()))
+            {
+                return formatter.format(arg, FormatContext.of(formatter, flags));
+            }
+        }
+        for (Formatter formatter : defaultFormatters)
+        {
+            if (formatter.isApplicable(arg.getClass()))
+            {
+                return formatter.format(arg, FormatContext.of(formatter, flags));
+            }
+        }
         System.out.println(type + " ; " + String.valueOf(flags) + " ; " + String.valueOf(arg));
         return String.valueOf(arg);
     }

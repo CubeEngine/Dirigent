@@ -42,13 +42,11 @@ public abstract class AbstractFormatter<T> implements Formatter<T>
         this.names.addAll(names);
     }
 
-    @Override
     public boolean isApplicable(Class<?> objectType)
     {
         return tClass.isAssignableFrom(objectType);
     }
 
-    @Override
     public Set<String> names()
     {
         return this.names;

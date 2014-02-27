@@ -73,7 +73,6 @@ public abstract class ReflectedFormatter extends AbstractFormatter<Object>
         }
     }
 
-    @Override
     public final String format(Object object, FormatContext flags)
     {
         for (Class<?> tClass : formats.keySet())

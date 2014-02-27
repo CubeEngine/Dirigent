@@ -73,4 +73,9 @@ public class FormatContext
     {
         return mapped.get(key);
     }
+
+    public static FormatContext of(Formatter<?> formatter, List<String> flags)
+    {
+        return null; // TODO
+    }
 }
