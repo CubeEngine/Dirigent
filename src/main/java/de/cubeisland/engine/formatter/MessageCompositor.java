@@ -298,24 +298,35 @@ public class MessageCompositor
     {
         if (type == null)
         {
-            return String.valueOf(arg); // TODO register default class formatter
+            for (Formatter formatter : defaultFormatters)
+            {
+                if (formatter.isApplicable(arg.getClass()))
+                {
+                    return formatter.format(arg, FormatContext.of(formatter, flags));
+                }
+            }
+            return String.valueOf(arg);
         }
         List<Formatter> formatterList = this.formatters.get(type);
-        for (Formatter formatter : formatterList)
+        if (formatterList != null)
         {
-            if (formatter.isApplicable(arg.getClass()))
+            for (Formatter formatter : formatterList)
             {
-                return formatter.format(arg, FormatContext.of(formatter, flags));
+                if (formatter.isApplicable(arg.getClass()))
+                {
+                    System.out.println(type + " ; " + String.valueOf(flags) + " ; " + String.valueOf(arg));
+                    return formatter.format(arg, FormatContext.of(formatter, flags));
+                }
             }
         }
         for (Formatter formatter : defaultFormatters)
         {
             if (formatter.isApplicable(arg.getClass()))
             {
+                System.out.println(type + " ; " + String.valueOf(flags) + " ; " + String.valueOf(arg));
                 return formatter.format(arg, FormatContext.of(formatter, flags));
             }
         }
-        System.out.println(type + " ; " + String.valueOf(flags) + " ; " + String.valueOf(arg));
-        return String.valueOf(arg);
+        throw new MissingFormatterException(type, arg.getClass());
     }
 }
