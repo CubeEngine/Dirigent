@@ -73,7 +73,7 @@ public abstract class ReflectedFormatter extends AbstractFormatter<Object>
         }
     }
 
-    public final String format(Object object, FormatContext flags)
+    public final String format(Object object, FormatContext context)
     {
         for (Class<?> tClass : formats.keySet())
         {
@@ -81,7 +81,7 @@ public abstract class ReflectedFormatter extends AbstractFormatter<Object>
             {
                 try
                 {
-                    return (String)formats.get(tClass).invoke(this, object, flags);
+                    return (String)formats.get(tClass).invoke(this, object, context);
                 }
                 catch (IllegalAccessException e)
                 {

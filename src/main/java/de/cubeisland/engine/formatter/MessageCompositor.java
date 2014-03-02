@@ -45,22 +45,23 @@ public class MessageCompositor
         START,
         POS,
         TYPE,
-        FLAGS
+        ARGUMENTS
     }
 
-    public final String composeMessage(String sourceMessage, Object... args)
+    public final String composeMessage(String sourceMessage, Object... messageArgs)
     {
+        System.out.println(sourceMessage);
         State state = State.NONE;
         boolean escape = false;
-        // {[[<position>:]type[:<flags>]]}
+        // {[[<position>:]type[:<args>]]}
         StringBuilder finalString = new StringBuilder();
         char[] chars = sourceMessage.toCharArray();
         int curPos = 0;
 
         String posBuffer = "";
         String typeBuffer = "";
-        String flagsBuffer = "";
-        List<String> flags = null;
+        String argsBuffer = "";
+        List<String> typeArguments = null;
 
         for (int i = 0; i < chars.length; i++)
         {
@@ -114,7 +115,7 @@ public class MessageCompositor
                     finalString.append(MACRO_BEGIN).append(curChar);
                     break;
                 case MACRO_END:
-                    finalString.append(this.format(null, null, args[curPos]));
+                    finalString.append(this.format(null, null, messageArgs[curPos]));
                     curPos++;
                     state = State.NONE;
                     break;
@@ -151,7 +152,7 @@ public class MessageCompositor
                     state = State.TYPE;
                     break;
                 case MACRO_END:
-                    finalString.append(this.format(null, null, args[Integer.valueOf(posBuffer)]));
+                    finalString.append(this.format(null, null, messageArgs[Integer.valueOf(posBuffer)]));
                     state = State.NONE;
                     break;
                 default:
@@ -189,9 +190,9 @@ public class MessageCompositor
                         posBuffer = "";
                         break;
                     }
-                    state = State.FLAGS;
-                    flags = new ArrayList<String>();
-                    flagsBuffer = "";
+                    state = State.ARGUMENTS;
+                    typeArguments = new ArrayList<String>();
+                    argsBuffer = "";
                     break;
                 case MACRO_END:
                     if (typeBuffer.isEmpty())
@@ -216,7 +217,7 @@ public class MessageCompositor
                         pos = Integer.valueOf(posBuffer); // Specified arg pos, NO increment counting pos.
                     }
                     // TODO message coloring before & after formatted object
-                    finalString.append(this.format(typeBuffer, null, args[pos]));
+                    finalString.append(this.format(typeBuffer, null, messageArgs[pos]));
                     state = State.NONE;
                     break;
                 default:
@@ -240,30 +241,30 @@ public class MessageCompositor
                     }
                 }
                 break;
-            case FLAGS:
+            case ARGUMENTS:
                 switch (curChar)
                 {
                 case MACRO_ESCAPE:
                     if (escape) // "\\\\"
                     {
                         escape = false;
-                        flagsBuffer += curChar;
+                        argsBuffer += curChar;
                         break;
                     }
                     escape = true;
                 case MACRO_SEPARATOR:
                     if (escape)
                     {
-                        flagsBuffer += curChar;
+                        argsBuffer += curChar;
                         break;
                     }
-                    flags.add(flagsBuffer);
-                    flagsBuffer = ""; // Next Flag...
+                    typeArguments.add(argsBuffer);
+                    argsBuffer = ""; // Next Flag...
                     break;
                 case MACRO_END:
                     if (escape)
                     {
-                        flagsBuffer += curChar;
+                        argsBuffer += curChar;
                     }
                     else
                     {
@@ -276,13 +277,13 @@ public class MessageCompositor
                         {
                             pos = Integer.valueOf(posBuffer); // Specified arg pos, NO increment counting pos.
                         }
-                        flags.add(flagsBuffer);
-                        finalString.append(this.format(typeBuffer, flags, args[pos]));
+                        typeArguments.add(argsBuffer);
+                        finalString.append(this.format(typeBuffer, typeArguments, messageArgs[pos]));
                         state = State.NONE;
                     }
                     break;
                 default:
-                    flagsBuffer += curChar;
+                    argsBuffer += curChar;
                 }
                 break;
             }
@@ -293,40 +294,58 @@ public class MessageCompositor
     private Map<String, List<Formatter>> formatters = new HashMap<String, List<Formatter>>();
     private Set<Formatter> defaultFormatters = new HashSet<Formatter>();
 
+    public void registerFormatter(Formatter<?> formatter)
+    {
+        for (String name : formatter.names())
+        {
+            List<Formatter> list = this.formatters.get(name);
+            if (list == null)
+            {
+                this.formatters.put(name, list = new ArrayList<Formatter>());
+            }
+            list.add(formatter);
+        }
+    }
+
+    public void registerDefaulFormatter(Formatter formatter)
+    {
+        this.defaultFormatters.add(formatter);
+    }
+
     // override in CE to append color at the end of format
-    protected String format(String type, List<String> flags, Object arg)
+    protected String format(String type, List<String> typeArguments, Object messageArgument)
     {
         if (type == null)
         {
             for (Formatter formatter : defaultFormatters)
             {
-                if (formatter.isApplicable(arg.getClass()))
+                if (formatter.isApplicable(messageArgument.getClass()))
                 {
-                    return formatter.format(arg, FormatContext.of(formatter, flags));
+                    return formatter.format(messageArgument, FormatContext.of(formatter, typeArguments));
                 }
             }
-            return String.valueOf(arg);
+            return String.valueOf(messageArgument);
         }
         List<Formatter> formatterList = this.formatters.get(type);
         if (formatterList != null)
         {
             for (Formatter formatter : formatterList)
             {
-                if (formatter.isApplicable(arg.getClass()))
+                if (formatter.isApplicable(messageArgument.getClass()))
                 {
-                    System.out.println(type + " ; " + String.valueOf(flags) + " ; " + String.valueOf(arg));
-                    return formatter.format(arg, FormatContext.of(formatter, flags));
+                    System.out.println(type + " ; " + String.valueOf(typeArguments) + " ; " + String.valueOf(messageArgument));
+                    return formatter.format(messageArgument, FormatContext.of(formatter, typeArguments));
                 }
             }
         }
         for (Formatter formatter : defaultFormatters)
         {
-            if (formatter.isApplicable(arg.getClass()))
+            if (formatter.isApplicable(messageArgument.getClass()))
             {
-                System.out.println(type + " ; " + String.valueOf(flags) + " ; " + String.valueOf(arg));
-                return formatter.format(arg, FormatContext.of(formatter, flags));
+                System.out.println(type + " ; " + String.valueOf(typeArguments) + " ; " + String.valueOf(messageArgument));
+                return formatter.format(messageArgument, FormatContext.of(formatter, typeArguments));
             }
         }
-        throw new MissingFormatterException(type, arg.getClass());
+        throw new MissingFormatterException(type, messageArgument.getClass());
     }
 }

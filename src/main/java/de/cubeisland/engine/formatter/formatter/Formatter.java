@@ -22,15 +22,15 @@
  */
 package de.cubeisland.engine.formatter.formatter;
 
-import de.cubeisland.engine.formatter.context.FormatContext;
-
 import java.util.Set;
+
+import de.cubeisland.engine.formatter.context.FormatContext;
 
 public interface Formatter<T>
 {
     boolean isApplicable(Class<?> objectType);
 
-    String format(T object, FormatContext flags);
+    String format(T object, FormatContext context);
 
     Set<String> names();
 }

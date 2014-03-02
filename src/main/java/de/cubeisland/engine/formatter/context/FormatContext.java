@@ -22,6 +22,7 @@
  */
 package de.cubeisland.engine.formatter.context;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,52 +31,107 @@ import de.cubeisland.engine.formatter.formatter.Formatter;
 
 public class FormatContext
 {
-    private static Map<String, MappedData> mappedData = new HashMap<String, MappedData>();
-    private static Map<Class<? extends Formatter>, Map<String, MappedData>> specialMappedData = new HashMap<Class<? extends Formatter>, Map<String, MappedData>>();
+    private static Map<String, Reader> readers = new HashMap<String, Reader>();
+    private static Map<Class<? extends Formatter>, Map<String, Reader>> specialMappedData = new HashMap<Class<? extends Formatter>, Map<String, Reader>>();
 
-    public static void register(MappedData data)
+    public static void register(Reader data)
     {
-        mappedData.put(data.getKey(), data); // TODO handle multiple
+        readers.put(data.getKey(), data); // TODO handle multiple
     }
 
-    public static void register(Class<? extends Formatter> formatterClass, MappedData mapped)
+    public static void register(Class<? extends Formatter> formatterClass, Reader mapped)
     {
-        Map<String, MappedData> mappedData = specialMappedData.get(formatterClass);
+        Map<String, Reader> mappedData = specialMappedData.get(formatterClass);
         if (mappedData == null)
         {
-            specialMappedData.put(formatterClass, mappedData = new HashMap<String, MappedData>());
+            specialMappedData.put(formatterClass, mappedData = new HashMap<String, Reader>());
         }
         mappedData.put(mapped.getKey(), mapped);
     }
 
-    private Formatter formatter;
+    public FormatContext(Formatter formatter)
+    {
+        this.formatter = formatter;
+    }
 
-    private Map<String, String> mapped;
-    private List<String> flags;
+    private final Formatter formatter;
+    private Map<String, String> mappedArguments = new HashMap<String, String>();
+    private List<String> arguments = new ArrayList<String>();
 
     public <T> T getMapped(String key, Class<T> clazz)
     {
-        String value = this.mapped.get(key);
+        String value = this.mappedArguments.get(key);
         if (value == null)
         {
             return null;
         }
-        Map<String, MappedData> curMappedData = specialMappedData.get(formatter.getClass());
+        Map<String, Reader> curMappedData = specialMappedData.get(formatter.getClass());
         if (curMappedData != null)
         {
-            MappedData data = curMappedData.get(key);
+            Reader data = curMappedData.get(key);
             return (T)data.getData(value);
         }
-        return (T)mappedData.get(key).getData(value);
+        return (T)readers.get(key).getData(value);
     }
 
     private String getValue(String key)
     {
-        return mapped.get(key);
+        return mappedArguments.get(key);
     }
+
+    public static final char MAP = '=';
+    public static final char ESCAPE = '\\';
 
     public static FormatContext of(Formatter<?> formatter, List<String> flags)
     {
-        return null; // TODO
+        FormatContext context = new FormatContext(formatter);
+        for (String flag : flags)
+        {
+            String readFlag = "";
+            String key = null;
+            boolean escape = false;
+            char[] chars = flag.toCharArray();
+            for (char curChar : chars)
+            {
+                switch (curChar)
+                {
+                    case ESCAPE:
+                        if (escape)
+                        {
+                            readFlag += curChar;
+                            escape = false;
+                        }
+                        else
+                        {
+                            escape = true;
+                        }
+                        break;
+                    case MAP:
+                        if (escape)
+                        {
+                            readFlag += curChar;
+                            escape = false;
+                        }
+                        else if (key == null)
+                        {
+                            key = readFlag;
+                            readFlag = "";
+                        }
+                        break;
+                    default:
+                        readFlag += curChar;
+                }
+            }
+            if (key == null)
+            {
+                context.arguments.add(readFlag);
+            }
+            else
+            {
+                context.mappedArguments.put(key, readFlag);
+            }
+        }
+
+        return context;
     }
 }
