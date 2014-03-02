@@ -22,6 +22,7 @@
  */
 package de.cubeisland.engine.formatter.formatter.example;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -45,6 +46,10 @@ public class DateFormatter extends AbstractFormatter<Date>
 
     public String format(Date object, FormatContext context)
     {
+        if (context.getMapped("format", SimpleDateFormat.class) == null)
+        {
+            return DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, context.getLocale()).format(object);
+        }
         return context.getMapped("format", SimpleDateFormat.class).format(object);
     }
 

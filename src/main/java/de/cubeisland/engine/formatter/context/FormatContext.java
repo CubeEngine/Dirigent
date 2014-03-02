@@ -25,6 +25,7 @@ package de.cubeisland.engine.formatter.context;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import de.cubeisland.engine.formatter.formatter.Formatter;
@@ -49,12 +50,24 @@ public class FormatContext
         mappedData.put(mapped.getKey(), mapped);
     }
 
-    public FormatContext(Formatter formatter)
+    public FormatContext(Formatter formatter, Locale locale)
     {
         this.formatter = formatter;
+        this.locale = locale;
+    }
+
+    public Formatter getFormatter()
+    {
+        return formatter;
+    }
+
+    public Locale getLocale()
+    {
+        return locale;
     }
 
     private final Formatter formatter;
+    private final Locale locale;
     private Map<String, String> mappedArguments = new HashMap<String, String>();
     private List<String> arguments = new ArrayList<String>();
 
@@ -74,27 +87,29 @@ public class FormatContext
         return (T)readers.get(key).getData(value);
     }
 
-    private String getValue(String key)
+    public String getArg(int i)
     {
-        return mappedArguments.get(key);
+        return this.arguments.get(i);
     }
 
     public static final char MAP = '=';
     public static final char ESCAPE = '\\';
 
-    public static FormatContext of(Formatter<?> formatter, List<String> flags)
+    public static FormatContext of(Formatter<?> formatter, Locale locale, List<String> flags)
     {
-        FormatContext context = new FormatContext(formatter);
-        for (String flag : flags)
+        FormatContext context = new FormatContext(formatter, locale);
+        if (flags != null)
         {
-            String readFlag = "";
-            String key = null;
-            boolean escape = false;
-            char[] chars = flag.toCharArray();
-            for (char curChar : chars)
+            for (String flag : flags)
             {
-                switch (curChar)
+                String readFlag = "";
+                String key = null;
+                boolean escape = false;
+                char[] chars = flag.toCharArray();
+                for (char curChar : chars)
                 {
+                    switch (curChar)
+                    {
                     case ESCAPE:
                         if (escape)
                         {
@@ -120,18 +135,18 @@ public class FormatContext
                         break;
                     default:
                         readFlag += curChar;
+                    }
+                }
+                if (key == null)
+                {
+                    context.arguments.add(readFlag);
+                }
+                else
+                {
+                    context.mappedArguments.put(key, readFlag);
                 }
             }
-            if (key == null)
-            {
-                context.arguments.add(readFlag);
-            }
-            else
-            {
-                context.mappedArguments.put(key, readFlag);
-            }
         }
-
         return context;
     }
 }

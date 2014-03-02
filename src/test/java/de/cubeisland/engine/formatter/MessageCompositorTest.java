@@ -20,5 +20,6 @@ public class MessageCompositorTest extends TestCase
     {
         System.out.println(compositor.composeMessage("Year: {date:format=YYYY}", new Date()));
         System.out.println(compositor.composeMessage("Date is: {date:format=YYYY-mm-DD}", new Date()));
+        System.out.println(compositor.composeMessage("Without Arguments; {date}", new Date()));
     }
 }
