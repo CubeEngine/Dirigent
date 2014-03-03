@@ -35,6 +35,7 @@ public class FormatContext
     private static Map<String, Reader> readers = new HashMap<String, Reader>();
     private static Map<Class<? extends Formatter>, Map<String, Reader>> specialMappedData = new HashMap<Class<? extends Formatter>, Map<String, Reader>>();
 
+
     public static void register(Reader data)
     {
         readers.put(data.getKey(), data); // TODO handle multiple
@@ -50,61 +51,15 @@ public class FormatContext
         mappedData.put(mapped.getKey(), mapped);
     }
 
-    public FormatContext(Formatter formatter, Locale locale)
+    public FormatContext(Formatter formatter, String type, Locale locale, List<String> typeArguments)
     {
         this.formatter = formatter;
         this.locale = locale;
-    }
+        this.type = type;
 
-    public Formatter getFormatter()
-    {
-        return formatter;
-    }
-
-    public Locale getLocale()
-    {
-        return locale;
-    }
-
-    private final Formatter formatter;
-    private final Locale locale;
-    private Map<String, String> mappedArguments = new HashMap<String, String>();
-    private List<String> arguments = new ArrayList<String>();
-
-    public <T> T getMapped(String key, Class<T> clazz)
-    {
-        String value = this.mappedArguments.get(key);
-        if (value == null)
+        if (typeArguments != null)
         {
-            return null;
-        }
-        Map<String, Reader> curMappedData = specialMappedData.get(formatter.getClass());
-        if (curMappedData != null)
-        {
-            Reader data = curMappedData.get(key);
-            return (T)data.getData(value);
-        }
-        return (T)readers.get(key).getData(value);
-    }
-
-    public String getArg(int i)
-    {
-        if (this.arguments.size() > i)
-        {
-            return this.arguments.get(i);
-        }
-        return null;
-    }
-
-    public static final char MAP = '=';
-    public static final char ESCAPE = '\\';
-
-    public static FormatContext of(Formatter<?> formatter, Locale locale, List<String> arguments)
-    {
-        FormatContext context = new FormatContext(formatter, locale);
-        if (arguments != null)
-        {
-            for (String flag : arguments)
+            for (String flag : typeArguments)
             {
                 String readFlag = "";
                 String key = null;
@@ -143,14 +98,62 @@ public class FormatContext
                 }
                 if (key == null)
                 {
-                    context.arguments.add(readFlag);
+                    this.arguments.add(readFlag);
                 }
                 else
                 {
-                    context.mappedArguments.put(key, readFlag);
+                    this.mappedArguments.put(key, readFlag);
                 }
             }
         }
-        return context;
+    }
+
+    public Formatter getFormatter()
+    {
+        return formatter;
+    }
+
+    public Locale getLocale()
+    {
+        return locale;
+    }
+
+    private final Formatter formatter;
+    private final Locale locale;
+    private final String type;
+    private Map<String, String> mappedArguments = new HashMap<String, String>();
+    private List<String> arguments = new ArrayList<String>();
+
+    public <T> T getMapped(String key, Class<T> clazz)
+    {
+        String value = this.mappedArguments.get(key);
+        if (value == null)
+        {
+            return null;
+        }
+        Map<String, Reader> curMappedData = specialMappedData.get(formatter.getClass());
+        if (curMappedData != null)
+        {
+            Reader data = curMappedData.get(key);
+            return (T)data.getData(value);
+        }
+        return (T)readers.get(key).getData(value);
+    }
+
+    public String getArg(int i)
+    {
+        if (this.arguments.size() > i)
+        {
+            return this.arguments.get(i);
+        }
+        return null;
+    }
+
+    public static final char MAP = '=';
+    public static final char ESCAPE = '\\';
+
+    public String getType()
+    {
+        return type;
     }
 }
