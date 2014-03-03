@@ -46,11 +46,12 @@ public class DateFormatter extends AbstractFormatter<Date>
 
     public String format(Date object, FormatContext context)
     {
-        if (context.getMapped("format", SimpleDateFormat.class) == null)
+        SimpleDateFormat sdf = context.getMapped("format", SimpleDateFormat.class);
+        if (sdf == null)
         {
             return DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, context.getLocale()).format(object);
         }
-        return context.getMapped("format", SimpleDateFormat.class).format(object);
+        return sdf.format(object);
     }
 
     public static class DateReader implements Reader<SimpleDateFormat>

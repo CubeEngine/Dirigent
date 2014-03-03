@@ -89,18 +89,25 @@ public class FormatContext
 
     public String getArg(int i)
     {
-        return this.arguments.get(i);
+        try
+        {
+            return this.arguments.get(i);
+        }
+        catch (IndexOutOfBoundsException e)
+        {
+            return null;
+        }
     }
 
     public static final char MAP = '=';
     public static final char ESCAPE = '\\';
 
-    public static FormatContext of(Formatter<?> formatter, Locale locale, List<String> flags)
+    public static FormatContext of(Formatter<?> formatter, Locale locale, List<String> arguments)
     {
         FormatContext context = new FormatContext(formatter, locale);
-        if (flags != null)
+        if (arguments != null)
         {
-            for (String flag : flags)
+            for (String flag : arguments)
             {
                 String readFlag = "";
                 String key = null;

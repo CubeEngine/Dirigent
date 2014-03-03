@@ -23,6 +23,7 @@
 package de.cubeisland.engine.formatter.formatter;
 
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -33,7 +34,15 @@ public abstract class AbstractFormatter<T> implements Formatter<T>
 
     AbstractFormatter()
     {
-        this.tClass = (Class<T>)((ParameterizedType)this.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+        Type genericSuperclass = this.getClass().getGenericSuperclass();
+        if (genericSuperclass instanceof ParameterizedType)
+        {
+            this.tClass = (Class<T>)((ParameterizedType)genericSuperclass).getActualTypeArguments()[0];
+        }
+        else
+        {
+            this.tClass = (Class<T>)Object.class;
+        }
     }
 
     protected AbstractFormatter(Set<String> names)
