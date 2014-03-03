@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Set;
 
 import de.cubeisland.engine.formatter.context.FormatContext;
+import de.cubeisland.engine.formatter.formatter.ArgumentSuffix;
 import de.cubeisland.engine.formatter.formatter.Formatter;
 
 public class MessageCompositor
@@ -51,10 +52,15 @@ public class MessageCompositor
 
     public final String composeMessage(String sourceMessage, Object... messageArgs)
     {
-        return this.composeMessage(Locale.getDefault(), sourceMessage, messageArgs);
+        return this.composeMessage(Locale.getDefault(), null, sourceMessage, messageArgs);
     }
 
-    public final String composeMessage(Locale locale, String sourceMessage, Object... messageArgs)
+    public final String composeMessage(ArgumentSuffix suffix, String sourceMessage, Object... messagArgs)
+    {
+        return this.composeMessage(Locale.getDefault(), suffix, sourceMessage, messagArgs);
+    }
+
+    public final String composeMessage(Locale locale, ArgumentSuffix suffix, String sourceMessage, Object... messageArgs)
     {
         System.out.println(sourceMessage);
         State state = State.NONE;
@@ -121,7 +127,7 @@ public class MessageCompositor
                     finalString.append(MACRO_BEGIN).append(curChar);
                     break;
                 case MACRO_END:
-                    finalString.append(this.format(locale, null, null, messageArgs[curPos]));
+                    finalString.append(this.format(locale, null, null, messageArgs[curPos], suffix));
                     curPos++;
                     state = State.NONE;
                     break;
@@ -158,7 +164,7 @@ public class MessageCompositor
                     state = State.TYPE;
                     break;
                 case MACRO_END:
-                    finalString.append(this.format(locale, null, null, messageArgs[Integer.valueOf(posBuffer)]));
+                    finalString.append(this.format(locale, null, null, messageArgs[Integer.valueOf(posBuffer)], suffix));
                     state = State.NONE;
                     break;
                 default:
@@ -223,7 +229,7 @@ public class MessageCompositor
                         pos = Integer.valueOf(posBuffer); // Specified arg pos, NO increment counting pos.
                     }
                     // TODO message coloring before & after formatted object
-                    finalString.append(this.format(locale, typeBuffer, null, messageArgs[pos]));
+                    finalString.append(this.format(locale, typeBuffer, null, messageArgs[pos], suffix));
                     state = State.NONE;
                     break;
                 default:
@@ -284,7 +290,7 @@ public class MessageCompositor
                             pos = Integer.valueOf(posBuffer); // Specified arg pos, NO increment counting pos.
                         }
                         typeArguments.add(argsBuffer);
-                        finalString.append(this.format(locale, typeBuffer, typeArguments, messageArgs[pos]));
+                        finalString.append(this.format(locale, typeBuffer, typeArguments, messageArgs[pos], suffix));
                         state = State.NONE;
                     }
                     break;
@@ -319,7 +325,7 @@ public class MessageCompositor
     }
 
     // override in CE to append color at the end of format
-    private final String format(Locale locale, String type, List<String> typeArguments, Object messageArgument)
+    private final String format(Locale locale, String type, List<String> typeArguments, Object messageArgument, ArgumentSuffix suffix)
     {
         if (type == null)
         {
@@ -327,7 +333,7 @@ public class MessageCompositor
             {
                 if (formatter.isApplicable(messageArgument.getClass()))
                 {
-                    return this.format(formatter, FormatContext.of(formatter, locale, typeArguments), messageArgument);
+                    return this.format(formatter, FormatContext.of(formatter, locale, typeArguments), messageArgument, suffix);
                 }
             }
             return String.valueOf(messageArgument);
@@ -339,7 +345,7 @@ public class MessageCompositor
             {
                 if (formatter.isApplicable(messageArgument.getClass()))
                 {
-                    return this.format(formatter, FormatContext.of(formatter, locale, typeArguments), messageArgument);
+                    return this.format(formatter, FormatContext.of(formatter, locale, typeArguments), messageArgument, suffix);
                 }
             }
         }
@@ -347,14 +353,14 @@ public class MessageCompositor
         {
             if (formatter.isApplicable(messageArgument.getClass()))
             {
-                return this.format(formatter, FormatContext.of(formatter, locale, typeArguments), messageArgument);
+                return this.format(formatter, FormatContext.of(formatter, locale, typeArguments), messageArgument, suffix);
             }
         }
         throw new MissingFormatterException(type, messageArgument.getClass());
     }
 
-    protected String format(Formatter formatter, FormatContext context, Object messageArgument)
+    protected String format(Formatter formatter, FormatContext context, Object messageArgument, ArgumentSuffix suffix)
     {
-        return formatter.format(messageArgument, context);
+        return formatter.format(messageArgument, context) + (suffix == null ? "" : suffix.getSuffix());
     }
 }
