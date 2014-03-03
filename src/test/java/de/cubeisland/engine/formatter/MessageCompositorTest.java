@@ -22,6 +22,7 @@
  */
 package de.cubeisland.engine.formatter;
 
+import java.util.Calendar;
 import java.util.Date;
 
 import de.cubeisland.engine.formatter.formatter.example.DateFormatter;
@@ -31,12 +32,12 @@ import junit.framework.TestCase;
 
 public class MessageCompositorTest extends TestCase
 {
-    private MessageCompositor compositor;
+    private DefaultMessageCompositor compositor;
 
     @Override
     protected void setUp() throws Exception
     {
-        this.compositor = new MessageCompositor();
+        this.compositor = new DefaultMessageCompositor();
         this.compositor.registerFormatter(new DateFormatter());
         this.compositor.registerFormatter(new IntegerFormatter());
         this.compositor.registerFormatter(new DecimalFormatter());
@@ -44,10 +45,14 @@ public class MessageCompositorTest extends TestCase
 
     public void testComposeMessage()
     {
-        System.out.println(compositor.composeMessage("Year: {date:format=YYYY}", new Date()));
-        System.out.println(compositor.composeMessage("Date is: {date:format=YYYY-mm-DD}", new Date()));
-        System.out.println(compositor.composeMessage("Without Arguments; {date}", new Date()));
-        System.out.println(compositor.composeMessage("Numbers: {number} {2:number} {number}", 1, 3 ,2));
-        System.out.println(compositor.composeMessage("Decimal: {decimal} {2:decimal:2} {decimal:5}", 4.321, 5.4321 ,9.87654321));
+        Calendar instance = Calendar.getInstance();
+        instance.set(2014, Calendar.AUGUST, 1, 1, 0, 0);
+        Date date = new Date(instance.getTimeInMillis());
+        assertEquals("Year: 2014", compositor.composeMessage("Year: {date:format=YYYY}", date));
+        assertEquals("Date is: 2014-08-01", compositor.composeMessage("Date is: {date:format=YYYY-MM-dd}", date));
+        assertEquals("Without Arguments: 01.08.14 01:00", compositor.composeMessage("Without Arguments: {date}", date));
+
+        assertEquals("Numbers: 1 2 3", compositor.composeMessage("Numbers: {number} {2:number} {number}", 1, 3 ,2));
+        assertEquals("Decimal: 4,321 9,88 5,43210", compositor.composeMessage("Decimal: {decimal} {2:decimal:2} {decimal:5}", 4.321, 5.4321 ,9.87654321));
     }
 }
