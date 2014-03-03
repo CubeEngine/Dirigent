@@ -319,7 +319,7 @@ public class MessageCompositor
     }
 
     // override in CE to append color at the end of format
-    protected String format(Locale locale, String type, List<String> typeArguments, Object messageArgument)
+    private final String format(Locale locale, String type, List<String> typeArguments, Object messageArgument)
     {
         if (type == null)
         {
@@ -327,7 +327,7 @@ public class MessageCompositor
             {
                 if (formatter.isApplicable(messageArgument.getClass()))
                 {
-                    return formatter.format(messageArgument, FormatContext.of(formatter, locale, typeArguments));
+                    return this.format(formatter, FormatContext.of(formatter, locale, typeArguments), messageArgument);
                 }
             }
             return String.valueOf(messageArgument);
@@ -339,8 +339,7 @@ public class MessageCompositor
             {
                 if (formatter.isApplicable(messageArgument.getClass()))
                 {
-                    System.out.println(type + " ; " + String.valueOf(typeArguments) + " ; " + String.valueOf(messageArgument));
-                    return formatter.format(messageArgument, FormatContext.of(formatter, locale, typeArguments));
+                    return this.format(formatter, FormatContext.of(formatter, locale, typeArguments), messageArgument);
                 }
             }
         }
@@ -348,10 +347,14 @@ public class MessageCompositor
         {
             if (formatter.isApplicable(messageArgument.getClass()))
             {
-                System.out.println(type + " ; " + String.valueOf(typeArguments) + " ; " + String.valueOf(messageArgument));
-                return formatter.format(messageArgument, FormatContext.of(formatter, locale, typeArguments));
+                return this.format(formatter, FormatContext.of(formatter, locale, typeArguments), messageArgument);
             }
         }
         throw new MissingFormatterException(type, messageArgument.getClass());
+    }
+
+    protected String format(Formatter formatter, FormatContext context, Object messageArgument)
+    {
+        return formatter.format(messageArgument, context);
     }
 }

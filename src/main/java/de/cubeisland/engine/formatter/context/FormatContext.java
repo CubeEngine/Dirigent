@@ -89,14 +89,11 @@ public class FormatContext
 
     public String getArg(int i)
     {
-        try
+        if (this.arguments.size() > i)
         {
             return this.arguments.get(i);
         }
-        catch (IndexOutOfBoundsException e)
-        {
-            return null;
-        }
+        return null;
     }
 
     public static final char MAP = '=';
