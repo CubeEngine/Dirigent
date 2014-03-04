@@ -52,7 +52,7 @@ public class DecimalFormatter extends ReflectedFormatter
         return this.formatNumber(bigDecimal, context);
     }
 
-    private String formatNumber(Number number, MacroContext context)
+    protected String formatNumber(Number number, MacroContext context)
     {
         String arg = context.getArg(0);
         NumberFormat decimalFormat = DecimalFormat.getInstance(context.getLocale());
