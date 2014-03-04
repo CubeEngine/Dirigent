@@ -24,15 +24,16 @@ package de.cubeisland.engine.formatter;
 
 import java.util.Locale;
 
-import de.cubeisland.engine.formatter.context.FormatContext;
-import de.cubeisland.engine.formatter.formatter.Formatter;
+import de.cubeisland.engine.formatter.context.MacroContext;
+import de.cubeisland.engine.formatter.formatter.Macro;
 
 public interface MessageCompositor
 {
     String composeMessage(String sourceMessage, Object... messageArgs);
     String composeMessage(Locale locale, String sourceMessage, Object... messageArgs);
-    void registerFormatter(Formatter<?> formatter);
-    void registerDefaultFormatter(Formatter formatter);
-    void postFormat(Formatter formatter, FormatContext context, Object messageArgument, StringBuilder finalString);
-    void preFormat(Formatter formatter, FormatContext context, Object messageArgument, StringBuilder finalString);
+    MessageCompositor registerMacro(Macro macro);
+    MessageCompositor registerMacro(Macro macro, boolean asDefault);
+    MessageCompositor registerDefaultMacro(Macro macro);
+    void postFormat(MacroContext context, Object messageArgument, StringBuilder finalString);
+    void preFormat(MacroContext context, Object messageArgument, StringBuilder finalString);
 }

@@ -24,6 +24,7 @@ package de.cubeisland.engine.formatter.formatter;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -43,6 +44,11 @@ public abstract class AbstractFormatter<T> implements Formatter<T>
         {
             this.tClass = (Class<T>)Object.class;
         }
+    }
+
+    public static Set<String> toSet(String... names)
+    {
+        return new HashSet<String>(Arrays.asList(names));
     }
 
     protected AbstractFormatter(Set<String> names)

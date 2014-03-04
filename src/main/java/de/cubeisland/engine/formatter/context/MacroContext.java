@@ -29,8 +29,9 @@ import java.util.Locale;
 import java.util.Map;
 
 import de.cubeisland.engine.formatter.formatter.Formatter;
+import de.cubeisland.engine.formatter.formatter.Macro;
 
-public class FormatContext
+public class MacroContext
 {
     private static Map<String, Reader> readers = new HashMap<String, Reader>();
     private static Map<Class<? extends Formatter>, Map<String, Reader>> specialMappedData = new HashMap<Class<? extends Formatter>, Map<String, Reader>>();
@@ -51,9 +52,9 @@ public class FormatContext
         mappedData.put(mapped.getKey(), mapped);
     }
 
-    public FormatContext(Formatter formatter, String type, Locale locale, List<String> typeArguments)
+    public MacroContext(Macro macro, String type, Locale locale, List<String> typeArguments)
     {
-        this.formatter = formatter;
+        this.macro = macro;
         this.locale = locale;
         this.type = type;
 
@@ -108,9 +109,9 @@ public class FormatContext
         }
     }
 
-    public Formatter getFormatter()
+    public Macro getMacro()
     {
-        return formatter;
+        return macro;
     }
 
     public Locale getLocale()
@@ -118,7 +119,7 @@ public class FormatContext
         return locale;
     }
 
-    private final Formatter formatter;
+    private final Macro macro;
     private final Locale locale;
     private final String type;
     private Map<String, String> mappedArguments = new HashMap<String, String>();
@@ -131,7 +132,7 @@ public class FormatContext
         {
             return null;
         }
-        Map<String, Reader> curMappedData = specialMappedData.get(formatter.getClass());
+        Map<String, Reader> curMappedData = specialMappedData.get(macro.getClass());
         if (curMappedData != null)
         {
             Reader data = curMappedData.get(key);

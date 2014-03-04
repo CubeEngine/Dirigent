@@ -22,15 +22,10 @@
  */
 package de.cubeisland.engine.formatter.formatter;
 
-import java.util.Set;
+import de.cubeisland.engine.formatter.context.MacroContext;
 
-import de.cubeisland.engine.formatter.context.FormatContext;
-
-public interface Formatter<T>
+public interface Formatter<T> extends Macro
 {
     boolean isApplicable(Class<?> objectType);
-
-    String format(T object, FormatContext context);
-
-    Set<String> names();
+    String process(T object, MacroContext context);
 }

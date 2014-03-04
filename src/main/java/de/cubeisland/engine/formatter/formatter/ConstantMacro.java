@@ -20,50 +20,11 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package de.cubeisland.engine.formatter.formatter.example;
-
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashSet;
+package de.cubeisland.engine.formatter.formatter;
 
 import de.cubeisland.engine.formatter.context.MacroContext;
-import de.cubeisland.engine.formatter.context.Reader;
-import de.cubeisland.engine.formatter.formatter.AbstractFormatter;
 
-public class DateFormatter extends AbstractFormatter<Date>
+public interface ConstantMacro extends Macro
 {
-    static
-    {
-        MacroContext.register(DateFormatter.class, new DateReader());
-    }
-
-    public DateFormatter()
-    {
-        super(new HashSet<String>(Arrays.asList("date")));
-    }
-
-    public String process(Date object, MacroContext context)
-    {
-        SimpleDateFormat sdf = context.getMapped("format", SimpleDateFormat.class);
-        if (sdf == null)
-        {
-            return DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, context.getLocale()).format(object);
-        }
-        return sdf.format(object);
-    }
-
-    public static class DateReader implements Reader<SimpleDateFormat>
-    {
-        public SimpleDateFormat getData(String raw)
-        {
-            return new SimpleDateFormat(raw);
-        }
-
-        public String getKey()
-        {
-            return "format";
-        }
-    }
+    String process(MacroContext context);
 }

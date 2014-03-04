@@ -26,7 +26,7 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
-import de.cubeisland.engine.formatter.context.FormatContext;
+import de.cubeisland.engine.formatter.context.MacroContext;
 import de.cubeisland.engine.formatter.formatter.ReflectedFormatter;
 import de.cubeisland.engine.formatter.formatter.reflected.Format;
 import de.cubeisland.engine.formatter.formatter.reflected.Names;
@@ -34,25 +34,25 @@ import de.cubeisland.engine.formatter.formatter.reflected.Names;
 @Names("decimal")
 public class DecimalFormatter extends ReflectedFormatter
 {
-    @Format(Float.class)
-    public String format(Float aFloat, FormatContext context)
+    @Format
+    public String format(Float f, MacroContext context)
     {
-        return this.formatNumber(aFloat, context);
+        return this.formatNumber(f, context);
     }
 
-    @Format(Double.class)
-    public String format(Double aDouble, FormatContext context)
+    @Format
+    public String format(Double d, MacroContext context)
     {
-        return this.formatNumber(aDouble, context);
+        return this.formatNumber(d, context);
     }
 
-    @Format(BigDecimal.class)
-    public String format(BigDecimal aBigDecimal, FormatContext context)
+    @Format
+    public String format(BigDecimal bigDecimal, MacroContext context)
     {
-        return this.formatNumber(aBigDecimal, context);
+        return this.formatNumber(bigDecimal, context);
     }
 
-    private String formatNumber(Number number, FormatContext context)
+    private String formatNumber(Number number, MacroContext context)
     {
         String arg = context.getArg(0);
         NumberFormat decimalFormat = DecimalFormat.getInstance(context.getLocale());
