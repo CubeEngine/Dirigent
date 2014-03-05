@@ -66,6 +66,149 @@ public class DefaultMessageCompositor implements MessageCompositor
         ARGUMENTS
     }
 
+    private class StateHolder
+    {
+        private final DefaultMessageCompositor compositor;
+
+        StateHolder(DefaultMessageCompositor compositor)
+        {
+            this.compositor = compositor;
+        }
+
+        State state = State.NONE;
+
+        StringBuilder finalString = new StringBuilder();
+
+        StringBuilder posBuffer = new StringBuilder();
+        StringBuilder typeBuffer = new StringBuilder();
+        StringBuilder argsBuffer = null;
+        List<String> typeArguments = null;
+        boolean escape = false;
+        int curPos = 0;
+
+        public void start() // NONE -> START
+        {
+            state = State.START;
+            posBuffer = new StringBuilder();
+            typeBuffer = new StringBuilder();
+            argsBuffer = null;
+            typeArguments = null;
+        }
+
+        public void escaped(char curChar)
+        {
+            escape = false;
+            finalString.append(curChar);
+        }
+
+        public void reset(char curChar)
+        {
+            state = State.NONE;
+            finalString.append(MACRO_BEGIN).append(posBuffer);
+            if (posBuffer.length() != 0 && typeBuffer.length() != 0)
+            {
+                finalString.append(MACRO_SEPARATOR);
+            }
+            finalString.append(typeBuffer).append(curChar);
+        }
+
+        public void format(Locale locale, Object[] messageArguments)
+        {
+            if (argsBuffer != null)
+            {
+                typeArguments.add(argsBuffer.toString());
+            }
+            Integer manualPos = null;
+            if (posBuffer.length() != 0)
+            {
+                manualPos = Integer.valueOf(posBuffer.toString());
+            }
+            final int pos = manualPos == null ? curPos : manualPos;
+            final Object messageArgument = messageArguments.length > pos ? messageArguments[pos] : null;
+            state = State.NONE;
+            String type = typeBuffer.toString();
+            if (!type.isEmpty())
+            {
+                List<Macro> macroList = formatters.get(type);
+                if (macroList != null)
+                {
+                    Macro matched = compositor.matchMacroFor(messageArgument, macroList);
+                    if (matched != null)
+                    {
+                        compositor.format(new MacroContext(matched, type, locale, typeArguments), messageArgument, finalString);
+                        if (matched instanceof Formatter && manualPos == null)
+                        {
+                            curPos++;
+                        }
+                        return;
+                    }
+                }
+            }
+            // else without type or not found:
+            Macro matched = compositor.matchMacroFor(messageArgument, defaultMacros);
+            if (matched != null)
+            {
+                compositor.format(new MacroContext(matched, null, locale, typeArguments), messageArgument, finalString);
+                if (matched instanceof Formatter && manualPos == null)
+                {
+                    curPos++;
+                }
+                return;
+            }
+            if (messageArgument == null)
+            {
+                throw new IllegalArgumentException(); // TODO msg
+            }
+            if (type.isEmpty())
+            {
+                finalString.append(String.valueOf(messageArgument));
+                curPos++;
+                return;
+            }
+            throw new MissingFormatterException(type, messageArgument.getClass());
+        }
+
+        public void position(char curChar)
+        {
+            state = State.POS;
+            posBuffer.append(curChar);
+        }
+
+        public void type(Character curChar)
+        {
+            state = State.TYPE;
+            if (curChar != null)
+            {
+                typeBuffer.append(curChar);
+            }
+        }
+
+        public void argumentStart()
+        {
+            state = State.ARGUMENTS;
+            if (typeArguments == null)
+            {
+                typeArguments = new ArrayList<String>();
+            }
+            if (argsBuffer != null)
+            {
+                typeArguments.add(argsBuffer.toString());
+            }
+            argsBuffer = new StringBuilder();
+        }
+
+        public void label()
+        {
+            state = State.LABEL;
+        }
+
+        public void argument(char curChar)
+        {
+            argsBuffer.append(curChar);
+            escape = false;
+        }
+    }
+
     public final String composeMessage(String sourceMessage, Object... messageArgs)
     {
         return this.composeMessage(this.defaultLocale, sourceMessage, messageArgs);
@@ -73,56 +216,40 @@ public class DefaultMessageCompositor implements MessageCompositor
 
     public final String composeMessage(Locale locale, String sourceMessage, Object... messageArgs)
     {
-        State state = State.NONE;
-        boolean escape = false;
-        // {[[<position>:]type[:<args>]]}
-        StringBuilder finalString = new StringBuilder();
+        // {[[<position>:]type[#<label>][:<args>]]}
         char[] chars = sourceMessage.toCharArray();
-        int curPos = 0;
-
-        StringBuilder posBuffer = new StringBuilder();
-        StringBuilder typeBuffer = new StringBuilder();
-        StringBuilder argsBuffer = new StringBuilder();
-        List<String> typeArguments = null;
-
+        StateHolder holder = new StateHolder(this);
         for (char curChar : chars)
         {
-            switch (state)
+            switch (holder.state)
             {
             case NONE:
                 switch (curChar)
                 {
                 case MACRO_BEGIN:
-                    if (escape)
+                    if (holder.escape)
                     {
-                        escape = false;
-                        finalString.append(curChar);
+                        holder.escaped(curChar);
                         break;
                     }
-                    state = State.START;
-                    posBuffer = new StringBuilder();
-                    typeBuffer = new StringBuilder();
+                    holder.start();
                     break;
                 case MACRO_ESCAPE:
-                    if (escape)
+                    if (holder.escape)
                     {
-                        finalString.append(curChar);
-                        escape = false;
+                        holder.escaped(curChar);
+                        break;
                     }
-                    else
-                    {
-                        escape = true;
-                    }
+                    holder.escape = true;
                     break;
                 case MACRO_SEPARATOR:
                 case MACRO_END:
                 default:
-                    if (escape)
+                    if (holder.escape) // re-add escaping char
                     {
-                        escape = false;
-                        finalString.append(MACRO_ESCAPE);
+                        holder.escaped(MACRO_ESCAPE);
                     }
-                    finalString.append(curChar);
+                    holder.finalString.append(curChar);
                     break;
                 }
                 break;
@@ -132,31 +259,23 @@ public class DefaultMessageCompositor implements MessageCompositor
                 case MACRO_BEGIN:
                 case MACRO_ESCAPE:
                 case MACRO_SEPARATOR:
-                    state = State.NONE;
-                    finalString.append(MACRO_BEGIN).append(curChar);
+                    holder.reset(curChar);
                     break;
                 case MACRO_END:
-                    if (this.format(locale, null, null, messageArgs, curPos, curPos, finalString))
-                    {
-                        curPos++;
-                    }
-                    state = State.NONE;
+                    holder.format(locale, messageArgs);
                     break;
                 default: // expecting position OR type
                     if (Character.isDigit(curChar)) // pos
                     {
-                        state = State.POS;
-                        posBuffer.append(curChar);
+                        holder.position(curChar);
                     }
                     else if ((curChar >= 'a' && curChar <= 'z') || (curChar >= 'A' && curChar <= 'Z')) // type
                     {
-                        state = State.TYPE;
-                        typeBuffer = new StringBuilder().append(curChar);
+                        holder.type(curChar);
                     }
                     else
                     {
-                        state = State.NONE;
-                        finalString.append(MACRO_BEGIN).append(curChar);
+                        holder.reset(curChar);
                         break;
                     }
                     break;
@@ -167,28 +286,22 @@ public class DefaultMessageCompositor implements MessageCompositor
                 {
                 case MACRO_BEGIN:
                 case MACRO_ESCAPE:
-                    state = State.NONE;
-                    finalString.append(MACRO_BEGIN).append(posBuffer).append(curChar);
+                    holder.reset(curChar);
                     break;
                 case MACRO_SEPARATOR:
-                    state = State.TYPE;
+                    holder.type(null);
                     break;
                 case MACRO_END:
-                    if (this.format(locale, null, null, messageArgs, curPos, Integer.valueOf(posBuffer.toString()), finalString))
-                    {
-                        curPos++;
-                    }
-                    state = State.NONE;
+                    holder.format(locale, messageArgs);
                     break;
                 default:
                     if (Character.isDigit(curChar)) // pos
                     {
-                        posBuffer.append(curChar);
+                        holder.position(curChar);
                     }
                     else
                     {
-                        state = State.NONE;
-                        finalString.append(MACRO_BEGIN).append(posBuffer).append(curChar);
+                        holder.reset(curChar);
                     }
                     break;
                 }
@@ -198,179 +311,107 @@ public class DefaultMessageCompositor implements MessageCompositor
                 {
                 case MACRO_BEGIN:
                 case MACRO_ESCAPE:
-                    state = State.NONE;
-                    finalString.append(MACRO_BEGIN).append(posBuffer).append(posBuffer.length() == 0 ? MACRO_SEPARATOR : "")
-                               .append(typeBuffer).append(curChar);
+                    holder.reset(curChar);
                     break;
                 case MACRO_SEPARATOR:
-                    if (typeBuffer.length() == 0)
+                    if (holder.typeBuffer.length() == 0)
                     {
-                        finalString.append(MACRO_BEGIN);
-                        if (posBuffer.length() != 0)
-                        {
-                            finalString.append(posBuffer).append(MACRO_SEPARATOR);
-                        }
-                        finalString.append(curChar);
-                        state = State.NONE;
-                        posBuffer = new StringBuilder();
+                        holder.reset(curChar);
                         break;
                     }
-                    state = State.ARGUMENTS;
-                    typeArguments = new ArrayList<String>();
-                    argsBuffer = new StringBuilder();
+                    holder.argumentStart();
                     break;
                 case MACRO_LABEL:
-                    if (typeBuffer.length() == 0)
+                    if (holder.typeBuffer.length() == 0)
                     {
-                        finalString.append(MACRO_BEGIN);
-                        if (posBuffer.length() != 0)
-                        {
-                            finalString.append(posBuffer).append(MACRO_SEPARATOR);
-                        }
-                        finalString.append(curChar);
-                        state = State.NONE;
-                        posBuffer = new StringBuilder();
+                        holder.reset(curChar);
                         break;
                     }
-                    state = State.LABEL;
+                    holder.label();
                     break;
                 case MACRO_END:
-                    if (typeBuffer.length() == 0)
+                    if (holder.typeBuffer.length() == 0)
                     {
-                        finalString.append(MACRO_BEGIN);
-                        if (posBuffer.length() != 0)
-                        {
-                            finalString.append(posBuffer).append(MACRO_SEPARATOR);
-                        }
-                        finalString.append(curChar);
-                        state = State.NONE;
-                        posBuffer = new StringBuilder();
+                        holder.reset(curChar);
                         break;
                     }
-                    int pos = curPos;
-                    if (posBuffer.length() != 0)
-                    {
-                        pos = Integer.valueOf(posBuffer.toString()); // Specified arg pos, NO increment counting pos.
-                    }
-                    if (this.format(locale, typeBuffer.toString(), null, messageArgs, curPos, pos, finalString))
-                    {
-                        curPos++;
-                    }
-                    state = State.NONE;
+                    holder.format(locale, messageArgs);
                     break;
                 default:
                     if ((curChar >= 'a' && curChar <= 'z') ||
                         (curChar >= 'A' && curChar <= 'Z') ||
                         Character.isDigit(curChar))
                     {
-                        typeBuffer.append(curChar);
-                    }
-                    else
-                    {
-                        finalString.append(MACRO_BEGIN);
-                        if (posBuffer.length() != 0)
-                        {
-                            finalString.append(posBuffer).append(MACRO_SEPARATOR);
-                        }
-                        finalString.append(curChar);
-                        state = State.NONE;
-                        posBuffer = new StringBuilder();
+                        holder.type(curChar);
                         break;
                     }
+                    holder.reset(curChar);
                 }
                 break;
             case LABEL:
                 switch (curChar)
                 {
                 case MACRO_ESCAPE:
-                    if (escape)
+                    if (holder.escape)
                     {
-                        escape = false;
+                        holder.escape = false;
                         break;
                     }
-                    escape = true;
+                    holder.escape = true;
                     break;
                 case MACRO_SEPARATOR:
-                    if (escape)
+                    if (holder.escape)
                     {
-                        escape = false;
+                        holder.escape = false;
                         break;
                     }
-                    state = State.ARGUMENTS;
-                    typeArguments = new ArrayList<String>();
-                    argsBuffer = new StringBuilder();
+                    holder.argumentStart();
                     break;
                 case MACRO_END:
-                    if (escape)
+                    if (holder.escape)
                     {
-                        escape = false;
+                        holder.escape = false;
                         break;
                     }
-                    int pos = curPos;
-                    if (posBuffer.length() != 0)
-                    {
-                        pos = Integer.valueOf(posBuffer.toString()); // Specified arg pos, NO increment counting pos.
-                    }
-                    if (this.format(locale, typeBuffer.toString(), null, messageArgs, curPos, pos, finalString))
-                    {
-                        curPos++;
-                    }
-                    state = State.NONE;
+                    holder.format(locale, messageArgs);
                     break;
                 default:
-                    escape = false;
+                    holder.escape = false;
                 }
                 break;
             case ARGUMENTS:
                 switch (curChar)
                 {
                 case MACRO_ESCAPE:
-                    if (escape) // "\\\\"
+                    if (holder.escape) // "\\\\"
                     {
-                        escape = false;
-                        argsBuffer.append(curChar);
+                        holder.argument(curChar);
                         break;
                     }
-                    escape = true;
+                    holder.escape = true;
                 case MACRO_SEPARATOR:
-                    if (escape)
+                    if (holder.escape)
                     {
-                        argsBuffer.append(curChar);
-                        escape = false;
+                        holder.argument(curChar);
                         break;
                     }
-                    typeArguments.add(argsBuffer.toString());
-                    argsBuffer = new StringBuilder(); // Next Flag...
+                    holder.argumentStart();
                     break;
                 case MACRO_END:
-                    if (escape)
+                    if (holder.escape)
                     {
-                        argsBuffer.append(curChar);
-                        escape = false;
+                        holder.argument(curChar);
+                        break;
                     }
-                    else
-                    {
-                        int pos = curPos;
-                        if (posBuffer.length() != 0)
-                        {
-                            pos = Integer.valueOf(posBuffer.toString()); // Specified arg pos, NO increment counting pos.
-                        }
-                        typeArguments.add(argsBuffer.toString());
-                        if (this.format(locale, typeBuffer.toString(), typeArguments, messageArgs, curPos, pos, finalString))
-                        {
-                            curPos++;
-                        }
-                        state = State.NONE;
-                    }
+                    holder.format(locale, messageArgs);
                     break;
                 default:
-                    argsBuffer.append(curChar);
-                    escape = false;
+                    holder.argument(curChar);
                 }
                 break;
             }
         }
-        return finalString.toString();
+        return holder.finalString.toString();
     }
 
     private Map<String, List<Macro>> formatters = new HashMap<String, List<Macro>>();
@@ -407,44 +448,7 @@ public class DefaultMessageCompositor implements MessageCompositor
 
     // override in CE to append color at the end of format
 
-    private boolean format(Locale locale, String type, List<String> typeArguments, Object[] messageArguments, int curPos, int actualPos, StringBuilder finalString)
-    {
-        Object messageArgument = null;
-        if (messageArguments.length > actualPos)
-        {
-            messageArgument = messageArguments[actualPos];
-        }
-        if (type != null)
-        {
-            List<Macro> macroList = this.formatters.get(type);
-            if (macroList != null)
-            {
-                Macro matched = this.matchMacroFor(messageArgument, macroList);
-                if (matched != null)
-                {
-                    this.format(new MacroContext(matched, type, locale, typeArguments), messageArgument, finalString);
-                    return matched instanceof Formatter && curPos == actualPos;
-                }
-            }
-        }
-        // else without type or not found:
-        Macro matched = this.matchMacroFor(messageArgument, defaultMacros);
-        if (matched != null)
-        {
-            this.format(new MacroContext(matched, null, locale, typeArguments), messageArgument, finalString);
-            return matched instanceof Formatter && curPos == actualPos;
-        }
-        if (messageArgument == null)
-        {
-            throw new IllegalArgumentException(); // TODO msg
-        }
-        if (type == null)
-        {
-            finalString.append(String.valueOf(messageArgument));
-            return true;
-        }
-        throw new MissingFormatterException(type, messageArgument.getClass());
-    }
+
 
     @SuppressWarnings("unchecked")
     private Macro matchMacroFor(Object messageArgument, Collection<Macro> macroList)
