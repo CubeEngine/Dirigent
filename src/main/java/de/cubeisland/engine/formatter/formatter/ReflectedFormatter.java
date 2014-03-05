@@ -48,7 +48,7 @@ public abstract class ReflectedFormatter extends AbstractFormatter<Object>
         {
             throw new AnnotationMissingException(Names.class);
         }
-        for (Method method : this.getClass().getDeclaredMethods())
+        for (Method method : this.getClass().getMethods())
         {
             if (method.getName().equals("format") && method.isAnnotationPresent(Format.class))
             {
