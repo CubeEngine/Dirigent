@@ -44,7 +44,13 @@ public class MessageCompositorTest extends TestCase
         this.compositor.registerMacro(new DecimalFormatter());
     }
 
-    public void testComposeMessage()
+    public void testNumbers()
+    {
+        assertEquals("Numbers: 1 2 3", compositor.composeMessage("Numbers: {number} {2:number} {number}", 1, 3 ,2));
+        assertEquals("Decimal: 4,321 9,88 5,43210", compositor.composeMessage(Locale.GERMANY, "Decimal: {decimal} {2:decimal:2} {decimal:5}", 4.321, 5.4321 ,9.87654321));
+    }
+
+    public void testDates()
     {
         Calendar instance = Calendar.getInstance();
         instance.set(2014, Calendar.AUGUST, 1, 1, 0, 0);
@@ -52,7 +58,5 @@ public class MessageCompositorTest extends TestCase
         assertEquals("Year: 2014", compositor.composeMessage("Year: {date:format=YYYY}", date));
         assertEquals("Date is: 2014-08-01", compositor.composeMessage("Date is: {date:format=YYYY-MM-dd}", date));
         assertEquals("Without Arguments: 01.08.14 01:00", compositor.composeMessage(Locale.GERMANY, "Without Arguments: {date#will use default short conversion}", date));
-        assertEquals("Numbers: 1 2 3", compositor.composeMessage("Numbers: {number} {2:number} {number}", 1, 3 ,2));
-        assertEquals("Decimal: 4,321 9,88 5,43210", compositor.composeMessage("Decimal: {decimal} {2:decimal:2} {decimal:5}", 4.321, 5.4321 ,9.87654321));
     }
 }
