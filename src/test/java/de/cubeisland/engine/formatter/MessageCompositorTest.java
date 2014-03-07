@@ -24,6 +24,7 @@ package de.cubeisland.engine.formatter;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 import de.cubeisland.engine.formatter.formatter.example.DateFormatter;
 import de.cubeisland.engine.formatter.formatter.example.DecimalFormatter;
@@ -50,8 +51,7 @@ public class MessageCompositorTest extends TestCase
         Date date = new Date(instance.getTimeInMillis());
         assertEquals("Year: 2014", compositor.composeMessage("Year: {date:format=YYYY}", date));
         assertEquals("Date is: 2014-08-01", compositor.composeMessage("Date is: {date:format=YYYY-MM-dd}", date));
-        assertEquals("Without Arguments: 01.08.14 01:00", compositor.composeMessage("Without Arguments: {date#will use default short conversion}", date));
-
+        assertEquals("Without Arguments: 01.08.14 01:00", compositor.composeMessage(Locale.GERMANY, "Without Arguments: {date#will use default short conversion}", date));
         assertEquals("Numbers: 1 2 3", compositor.composeMessage("Numbers: {number} {2:number} {number}", 1, 3 ,2));
         assertEquals("Decimal: 4,321 9,88 5,43210", compositor.composeMessage("Decimal: {decimal} {2:decimal:2} {decimal:5}", 4.321, 5.4321 ,9.87654321));
     }
