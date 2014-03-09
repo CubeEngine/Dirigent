@@ -95,6 +95,7 @@ public class MacroContext
                         break;
                     default:
                         readFlag += curChar;
+                        break;
                     }
                 }
                 if (key == null)

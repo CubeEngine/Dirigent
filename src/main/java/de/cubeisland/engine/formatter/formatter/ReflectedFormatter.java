@@ -34,6 +34,11 @@ import de.cubeisland.engine.formatter.formatter.reflected.AnnotationMissingExcep
 import de.cubeisland.engine.formatter.formatter.reflected.Format;
 import de.cubeisland.engine.formatter.formatter.reflected.Names;
 
+/**
+ * A Formatter using annotations and reflection to allow multiple Classes to be processes by the same Formatter
+ * <p>An implemented ReflectedFormatter needs a @Names Annotation on its declaration and at least one Method like this:
+ * <p>public String format(T object, MacroContext context) with a @Format Annotation
+ */
 public abstract class ReflectedFormatter extends AbstractFormatter<Object>
 {
     private Map<Class, Method> formats = new HashMap<Class, Method>();

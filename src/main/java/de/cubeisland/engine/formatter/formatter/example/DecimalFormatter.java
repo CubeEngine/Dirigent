@@ -71,7 +71,7 @@ public class DecimalFormatter extends ReflectedFormatter
             }
             catch (NumberFormatException e)
             {
-                throw new IllegalArgumentException("The 'decimal' type does not allow arguments other than integer for decimal places");
+                throw new IllegalArgumentException("The 'decimal' type does not allow arguments other than integer for decimal places", e);
             }
         }
     }

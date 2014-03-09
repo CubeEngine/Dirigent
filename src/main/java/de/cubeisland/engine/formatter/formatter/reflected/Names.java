@@ -29,6 +29,9 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
+/**
+ * This Annotation is used for ReflectedFormatter to declare the names of the formatter
+ */
 public @interface Names
 {
     String[] value();

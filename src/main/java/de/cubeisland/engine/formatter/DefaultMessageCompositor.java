@@ -189,6 +189,7 @@ public class DefaultMessageCompositor implements MessageCompositor
                         break;
                     }
                     holder.resetMacro(curChar);
+                    break;
                 }
                 break;
             case LABEL:
@@ -220,6 +221,7 @@ public class DefaultMessageCompositor implements MessageCompositor
                     break;
                 default:
                     holder.label();
+                    break;
                 }
                 break;
             case ARGUMENTS:
@@ -250,6 +252,7 @@ public class DefaultMessageCompositor implements MessageCompositor
                     break;
                 default:
                     holder.argument(curChar);
+                    break;
                 }
                 break;
             }

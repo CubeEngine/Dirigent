@@ -29,5 +29,8 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
+/**
+ * This Annotation is used for ReflectedFormatter to declare the format methods
+ */
 public @interface Format
 {}

@@ -26,5 +26,10 @@ import java.util.Set;
 
 public interface Macro
 {
+    /**
+     * The names of this macro
+     *
+     * @return the names
+     */
     Set<String> names();
 }
