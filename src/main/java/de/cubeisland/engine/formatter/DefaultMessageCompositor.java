@@ -234,6 +234,7 @@ public class DefaultMessageCompositor implements MessageCompositor
                         break;
                     }
                     holder.escape();
+                    break;
                 case MACRO_SEPARATOR:
                     if (holder.escaped())
                     {
