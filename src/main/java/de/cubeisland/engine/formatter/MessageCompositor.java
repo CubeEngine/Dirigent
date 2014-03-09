@@ -25,15 +25,132 @@ package de.cubeisland.engine.formatter;
 import java.util.Locale;
 
 import de.cubeisland.engine.formatter.context.MacroContext;
+import de.cubeisland.engine.formatter.context.Reader;
 import de.cubeisland.engine.formatter.formatter.Macro;
 
+/**
+ * A message-compositor processing macros {[[<position>:]type[#<label>][:<args>]]} or just {[pos]}
+ */
 public interface MessageCompositor
 {
-    String composeMessage(String sourceMessage, Object... messageArgs);
-    String composeMessage(Locale locale, String sourceMessage, Object... messageArgs);
+    /**
+     * Searches for Macros in the sourceMessages and process all found Macros
+     *
+     * @param sourceMessage the sourceMessage
+     * @param messageArguments the messageArguments
+     * @return the processed String
+     */
+    String composeMessage(String sourceMessage, Object... messageArguments);
+
+    /**
+     * Searches for Macros in the sourceMessages and process all found Macros
+     *
+     * @param locale the locale
+     * @param sourceMessage the sourceMessage
+     * @param messageArguments the messageArguments
+     * @return the processed String
+     */
+    String composeMessage(Locale locale, String sourceMessage, Object... messageArguments);
+
+    /**
+     * Registers a Macro for its names
+     *
+     * @param macro the macro to register
+     * @return fluent interface
+     */
     MessageCompositor registerMacro(Macro macro);
+
+    /**
+     * Registers a Macro for its names
+     *
+     * @param macro the macro to register
+     * @param asDefault if true registers the macro as default too
+     * @return fluent interface
+     */
     MessageCompositor registerMacro(Macro macro, boolean asDefault);
+
+    /**
+     * Registers a Macro to be used if no type is given
+     *
+     * @param macro the macro to register
+     * @return fluent interface
+     */
     MessageCompositor registerDefaultMacro(Macro macro);
+
+    /**
+     * Registers a Reader for a specific key
+     *
+     * @param key the key
+     * @param reader the reader
+     * @return fluent interface
+     */
+    MessageCompositor registerReader(String key, Reader reader);
+
+    /**
+     * Registers a Reader for a specific key and macro
+     *
+     * @param macroClass the macros class
+     * @param key the key
+     * @param reader the reader
+     * @return fluent interface
+     */
+    MessageCompositor registerReader(Class<? extends Macro> macroClass, String key, Reader reader);
+
+    /**
+     * Regiters a default Reader for a specific Macro
+     *
+     * @param macroClass the macros class
+     * @param reader the the reader
+     * @return fluent interface
+     */
+    MessageCompositor registerDefaultReader(Class<? extends Macro> macroClass, Reader reader);
+
+    /**
+     * Reads a value for a key
+     *
+     * @param key the key
+     * @param value the value to read
+     * @param clazz the class to cast into
+     * @return the read value or null
+     */
+    <T> T read(String key, String value, Class<T> clazz);
+
+    /**
+     * Reads a value for a key and macro
+     *
+     * @param macro the macro
+     * @param key the key
+     * @param value the value to read
+     * @param clazz the class to cast into
+     * @return the read value or null
+     */
+    <T> T read(Macro macro, String key, String value, Class<T> clazz);
+
+    /**
+     * Reads a value for a macro
+     *
+     * @param macro the macro
+     * @param value the value to read
+     * @param clazz the class to cast into
+     * @return the read value or null
+     */
+    <T> T read(Macro macro, String value, Class<T> clazz);
+
+    /**
+     * This Method is called right before a processed Macro is appended to the final String
+     *
+     * @param context the context
+     * @param messageArgument the messageArgument (can be null)
+     * @param finalString the StringBuilder containing the final String
+     */
     void postFormat(MacroContext context, Object messageArgument, StringBuilder finalString);
+
+    /**
+     * This Method is called right after a processed Macro was appended to the final String
+     *
+     * @param context the context
+     * @param messageArgument the messageArgument (can be null)
+     * @param finalString the StringBuilder containing the final String
+     */
     void preFormat(MacroContext context, Object messageArgument, StringBuilder finalString);
 }

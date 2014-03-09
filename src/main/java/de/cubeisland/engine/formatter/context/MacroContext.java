@@ -28,32 +28,25 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import de.cubeisland.engine.formatter.formatter.Formatter;
+import de.cubeisland.engine.formatter.MessageCompositor;
 import de.cubeisland.engine.formatter.formatter.Macro;
 
 public class MacroContext
 {
-    private static Map<String, Reader> readers = new HashMap<String, Reader>();
-    private static Map<Class<? extends Formatter>, Map<String, Reader>> specialMappedData = new HashMap<Class<? extends Formatter>, Map<String, Reader>>();
+    private final MessageCompositor compositor;
+    private final Macro macro;
+    private final Locale locale;
+    private final String type;
 
+    private Map<String, String> mappedArguments = new HashMap<String, String>();
+    private List<String> arguments = new ArrayList<String>();
 
-    public static void register(Reader data)
+    public static final char MAP = '=';
+    public static final char ESCAPE = '\\';
+
+    public MacroContext(MessageCompositor compositor, Macro macro, String type, Locale locale, List<String> typeArguments)
     {
-        readers.put(data.getKey(), data); // TODO handle multiple
-    }
-
-    public static void register(Class<? extends Formatter> formatterClass, Reader mapped)
-    {
-        Map<String, Reader> mappedData = specialMappedData.get(formatterClass);
-        if (mappedData == null)
-        {
-            specialMappedData.put(formatterClass, mappedData = new HashMap<String, Reader>());
-        }
-        mappedData.put(mapped.getKey(), mapped);
-    }
-
-    public MacroContext(Macro macro, String type, Locale locale, List<String> typeArguments)
-    {
+        this.compositor = compositor;
         this.macro = macro;
         this.locale = locale;
         this.type = type;
@@ -120,26 +113,34 @@ public class MacroContext
         return locale;
     }
 
-    private final Macro macro;
-    private final Locale locale;
-    private final String type;
-    private Map<String, String> mappedArguments = new HashMap<String, String>();
-    private List<String> arguments = new ArrayList<String>();
-
-    public <T> T getMapped(String key, Class<T> clazz)
+    public String getMapped(String key)
     {
-        String value = this.mappedArguments.get(key);
+        return this.mappedArguments.get(key);
+    }
+
+    public <T> T readMapped(String key, Class<T> clazz)
+    {
+        String value = this.getMapped(key);
         if (value == null)
         {
             return null;
         }
-        Map<String, Reader> curMappedData = specialMappedData.get(macro.getClass());
-        if (curMappedData != null)
+        T read = this.compositor.read(this.macro, key, value, clazz);
+        if (read == null)
         {
-            Reader data = curMappedData.get(key);
-            return (T)data.getData(value);
+            return this.compositor.read(key, value, clazz);
         }
-        return (T)readers.get(key).getData(value);
+        return read;
+    }
+
+    public <T> T readArg(int i, Class<T> clazz)
+    {
+        String value = this.getArg(i);
+        if (value == null)
+        {
+            return null;
+        }
+        return this.compositor.read(this.macro, value, clazz);
     }
 
     public String getArg(int i)
@@ -150,9 +151,6 @@ public class MacroContext
         }
         return null;
     }
-
-    public static final char MAP = '=';
-    public static final char ESCAPE = '\\';
 
     public String getType()
     {

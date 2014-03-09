@@ -34,11 +34,6 @@ import de.cubeisland.engine.formatter.formatter.AbstractFormatter;
 
 public class DateFormatter extends AbstractFormatter<Date>
 {
-    static
-    {
-        MacroContext.register(DateFormatter.class, new DateReader());
-    }
-
     public DateFormatter()
     {
         super(new HashSet<String>(Arrays.asList("date")));
@@ -46,7 +41,7 @@ public class DateFormatter extends AbstractFormatter<Date>
 
     public String process(Date object, MacroContext context)
     {
-        SimpleDateFormat sdf = context.getMapped("format", SimpleDateFormat.class);
+        SimpleDateFormat sdf = context.readMapped("format", SimpleDateFormat.class);
         if (sdf == null)
         {
             return DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, context.getLocale()).format(object);
@@ -59,11 +54,6 @@ public class DateFormatter extends AbstractFormatter<Date>
         public SimpleDateFormat getData(String raw)
         {
             return new SimpleDateFormat(raw);
-        }
-
-        public String getKey()
-        {
-            return "format";
         }
     }
 }

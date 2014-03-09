@@ -25,6 +25,4 @@ package de.cubeisland.engine.formatter.context;
 public interface Reader<T>
 {
     public T getData(String raw);
-
-    public String getKey();
 }

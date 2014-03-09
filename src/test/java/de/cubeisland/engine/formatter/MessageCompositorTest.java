@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.Locale;
 
 import de.cubeisland.engine.formatter.formatter.example.DateFormatter;
+import de.cubeisland.engine.formatter.formatter.example.DateFormatter.DateReader;
 import de.cubeisland.engine.formatter.formatter.example.DecimalFormatter;
 import de.cubeisland.engine.formatter.formatter.example.IntegerFormatter;
 import junit.framework.TestCase;
@@ -40,6 +41,8 @@ public class MessageCompositorTest extends TestCase
     {
         this.compositor = new DefaultMessageCompositor();
         this.compositor.registerMacro(new DateFormatter());
+        this.compositor.registerReader(DateFormatter.class, "format", new DateReader());
+
         this.compositor.registerMacro(new IntegerFormatter());
         this.compositor.registerMacro(new DecimalFormatter());
     }

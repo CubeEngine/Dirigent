@@ -32,6 +32,12 @@ import de.cubeisland.engine.formatter.formatter.Macro;
 
 class StateHolder
 {
+    public static final char MACRO_BEGIN = '{';
+    public static final char MACRO_END = '}';
+    public static final char MACRO_ESCAPE = '\\';
+    public static final char MACRO_SEPARATOR = ':';
+    public static final char MACRO_LABEL = '#';
+
     enum State
     {
         NONE,
@@ -43,22 +49,26 @@ class StateHolder
     }
 
     private final DefaultMessageCompositor compositor;
+    private final Locale locale;
+    private final String sourceMessage;
+    private final Object[] messageArgs;
 
-    StateHolder(DefaultMessageCompositor compositor)
-    {
-        this.compositor = compositor;
-    }
-
-    State state = State.NONE;
-
+    private State state = State.NONE;
     StringBuilder finalString = new StringBuilder();
-
     StringBuilder posBuffer = new StringBuilder();
     StringBuilder typeBuffer = new StringBuilder();
     StringBuilder argsBuffer = null;
     List<String> typeArguments = null;
     private boolean escape = false;
     int curPos = 0;
+
+    StateHolder(DefaultMessageCompositor compositor, Locale locale, String sourceMessage, Object[] messageArgs)
+    {
+        this.compositor = compositor;
+        this.locale = locale;
+        this.sourceMessage = sourceMessage;
+        this.messageArgs = messageArgs;
+    }
 
     public boolean escaped()
     {
@@ -88,10 +98,10 @@ class StateHolder
     public void resetMacro(char curChar) // ? -> NONE
     {
         state = State.NONE;
-        finalString.append(DefaultMessageCompositor.MACRO_BEGIN).append(posBuffer);
+        finalString.append(MACRO_BEGIN).append(posBuffer);
         if (posBuffer.length() != 0 && typeBuffer.length() != 0)
         {
-            finalString.append(DefaultMessageCompositor.MACRO_SEPARATOR);
+            finalString.append(MACRO_SEPARATOR);
         }
         finalString.append(typeBuffer).append(curChar);
     }
@@ -137,7 +147,7 @@ class StateHolder
         escape = false;
     }
 
-    public void format(Locale locale, Object[] messageArguments) // ? -> format -> NONE
+    public void format() // ? -> format -> NONE
     {
         if (argsBuffer != null)
         {
@@ -149,7 +159,7 @@ class StateHolder
             manualPos = Integer.valueOf(posBuffer.toString());
         }
         final int pos = manualPos == null ? curPos : manualPos;
-        final Object messageArgument = messageArguments.length > pos ? messageArguments[pos] : null;
+        final Object messageArgument = messageArgs.length > pos ? messageArgs[pos] : null;
         state = State.NONE;
         String type = typeBuffer.toString();
         if (!type.isEmpty())
@@ -160,7 +170,7 @@ class StateHolder
                 Macro matched = compositor.matchMacroFor(messageArgument, macroList);
                 if (matched != null)
                 {
-                    compositor.format(new MacroContext(matched, type, locale, typeArguments), messageArgument, finalString);
+                    compositor.format(new MacroContext(compositor, matched, type, locale, typeArguments), messageArgument, finalString);
                     if (matched instanceof Formatter && manualPos == null)
                     {
                         curPos++;
@@ -173,7 +183,7 @@ class StateHolder
         Macro matched = compositor.matchMacroFor(messageArgument, compositor.defaultMacros);
         if (matched != null)
         {
-            compositor.format(new MacroContext(matched, null, locale, typeArguments), messageArgument, finalString);
+            compositor.format(new MacroContext(compositor, matched, null, locale, typeArguments), messageArgument, finalString);
             if (matched instanceof Formatter && manualPos == null)
             {
                 curPos++;
@@ -191,5 +201,228 @@ class StateHolder
             return;
         }
         throw new MissingFormatterException(type, messageArgument.getClass());
+    }
+
+    public void stateNone(char curChar)
+    {
+        switch (curChar)
+        {
+        case MACRO_BEGIN:
+            if (this.escaped())
+            {
+                this.none(curChar);
+                break;
+            }
+            this.startMacro();
+            break;
+        case MACRO_ESCAPE:
+            if (this.escaped())
+            {
+                this.none(curChar);
+                break;
+            }
+            this.escape();
+            break;
+        case MACRO_SEPARATOR:
+        case MACRO_END:
+        default:
+            if (this.escaped()) // re-add escaping char
+            {
+                this.none(MACRO_ESCAPE);
+            }
+            this.none(curChar);
+            break;
+        }
+    }
+
+    public void stateStart(char curChar)
+    {
+        switch (curChar)
+        {
+        case MACRO_BEGIN:
+        case MACRO_ESCAPE:
+        case MACRO_SEPARATOR:
+            this.resetMacro(curChar);
+            break;
+        case MACRO_END:
+            this.format();
+            break;
+        default: // expecting position OR type
+            if (Character.isDigit(curChar)) // pos
+            {
+                this.position(curChar);
+                break;
+            }
+            if ((curChar >= 'a' && curChar <= 'z') || (curChar >= 'A' && curChar <= 'Z')) // type
+            {
+                this.type(curChar);
+                break;
+            }
+            this.resetMacro(curChar);
+            break;
+        }
+    }
+
+    public void statePos(char curChar)
+    {
+        switch (curChar)
+        {
+        case MACRO_BEGIN:
+        case MACRO_ESCAPE:
+            this.resetMacro(curChar);
+            break;
+        case MACRO_SEPARATOR:
+            this.type(null);
+            break;
+        case MACRO_END:
+            this.format();
+            break;
+        default:
+            if (Character.isDigit(curChar)) // pos
+            {
+                this.position(curChar);
+                break;
+            }
+            this.resetMacro(curChar);
+            break;
+        }
+    }
+
+    public void stateType(char curChar)
+    {
+        switch (curChar)
+        {
+        case MACRO_BEGIN:
+        case MACRO_ESCAPE:
+            this.resetMacro(curChar);
+            break;
+        case MACRO_SEPARATOR:
+            if (this.typeBuffer.length() == 0)
+            {
+                this.resetMacro(curChar);
+                break;
+            }
+            this.startArgument();
+            break;
+        case MACRO_LABEL:
+            if (this.typeBuffer.length() == 0)
+            {
+                this.resetMacro(curChar);
+                break;
+            }
+            this.label();
+            break;
+        case MACRO_END:
+            if (this.typeBuffer.length() == 0)
+            {
+                this.resetMacro(curChar);
+                break;
+            }
+            this.format();
+            break;
+        default:
+            if ((curChar >= 'a' && curChar <= 'z') ||
+                (curChar >= 'A' && curChar <= 'Z') ||
+                Character.isDigit(curChar))
+            {
+                this.type(curChar);
+                break;
+            }
+            this.resetMacro(curChar);
+            break;
+        }
+    }
+
+    public void stateLabel(char curChar)
+    {
+        switch (curChar)
+        {
+        case MACRO_ESCAPE:
+            if (this.escaped())
+            {
+                this.label();
+                break;
+            }
+            this.escape();
+            break;
+        case MACRO_SEPARATOR:
+            if (this.escaped())
+            {
+                this.label();
+                break;
+            }
+            this.startArgument();
+            break;
+        case MACRO_END:
+            if (this.escaped())
+            {
+                this.label();
+                break;
+            }
+            this.format();
+            break;
+        default:
+            this.label();
+            break;
+        }
+    }
+
+    public void stateArguments(char curChar)
+    {
+        switch (curChar)
+        {
+        case MACRO_ESCAPE:
+            if (this.escaped()) // "\\\\"
+            {
+                this.argument(curChar);
+                break;
+            }
+            this.escape();
+            break;
+        case MACRO_SEPARATOR:
+            if (this.escaped())
+            {
+                this.argument(curChar);
+                break;
+            }
+            this.startArgument();
+            break;
+        case MACRO_END:
+            if (this.escaped())
+            {
+                this.argument(curChar);
+                break;
+            }
+            this.format();
+            break;
+        default:
+            this.argument(curChar);
+            break;
+        }
+    }
+    
+    public void chooseState(char curChar)
+    {
+        switch (this.state)
+        {
+        case NONE:
+            this.stateNone(curChar);
+            break;
+        case START:
+            this.stateStart(curChar);
+            break;
+        case POS:
+            this.statePos(curChar);
+            break;
+        case TYPE:
+            this.stateType(curChar);
+            break;
+        case LABEL:
+            this.stateLabel(curChar);
+            break;
+        case ARGUMENTS:
+            this.stateArguments(curChar);
+            break;
+        }
     }
 }
