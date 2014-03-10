@@ -28,7 +28,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 
-import de.cubeisland.engine.messagecompositor.MacroContext;
+import de.cubeisland.engine.messagecompositor.macro.MacroContext;
 import de.cubeisland.engine.messagecompositor.macro.Reader;
 import de.cubeisland.engine.messagecompositor.macro.AbstractFormatter;
 
@@ -44,7 +44,8 @@ public class DateFormatter extends AbstractFormatter<Date>
         SimpleDateFormat sdf = context.readMapped("format", SimpleDateFormat.class);
         if (sdf == null)
         {
-            return DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, context.getLocale()).format(object);
+            DateFormat instance = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, context.getLocale());
+            return instance.format(object);
         }
         return sdf.format(object);
     }

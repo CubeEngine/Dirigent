@@ -29,6 +29,7 @@ import java.util.Locale;
 import de.cubeisland.engine.messagecompositor.exception.MissingMacroException;
 import de.cubeisland.engine.messagecompositor.macro.Formatter;
 import de.cubeisland.engine.messagecompositor.macro.Macro;
+import de.cubeisland.engine.messagecompositor.macro.MacroContext;
 
 class Message
 {
@@ -40,7 +41,12 @@ class Message
 
     enum State
     {
-        NONE, START, POS, TYPE, LABEL, ARGUMENTS
+        NONE,
+        START,
+        POS,
+        TYPE,
+        LABEL,
+        ARGUMENTS
     }
 
     private final DefaultMessageCompositor compositor;
@@ -128,8 +134,9 @@ class Message
         case MACRO_SEPARATOR:
         case MACRO_END:
         default:
-            if (this.escaped()) // re-add escaping char
+            if (this.escaped())
             {
+                // re-add escaping char
                 this.none(MACRO_ESCAPE);
             }
             break;
@@ -148,7 +155,8 @@ class Message
         case MACRO_END:
             this.format();
             return;
-        default: // expecting position OR type
+        default:
+            // expecting position OR type
             if (Character.isDigit(curChar)) // pos
             {
                 this.position(curChar);
@@ -370,11 +378,16 @@ class Message
         {
             typeArguments = new ArrayList<String>();
         }
+        this.endArgument();
+        argsBuffer = new StringBuilder();
+    }
+
+    private void endArgument()
+    {
         if (argsBuffer != null)
         {
             typeArguments.add(argsBuffer.toString());
         }
-        argsBuffer = new StringBuilder();
     }
 
     // ARGUMENTS -> ARGUMENTS
@@ -387,10 +400,7 @@ class Message
     // ? -> format -> NONE
     private void format()
     {
-        if (argsBuffer != null)
-        {
-            typeArguments.add(argsBuffer.toString());
-        }
+        this.endArgument();
         Integer manualPos = null;
         if (posBuffer.length() != 0)
         {
@@ -402,30 +412,22 @@ class Message
         String type = typeBuffer.toString();
         if (!type.isEmpty())
         {
-            List<Macro> macroList = compositor.macros.get(type);
-            if (macroList != null)
+            Macro matched = compositor.matchMacroFor(messageArgument, type);
+            if (matched != null)
             {
-                Macro matched = compositor.matchMacroFor(messageArgument, macroList);
-                if (matched != null)
-                {
-                    compositor.format(new MacroContext(compositor, matched, type, locale, typeArguments), messageArgument, finalString);
-                    if (matched instanceof Formatter && manualPos == null)
-                    {
-                        curPos++;
-                    }
-                    return;
-                }
+                compositor
+                    .format(new MacroContext(compositor, matched, type, locale, typeArguments), messageArgument, finalString);
+                this.adjustCurPos(matched, manualPos);
+                return;
             }
         }
         // else without type or not found:
         Macro matched = compositor.matchMacroFor(messageArgument, compositor.defaultMacros);
         if (matched != null)
         {
-            compositor.format(new MacroContext(compositor, matched, null, locale, typeArguments), messageArgument, finalString);
-            if (matched instanceof Formatter && manualPos == null)
-            {
-                curPos++;
-            }
+            compositor
+                .format(new MacroContext(compositor, matched, null, locale, typeArguments), messageArgument, finalString);
+            this.adjustCurPos(matched, manualPos);
             return;
         }
         if (messageArgument == null)
@@ -439,5 +441,13 @@ class Message
             return;
         }
         throw new MissingMacroException(type, messageArgument.getClass());
+    }
+
+    private void adjustCurPos(Macro matched, Integer manualPos)
+    {
+        if (matched instanceof Formatter && manualPos == null)
+        {
+            curPos++;
+        }
     }
 }

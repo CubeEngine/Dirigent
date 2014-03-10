@@ -22,8 +22,6 @@
  */
 package de.cubeisland.engine.messagecompositor.macro;
 
-import de.cubeisland.engine.messagecompositor.MacroContext;
-
 /**
  * A Macro accepting an Object of the Class T to process
  */
@@ -33,6 +31,7 @@ public interface Formatter<T> extends Macro
      * Checks whether this formatter can format a given object-type
      *
      * @param objectType the objectType
+     *
      * @return true if this formatter can format objects of given class
      */
     boolean isApplicable(Class<?> objectType);
@@ -40,8 +39,9 @@ public interface Formatter<T> extends Macro
     /**
      * Processes a macro with an object T as input
      *
-     * @param object the input object
+     * @param object  the input object
      * @param context the context
+     *
      * @return the processed macro-result
      */
     String process(T object, MacroContext context);

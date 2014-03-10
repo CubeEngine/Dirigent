@@ -20,7 +20,7 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package de.cubeisland.engine.messagecompositor;
+package de.cubeisland.engine.messagecompositor.macro;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import de.cubeisland.engine.messagecompositor.macro.Macro;
+import de.cubeisland.engine.messagecompositor.MessageCompositor;
 
 /**
  * Contextual Information for a Macro
@@ -46,7 +46,7 @@ public class MacroContext
     public static final char MAP = '=';
     public static final char ESCAPE = '\\';
 
-    MacroContext(MessageCompositor compositor, Macro macro, String type, Locale locale, List<String> typeArguments)
+    public MacroContext(MessageCompositor compositor, Macro macro, String type, Locale locale, List<String> typeArguments)
     {
         this.compositor = compositor;
         this.macro = macro;
@@ -55,34 +55,41 @@ public class MacroContext
 
         if (typeArguments != null)
         {
-            for (String flag : typeArguments)
+            this.readArguments(typeArguments);
+        }
+    }
+
+    private void readArguments(List<String> typeArguments)
+    {
+        for (String flag : typeArguments)
+        {
+            String readFlag = "";
+            String key = null;
+            boolean escape = false;
+            char[] chars = flag.toCharArray();
+            for (char curChar : chars)
             {
-                String readFlag = "";
-                String key = null;
-                boolean escape = false;
-                char[] chars = flag.toCharArray();
-                for (char curChar : chars)
+                if (escape)
+                {
+                    switch (curChar)
+                    {
+                    default:
+                        readFlag += ESCAPE;
+                    case ESCAPE:
+                    case MAP:
+                        readFlag += curChar;
+                    }
+                    escape = false;
+                }
+                else
                 {
                     switch (curChar)
                     {
                     case ESCAPE:
-                        if (escape)
-                        {
-                            readFlag += curChar;
-                            escape = false;
-                        }
-                        else
-                        {
-                            escape = true;
-                        }
+                        escape = true;
                         break;
                     case MAP:
-                        if (escape)
-                        {
-                            readFlag += curChar;
-                            escape = false;
-                        }
-                        else if (key == null)
+                        if (key == null)
                         {
                             key = readFlag;
                             readFlag = "";
@@ -93,14 +100,14 @@ public class MacroContext
                         break;
                     }
                 }
-                if (key == null)
-                {
-                    this.arguments.add(readFlag);
-                }
-                else
-                {
-                    this.mappedArguments.put(key, readFlag);
-                }
+            }
+            if (key == null)
+            {
+                this.arguments.add(readFlag);
+            }
+            else
+            {
+                this.mappedArguments.put(key, readFlag);
             }
         }
     }
@@ -129,6 +136,7 @@ public class MacroContext
      * Gets an indexed argument
      *
      * @param i the index
+     *
      * @return the value or null
      */
     public final String getArg(int i)
@@ -143,8 +151,9 @@ public class MacroContext
     /**
      * Attempts to read an indexed argument
      *
-     * @param i the index
+     * @param i     the index
      * @param clazz the class to cast into
+     *
      * @return the value or null
      */
     public final <T> T readArg(int i, Class<T> clazz)
@@ -161,6 +170,7 @@ public class MacroContext
      * Gets a mapped argument for given key
      *
      * @param key the key
+     *
      * @return the value or null
      */
     public final String getMapped(String key)
@@ -171,8 +181,9 @@ public class MacroContext
     /**
      * Attempts to read a mapped argument for given key
      *
-     * @param key the key
+     * @param key   the key
      * @param clazz the class to cast into
+     *
      * @return the value or null
      */
     public final <T> T readMapped(String key, Class<T> clazz)

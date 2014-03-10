@@ -34,6 +34,7 @@ import java.util.Set;
 import de.cubeisland.engine.messagecompositor.macro.ConstantMacro;
 import de.cubeisland.engine.messagecompositor.macro.Formatter;
 import de.cubeisland.engine.messagecompositor.macro.Macro;
+import de.cubeisland.engine.messagecompositor.macro.MacroContext;
 import de.cubeisland.engine.messagecompositor.macro.Reader;
 
 public class DefaultMessageCompositor implements MessageCompositor
@@ -177,12 +178,25 @@ public class DefaultMessageCompositor implements MessageCompositor
             {
                 cMacro = (ConstantMacro)macro;
             }
-            else if (messageArgument != null && macro instanceof Formatter && ((Formatter)macro).isApplicable(messageArgument.getClass()))
+            else if (messageArgument != null
+                  && macro instanceof Formatter
+                  && ((Formatter)macro).isApplicable(messageArgument.getClass()))
             {
                 return macro;
             }
         }
         return cMacro;
+    }
+
+
+    final Macro matchMacroFor(Object messageArgument, String type)
+    {
+        List<Macro> list = this.macros.get(type);
+        if (list == null)
+        {
+            return null;
+        }
+        return this.matchMacroFor(messageArgument, list);
     }
 
     @SuppressWarnings("unchecked")

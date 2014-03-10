@@ -22,8 +22,6 @@
  */
 package de.cubeisland.engine.messagecompositor.macro;
 
-import de.cubeisland.engine.messagecompositor.MacroContext;
-
 /**
  * A Macro that accepts no additional input
  */
@@ -33,6 +31,7 @@ public interface ConstantMacro extends Macro
      * Processes a macro without additional input
      *
      * @param context the context
+     *
      * @return the processed macro-result
      */
     String process(MacroContext context);
