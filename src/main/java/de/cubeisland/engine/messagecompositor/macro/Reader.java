@@ -20,12 +20,12 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package de.cubeisland.engine.messagecompositor.exception;
+package de.cubeisland.engine.messagecompositor.macro;
 
-public class MissingFormatterException extends RuntimeException
+/**
+ * A Reader converts a raw String into an object of the class T
+ */
+public interface Reader<T>
 {
-    public MissingFormatterException(String type, Class clazz)
-    {
-        super("There is no registered formatter for '" + type + "' supporting " + clazz.getName());
-    }
+    public T read(String raw);
 }

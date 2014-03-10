@@ -20,9 +20,15 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package de.cubeisland.engine.messagecompositor.context;
+package de.cubeisland.engine.messagecompositor.exception;
 
-public interface Reader<T>
+/**
+ * This exception is thrown whenever there is no macro for a name and class
+ */
+public class MissingMacroException extends RuntimeException
 {
-    public T getData(String raw);
+    public MissingMacroException(String type, Class clazz)
+    {
+        super("There is no registered macro for '" + type + "' supporting " + clazz.getName());
+    }
 }

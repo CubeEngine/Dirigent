@@ -22,7 +22,7 @@
  */
 package de.cubeisland.engine.messagecompositor.macro;
 
-import de.cubeisland.engine.messagecompositor.context.MacroContext;
+import de.cubeisland.engine.messagecompositor.MacroContext;
 
 /**
  * A Macro accepting an Object of the Class T to process

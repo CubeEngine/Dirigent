@@ -29,7 +29,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import de.cubeisland.engine.messagecompositor.context.MacroContext;
+import de.cubeisland.engine.messagecompositor.MacroContext;
 import de.cubeisland.engine.messagecompositor.exception.AnnotationMissingException;
 import de.cubeisland.engine.messagecompositor.macro.AbstractFormatter;
 

@@ -24,9 +24,8 @@ package de.cubeisland.engine.messagecompositor;
 
 import java.util.Locale;
 
-import de.cubeisland.engine.messagecompositor.context.MacroContext;
-import de.cubeisland.engine.messagecompositor.context.Reader;
 import de.cubeisland.engine.messagecompositor.macro.Macro;
+import de.cubeisland.engine.messagecompositor.macro.Reader;
 
 /**
  * A message-compositor processing macros {[[<position>:]type[#<label>][:<args>]]} or just {[pos]}

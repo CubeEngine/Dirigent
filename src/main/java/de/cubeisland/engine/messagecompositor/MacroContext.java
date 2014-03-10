@@ -20,7 +20,7 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package de.cubeisland.engine.messagecompositor.context;
+package de.cubeisland.engine.messagecompositor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,9 +28,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import de.cubeisland.engine.messagecompositor.MessageCompositor;
 import de.cubeisland.engine.messagecompositor.macro.Macro;
 
+/**
+ * Contextual Information for a Macro
+ */
 public class MacroContext
 {
     private final MessageCompositor compositor;
@@ -44,7 +46,7 @@ public class MacroContext
     public static final char MAP = '=';
     public static final char ESCAPE = '\\';
 
-    public MacroContext(MessageCompositor compositor, Macro macro, String type, Locale locale, List<String> typeArguments)
+    MacroContext(MessageCompositor compositor, Macro macro, String type, Locale locale, List<String> typeArguments)
     {
         this.compositor = compositor;
         this.macro = macro;
@@ -103,22 +105,77 @@ public class MacroContext
         }
     }
 
-    public Macro getMacro()
+    /**
+     * Gets the Macro this context was created for
+     *
+     * @return the macro
+     */
+    public final Macro getMacro()
     {
         return macro;
     }
 
-    public Locale getLocale()
+    /**
+     * Gets the locale to use
+     *
+     * @return the locale to use
+     */
+    public final Locale getLocale()
     {
         return locale;
     }
 
-    public String getMapped(String key)
+    /**
+     * Gets an indexed argument
+     *
+     * @param i the index
+     * @return the value or null
+     */
+    public final String getArg(int i)
+    {
+        if (this.arguments.size() > i)
+        {
+            return this.arguments.get(i);
+        }
+        return null;
+    }
+
+    /**
+     * Attempts to read an indexed argument
+     *
+     * @param i the index
+     * @param clazz the class to cast into
+     * @return the value or null
+     */
+    public final <T> T readArg(int i, Class<T> clazz)
+    {
+        String value = this.getArg(i);
+        if (value == null)
+        {
+            return null;
+        }
+        return this.compositor.read(this.macro, value, clazz);
+    }
+
+    /**
+     * Gets a mapped argument for given key
+     *
+     * @param key the key
+     * @return the value or null
+     */
+    public final String getMapped(String key)
     {
         return this.mappedArguments.get(key);
     }
 
-    public <T> T readMapped(String key, Class<T> clazz)
+    /**
+     * Attempts to read a mapped argument for given key
+     *
+     * @param key the key
+     * @param clazz the class to cast into
+     * @return the value or null
+     */
+    public final <T> T readMapped(String key, Class<T> clazz)
     {
         String value = this.getMapped(key);
         if (value == null)
@@ -133,26 +190,12 @@ public class MacroContext
         return read;
     }
 
-    public <T> T readArg(int i, Class<T> clazz)
-    {
-        String value = this.getArg(i);
-        if (value == null)
-        {
-            return null;
-        }
-        return this.compositor.read(this.macro, value, clazz);
-    }
-
-    public String getArg(int i)
-    {
-        if (this.arguments.size() > i)
-        {
-            return this.arguments.get(i);
-        }
-        return null;
-    }
-
-    public String getType()
+    /**
+     * Gets the name of the macro this context got created for
+     *
+     * @return the macros name
+     */
+    public final String getType()
     {
         return type;
     }
