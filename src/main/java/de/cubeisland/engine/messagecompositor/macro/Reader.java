@@ -27,5 +27,5 @@ package de.cubeisland.engine.messagecompositor.macro;
  */
 public interface Reader<T>
 {
-    public T read(String raw);
+    T read(String raw);
 }

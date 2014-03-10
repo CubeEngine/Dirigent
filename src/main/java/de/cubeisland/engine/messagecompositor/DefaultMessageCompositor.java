@@ -112,12 +112,12 @@ public class DefaultMessageCompositor implements MessageCompositor
 
     public final MessageCompositor registerReader(Class<? extends Macro> macroClass, String key, Reader reader)
     {
-        Map<String, Reader> readers = mappedReaders.get(macroClass);
-        if (readers == null)
+        Map<String, Reader> mReaders = mappedReaders.get(macroClass);
+        if (mReaders == null)
         {
-            mappedReaders.put(macroClass, readers = new HashMap<String, Reader>());
+            mappedReaders.put(macroClass, mReaders = new HashMap<String, Reader>());
         }
-        readers.put(key, reader);
+        mReaders.put(key, reader);
         return this;
     }
 

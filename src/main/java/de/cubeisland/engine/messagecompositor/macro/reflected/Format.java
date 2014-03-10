@@ -33,4 +33,5 @@ import java.lang.annotation.Target;
  * This Annotation is used for ReflectedFormatter to declare the format methods
  */
 public @interface Format
-{}
+{
+}

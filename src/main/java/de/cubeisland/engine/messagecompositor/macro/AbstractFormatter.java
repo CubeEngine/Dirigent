@@ -47,15 +47,15 @@ public abstract class AbstractFormatter<T> implements Formatter<T>
         }
     }
 
-    public static Set<String> toSet(String... names)
-    {
-        return new HashSet<String>(Arrays.asList(names));
-    }
-
     protected AbstractFormatter(Set<String> names)
     {
         this();
         this.names.addAll(names);
+    }
+
+    public static Set<String> toSet(String... names)
+    {
+        return new HashSet<String>(Arrays.asList(names));
     }
 
     public boolean isApplicable(Class<?> objectType)

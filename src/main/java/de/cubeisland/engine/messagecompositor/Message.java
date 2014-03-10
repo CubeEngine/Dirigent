@@ -157,7 +157,7 @@ class Message
                 this.position(curChar);
                 break;
             }
-            if ((curChar >= 'a' && curChar <= 'z') || (curChar >= 'A' && curChar <= 'Z')) // type
+            if (this.isLetter(curChar)) // type
             {
                 this.type(curChar);
                 break;
@@ -225,9 +225,7 @@ class Message
             this.format();
             break;
         default:
-            if ((curChar >= 'a' && curChar <= 'z') ||
-                (curChar >= 'A' && curChar <= 'Z') ||
-                Character.isDigit(curChar))
+            if (this.isLetter(curChar) || Character.isDigit(curChar))
             {
                 this.type(curChar);
                 break;
@@ -307,6 +305,11 @@ class Message
 
     // Helper-Methods:
 
+    private boolean isLetter(char character)
+    {
+        return (character >= 'a' && character <= 'z') || (character >= 'A' && character <= 'Z');
+    }
+
     private boolean escaped()
     {
         return escape;
@@ -317,13 +320,15 @@ class Message
         this.escape = true;
     }
 
-    private void none(char curChar) // NONE -> NONE
+    // NONE -> NONE
+    private void none(char curChar)
     {
         escape = false;
         finalString.append(curChar);
     }
 
-    private void startMacro() // NONE -> START
+    // NONE -> START
+    private void startMacro()
     {
         state = State.START;
         posBuffer = new StringBuilder();
@@ -332,7 +337,8 @@ class Message
         typeArguments = null;
     }
 
-    private void resetMacro(char curChar) // ? -> NONE
+    // ? -> NONE
+    private void resetMacro(char curChar)
     {
         state = State.NONE;
         finalString.append(MACRO_BEGIN).append(posBuffer);
@@ -343,13 +349,15 @@ class Message
         finalString.append(typeBuffer).append(curChar);
     }
 
-    private void position(char curChar) // START -> POS
+    // START -> POS
+    private void position(char curChar)
     {
         state = State.POS;
         posBuffer.append(curChar);
     }
 
-    private void type(Character curChar) // START|POS -> TYPE
+    // START|POS -> TYPE
+    private void type(Character curChar)
     {
         state = State.TYPE;
         if (curChar != null)
@@ -358,13 +366,15 @@ class Message
         }
     }
 
-    private void label() // TYPE|LABEL -> LABEL
+    // TYPE|LABEL -> LABEL
+    private void label()
     {
         state = State.LABEL;
         escape = false;
     }
 
-    private void startArgument() // TYPE|ARGUMENTS -> ARGUMENTS#next
+    // TYPE|ARGUMENTS -> ARGUMENTS#next
+    private void startArgument()
     {
         state = State.ARGUMENTS;
         if (typeArguments == null)
@@ -378,13 +388,15 @@ class Message
         argsBuffer = new StringBuilder();
     }
 
-    private void argument(char curChar) // ARGUMENTS -> ARGUMENTS
+    // ARGUMENTS -> ARGUMENTS
+    private void argument(char curChar)
     {
         argsBuffer.append(curChar);
         escape = false;
     }
 
-    private void format() // ? -> format -> NONE
+    // ? -> format -> NONE
+    private void format()
     {
         if (argsBuffer != null)
         {
@@ -429,7 +441,7 @@ class Message
         }
         if (messageArgument == null)
         {
-            throw new IllegalArgumentException(); // TODO msg
+            throw new IllegalArgumentException("The message expected a messageArgument but could not find one");
         }
         if (type.isEmpty())
         {

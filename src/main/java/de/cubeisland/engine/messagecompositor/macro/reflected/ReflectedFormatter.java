@@ -54,7 +54,7 @@ public abstract class ReflectedFormatter extends AbstractFormatter<Object>
         }
         for (Method method : this.getClass().getMethods())
         {
-            if (method.getName().equals("format") && method.isAnnotationPresent(Format.class))
+            if ("format".equals(method.getName()) && method.isAnnotationPresent(Format.class))
             {
                 Class<?>[] parameterTypes = method.getParameterTypes();
                 if (method.getReturnType() == String.class &&
@@ -88,11 +88,12 @@ public abstract class ReflectedFormatter extends AbstractFormatter<Object>
                 }
                 catch (IllegalAccessException e)
                 {
-                    throw new IllegalArgumentException(e); // This cannot happen as it got checked before
+                    // These cannot happen as it got checked before:
+                    throw new IllegalArgumentException(e);
                 }
                 catch (InvocationTargetException e)
                 {
-                    throw new IllegalArgumentException(e); // This cannot happen as it got checked before
+                    throw new IllegalArgumentException(e);
                 }
             }
         }

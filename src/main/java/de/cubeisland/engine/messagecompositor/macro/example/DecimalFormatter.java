@@ -56,8 +56,9 @@ public class DecimalFormatter extends ReflectedFormatter
     {
         String arg = context.getArg(0);
         NumberFormat decimalFormat = DecimalFormat.getInstance(context.getLocale());
-        if (arg == null) // No precision
+        if (arg == null)
         {
+            // no precision
             return decimalFormat.format(number);
         }
         else
