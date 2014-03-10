@@ -20,15 +20,16 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package de.cubeisland.engine.formatter;
+package de.cubeisland.engine.messagecompositor;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import de.cubeisland.engine.formatter.context.MacroContext;
-import de.cubeisland.engine.formatter.formatter.Formatter;
-import de.cubeisland.engine.formatter.formatter.Macro;
+import de.cubeisland.engine.messagecompositor.context.MacroContext;
+import de.cubeisland.engine.messagecompositor.exception.MissingFormatterException;
+import de.cubeisland.engine.messagecompositor.macro.Formatter;
+import de.cubeisland.engine.messagecompositor.macro.Macro;
 
 class StateHolder
 {

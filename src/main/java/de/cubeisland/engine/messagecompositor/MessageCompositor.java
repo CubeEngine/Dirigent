@@ -20,13 +20,13 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package de.cubeisland.engine.formatter;
+package de.cubeisland.engine.messagecompositor;
 
 import java.util.Locale;
 
-import de.cubeisland.engine.formatter.context.MacroContext;
-import de.cubeisland.engine.formatter.context.Reader;
-import de.cubeisland.engine.formatter.formatter.Macro;
+import de.cubeisland.engine.messagecompositor.context.MacroContext;
+import de.cubeisland.engine.messagecompositor.context.Reader;
+import de.cubeisland.engine.messagecompositor.macro.Macro;
 
 /**
  * A message-compositor processing macros {[[<position>:]type[#<label>][:<args>]]} or just {[pos]}

@@ -20,31 +20,16 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package de.cubeisland.engine.formatter.formatter;
+package de.cubeisland.engine.messagecompositor.macro;
 
-import de.cubeisland.engine.formatter.context.MacroContext;
+import java.util.Set;
 
-/**
- * A Macro accepting an Object of the Class T to process
- *
- * @param <T>
- */
-public interface Formatter<T> extends Macro
+public interface Macro
 {
     /**
-     * Checks whether this formatter can format a given object-type
+     * The names of this macro
      *
-     * @param objectType the objectType
-     * @return true if this formatter can format objects of given class
+     * @return the names
      */
-    boolean isApplicable(Class<?> objectType);
-
-    /**
-     * Processes a macro with an object T as input
-     *
-     * @param object the input object
-     * @param context the context
-     * @return the processed macro-result
-     */
-    String process(T object, MacroContext context);
+    Set<String> names();
 }

@@ -20,7 +20,7 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package de.cubeisland.engine.formatter.formatter;
+package de.cubeisland.engine.messagecompositor.macro;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -33,7 +33,8 @@ public abstract class AbstractFormatter<T> implements Formatter<T>
     protected final Class<T> tClass;
     protected Set<String> names = new HashSet<String>();
 
-    AbstractFormatter()
+    @SuppressWarnings("unchecked")
+    protected AbstractFormatter()
     {
         Type genericSuperclass = this.getClass().getGenericSuperclass();
         if (genericSuperclass instanceof ParameterizedType)

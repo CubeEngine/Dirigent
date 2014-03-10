@@ -20,7 +20,7 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package de.cubeisland.engine.formatter;
+package de.cubeisland.engine.messagecompositor;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,11 +31,11 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import de.cubeisland.engine.formatter.context.MacroContext;
-import de.cubeisland.engine.formatter.context.Reader;
-import de.cubeisland.engine.formatter.formatter.ConstantMacro;
-import de.cubeisland.engine.formatter.formatter.Formatter;
-import de.cubeisland.engine.formatter.formatter.Macro;
+import de.cubeisland.engine.messagecompositor.context.MacroContext;
+import de.cubeisland.engine.messagecompositor.context.Reader;
+import de.cubeisland.engine.messagecompositor.macro.ConstantMacro;
+import de.cubeisland.engine.messagecompositor.macro.Formatter;
+import de.cubeisland.engine.messagecompositor.macro.Macro;
 
 public class DefaultMessageCompositor implements MessageCompositor
 {

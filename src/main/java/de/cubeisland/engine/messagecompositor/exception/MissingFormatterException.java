@@ -20,17 +20,12 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package de.cubeisland.engine.formatter.formatter.reflected;
+package de.cubeisland.engine.messagecompositor.exception;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
-@Target(ElementType.METHOD)
-@Retention(RetentionPolicy.RUNTIME)
-/**
- * This Annotation is used for ReflectedFormatter to declare the format methods
- */
-public @interface Format
-{}
+public class MissingFormatterException extends RuntimeException
+{
+    public MissingFormatterException(String type, Class clazz)
+    {
+        super("There is no registered formatter for '" + type + "' supporting " + clazz.getName());
+    }
+}

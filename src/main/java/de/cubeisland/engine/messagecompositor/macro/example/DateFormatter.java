@@ -20,20 +20,40 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package de.cubeisland.engine.formatter.formatter;
+package de.cubeisland.engine.messagecompositor.macro.example;
 
-import de.cubeisland.engine.formatter.context.MacroContext;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashSet;
 
-/**
- * A Macro that accepts no additional input
- */
-public interface ConstantMacro extends Macro
+import de.cubeisland.engine.messagecompositor.context.MacroContext;
+import de.cubeisland.engine.messagecompositor.context.Reader;
+import de.cubeisland.engine.messagecompositor.macro.AbstractFormatter;
+
+public class DateFormatter extends AbstractFormatter<Date>
 {
-    /**
-     * Processes a macro without additional input
-     *
-     * @param context the context
-     * @return the processed macro-result
-     */
-    String process(MacroContext context);
+    public DateFormatter()
+    {
+        super(new HashSet<String>(Arrays.asList("date")));
+    }
+
+    public String process(Date object, MacroContext context)
+    {
+        SimpleDateFormat sdf = context.readMapped("format", SimpleDateFormat.class);
+        if (sdf == null)
+        {
+            return DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, context.getLocale()).format(object);
+        }
+        return sdf.format(object);
+    }
+
+    public static class DateReader implements Reader<SimpleDateFormat>
+    {
+        public SimpleDateFormat getData(String raw)
+        {
+            return new SimpleDateFormat(raw);
+        }
+    }
 }

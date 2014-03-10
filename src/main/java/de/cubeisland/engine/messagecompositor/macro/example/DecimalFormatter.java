@@ -20,16 +20,16 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package de.cubeisland.engine.formatter.formatter.example;
+package de.cubeisland.engine.messagecompositor.macro.example;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
-import de.cubeisland.engine.formatter.context.MacroContext;
-import de.cubeisland.engine.formatter.formatter.ReflectedFormatter;
-import de.cubeisland.engine.formatter.formatter.reflected.Format;
-import de.cubeisland.engine.formatter.formatter.reflected.Names;
+import de.cubeisland.engine.messagecompositor.context.MacroContext;
+import de.cubeisland.engine.messagecompositor.macro.reflected.ReflectedFormatter;
+import de.cubeisland.engine.messagecompositor.macro.reflected.Format;
+import de.cubeisland.engine.messagecompositor.macro.reflected.Names;
 
 @Names("decimal")
 public class DecimalFormatter extends ReflectedFormatter

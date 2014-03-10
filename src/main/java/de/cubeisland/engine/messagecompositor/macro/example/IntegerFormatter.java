@@ -20,17 +20,23 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package de.cubeisland.engine.formatter.formatter.reflected;
+package de.cubeisland.engine.messagecompositor.macro.example;
 
-import java.lang.annotation.Annotation;
+import java.util.Arrays;
+import java.util.HashSet;
 
-/**
- * This Exception is thrown whenever a ReflectedFormatter is missing the @Names Annotation or has no valid @Format annotated method
- */
-public class AnnotationMissingException extends RuntimeException
+import de.cubeisland.engine.messagecompositor.context.MacroContext;
+import de.cubeisland.engine.messagecompositor.macro.AbstractFormatter;
+
+public class IntegerFormatter extends AbstractFormatter<Integer>
 {
-    public AnnotationMissingException(Class<? extends Annotation> clazz)
+    public IntegerFormatter()
     {
-        super("This formatter is missing a @" + clazz.getName() + " Annotation!");
+        super(new HashSet<String>(Arrays.asList("number")));
+    }
+
+    public String process(Integer object, MacroContext context)
+    {
+        return String.valueOf(object);
     }
 }

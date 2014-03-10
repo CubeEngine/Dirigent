@@ -20,19 +20,29 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package de.cubeisland.engine.formatter.formatter.reflected;
+package de.cubeisland.engine.messagecompositor.macro;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import de.cubeisland.engine.messagecompositor.context.MacroContext;
 
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
 /**
- * This Annotation is used for ReflectedFormatter to declare the names of the formatter
+ * A Macro accepting an Object of the Class T to process
  */
-public @interface Names
+public interface Formatter<T> extends Macro
 {
-    String[] value();
+    /**
+     * Checks whether this formatter can format a given object-type
+     *
+     * @param objectType the objectType
+     * @return true if this formatter can format objects of given class
+     */
+    boolean isApplicable(Class<?> objectType);
+
+    /**
+     * Processes a macro with an object T as input
+     *
+     * @param object the input object
+     * @param context the context
+     * @return the processed macro-result
+     */
+    String process(T object, MacroContext context);
 }

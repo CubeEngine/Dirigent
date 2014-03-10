@@ -20,7 +20,7 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package de.cubeisland.engine.formatter.formatter;
+package de.cubeisland.engine.messagecompositor.macro.reflected;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -29,10 +29,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import de.cubeisland.engine.formatter.context.MacroContext;
-import de.cubeisland.engine.formatter.formatter.reflected.AnnotationMissingException;
-import de.cubeisland.engine.formatter.formatter.reflected.Format;
-import de.cubeisland.engine.formatter.formatter.reflected.Names;
+import de.cubeisland.engine.messagecompositor.context.MacroContext;
+import de.cubeisland.engine.messagecompositor.exception.AnnotationMissingException;
+import de.cubeisland.engine.messagecompositor.macro.AbstractFormatter;
 
 /**
  * A Formatter using annotations and reflection to allow multiple Classes to be processes by the same Formatter

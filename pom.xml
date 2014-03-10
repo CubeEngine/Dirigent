@@ -3,11 +3,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>de.cubeisland.engine</groupId>
-    <artifactId>formatter</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <artifactId>messagecompositor</artifactId>
+    <version>0.0.2-SNAPSHOT</version>
 
-    <name>Formatter</name>
-    <description>A compact formatting library</description>
+    <name>MessageCompositor</name>
+    <description>A readable and compact message composing library</description>
     <url>engine.cubeisland.de</url>
 
     <licenses>
@@ -24,9 +24,9 @@
     </parent>
 
     <scm>
-        <url>https://github.com/CubeEngineDev/Formatter</url>
-        <connection>scm:git:https://github.com/CubeEngineDev/Formatter</connection>
-        <developerConnection>scm:git:https://github.com/CubeEngineDev/Formatter</developerConnection>
+        <url>https://github.com/CubeEngineDev/MessageCompositor</url>
+        <connection>scm:git:https://github.com/CubeEngineDev/MessageCompositor</connection>
+        <developerConnection>scm:git:https://github.com/CubeEngineDev/MessageCompositor</developerConnection>
         <tag>HEAD</tag>
     </scm>
 

@@ -20,16 +20,20 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package de.cubeisland.engine.formatter.formatter;
+package de.cubeisland.engine.messagecompositor.macro;
 
-import java.util.Set;
+import de.cubeisland.engine.messagecompositor.context.MacroContext;
 
-public interface Macro
+/**
+ * A Macro that accepts no additional input
+ */
+public interface ConstantMacro extends Macro
 {
     /**
-     * The names of this macro
+     * Processes a macro without additional input
      *
-     * @return the names
+     * @param context the context
+     * @return the processed macro-result
      */
-    Set<String> names();
+    String process(MacroContext context);
 }
