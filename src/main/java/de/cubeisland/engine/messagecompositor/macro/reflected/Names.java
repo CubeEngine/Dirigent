@@ -34,5 +34,10 @@ import java.lang.annotation.Target;
  */
 public @interface Names
 {
+    /**
+     * Returns the names for a ReflectedFormatter
+     *
+     * @return the names
+     */
     String[] value();
 }

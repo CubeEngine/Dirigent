@@ -73,11 +73,14 @@ public class MacroContext
                 {
                     switch (curChar)
                     {
-                    default:
-                        readFlag += ESCAPE;
                     case ESCAPE:
                     case MAP:
                         readFlag += curChar;
+                        break;
+                    default:
+                        readFlag += ESCAPE;
+                        readFlag += curChar;
+                        break;
                     }
                     escape = false;
                 }
