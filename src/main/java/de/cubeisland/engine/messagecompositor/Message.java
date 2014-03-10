@@ -114,19 +114,17 @@ class Message
         case MACRO_BEGIN:
             if (this.escaped())
             {
-                this.none(curChar);
                 break;
             }
             this.startMacro();
-            break;
+            return;
         case MACRO_ESCAPE:
             if (this.escaped())
             {
-                this.none(curChar);
                 break;
             }
             this.escape();
-            break;
+            return;
         case MACRO_SEPARATOR:
         case MACRO_END:
         default:
@@ -134,9 +132,9 @@ class Message
             {
                 this.none(MACRO_ESCAPE);
             }
-            this.none(curChar);
             break;
         }
+        this.none(curChar);
     }
 
     private void stateStart(char curChar)
@@ -146,25 +144,24 @@ class Message
         case MACRO_BEGIN:
         case MACRO_ESCAPE:
         case MACRO_SEPARATOR:
-            this.resetMacro(curChar);
             break;
         case MACRO_END:
             this.format();
-            break;
+            return;
         default: // expecting position OR type
             if (Character.isDigit(curChar)) // pos
             {
                 this.position(curChar);
-                break;
+                return;
             }
             if (this.isLetter(curChar)) // type
             {
                 this.type(curChar);
-                break;
+                return;
             }
-            this.resetMacro(curChar);
             break;
         }
+        this.resetMacro(curChar);
     }
 
     private void statePos(char curChar)
@@ -173,23 +170,22 @@ class Message
         {
         case MACRO_BEGIN:
         case MACRO_ESCAPE:
-            this.resetMacro(curChar);
             break;
         case MACRO_SEPARATOR:
             this.type(null);
-            break;
+            return;
         case MACRO_END:
             this.format();
-            break;
+            return;
         default:
             if (Character.isDigit(curChar)) // pos
             {
                 this.position(curChar);
-                break;
+                return;
             }
-            this.resetMacro(curChar);
             break;
         }
+        this.resetMacro(curChar);
     }
 
     private void stateType(char curChar)
@@ -198,41 +194,37 @@ class Message
         {
         case MACRO_BEGIN:
         case MACRO_ESCAPE:
-            this.resetMacro(curChar);
             break;
         case MACRO_SEPARATOR:
             if (this.typeBuffer.length() == 0)
             {
-                this.resetMacro(curChar);
                 break;
             }
             this.startArgument();
-            break;
+            return;
         case MACRO_LABEL:
             if (this.typeBuffer.length() == 0)
             {
-                this.resetMacro(curChar);
                 break;
             }
             this.label();
-            break;
+            return;
         case MACRO_END:
             if (this.typeBuffer.length() == 0)
             {
-                this.resetMacro(curChar);
                 break;
             }
             this.format();
-            break;
+            return;
         default:
             if (this.isLetter(curChar) || Character.isDigit(curChar))
             {
                 this.type(curChar);
-                break;
+                return;
             }
-            this.resetMacro(curChar);
             break;
         }
+        this.resetMacro(curChar);
     }
 
     private void stateLabel(char curChar)
@@ -242,31 +234,28 @@ class Message
         case MACRO_ESCAPE:
             if (this.escaped())
             {
-                this.label();
                 break;
             }
             this.escape();
-            break;
+            return;
         case MACRO_SEPARATOR:
             if (this.escaped())
             {
-                this.label();
                 break;
             }
             this.startArgument();
-            break;
+            return;
         case MACRO_END:
             if (this.escaped())
             {
-                this.label();
                 break;
             }
             this.format();
-            break;
+            return;
         default:
-            this.label();
             break;
         }
+        this.label();
     }
 
     private void stateArguments(char curChar)

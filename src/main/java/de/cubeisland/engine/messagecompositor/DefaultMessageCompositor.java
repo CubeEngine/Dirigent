@@ -91,7 +91,8 @@ public class DefaultMessageCompositor implements MessageCompositor
             List<Macro> list = this.macros.get(name);
             if (list == null)
             {
-                this.macros.put(name, list = new ArrayList<Macro>());
+                list = new ArrayList<Macro>();
+                this.macros.put(name, list);
             }
             list.add(macro);
         }
@@ -115,7 +116,8 @@ public class DefaultMessageCompositor implements MessageCompositor
         Map<String, Reader> mReaders = mappedReaders.get(macroClass);
         if (mReaders == null)
         {
-            mappedReaders.put(macroClass, mReaders = new HashMap<String, Reader>());
+            mReaders = new HashMap<String, Reader>();
+            mappedReaders.put(macroClass, mReaders);
         }
         mReaders.put(key, reader);
         return this;
@@ -203,11 +205,13 @@ public class DefaultMessageCompositor implements MessageCompositor
         this.postFormat(context, messageArguments, finalString);
     }
 
-    public void postFormat(MacroContext context, Object messageArgument, StringBuilder finalString)
-    {
-    }
-
     public void preFormat(MacroContext context, Object messageArgument, StringBuilder finalString)
     {
+        // implement preFormat behaviour
+    }
+
+    public void postFormat(MacroContext context, Object messageArgument, StringBuilder finalString)
+    {
+        // implement postFormat behaviour
     }
 }
