@@ -216,7 +216,7 @@ public class MacroContext
     /**
      * Gets the name of the macro this context got created for
      *
-     * @return the macros name
+     * @return the macros name or empty String if the macro has no name
      */
     public final String getType()
     {

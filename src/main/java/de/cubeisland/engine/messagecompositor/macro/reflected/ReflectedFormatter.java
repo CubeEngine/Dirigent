@@ -29,9 +29,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import de.cubeisland.engine.messagecompositor.macro.MacroContext;
 import de.cubeisland.engine.messagecompositor.exception.AnnotationMissingException;
 import de.cubeisland.engine.messagecompositor.macro.AbstractFormatter;
+import de.cubeisland.engine.messagecompositor.macro.MacroContext;
 
 /**
  * A Formatter using annotations and reflection to allow multiple Classes to be processes by the same Formatter
@@ -44,14 +44,20 @@ public abstract class ReflectedFormatter extends AbstractFormatter<Object>
 
     protected ReflectedFormatter()
     {
-        if (this.getClass().isAnnotationPresent(Names.class))
-        {
-            this.names.addAll(Arrays.asList(this.getClass().getAnnotation(Names.class).value()));
-        }
-        else
+        if (!this.getClass().isAnnotationPresent(Names.class))
         {
             throw new AnnotationMissingException(Names.class);
         }
+        this.names.addAll(Arrays.asList(this.getClass().getAnnotation(Names.class).value()));
+        this.findFormatMethods();
+        if (this.formats.isEmpty())
+        {
+            throw new AnnotationMissingException(Format.class);
+        }
+    }
+
+    private void findFormatMethods()
+    {
         for (Method method : this.getClass().getMethods())
         {
             if ("format".equals(method.getName()) && method.isAnnotationPresent(Format.class))
@@ -69,10 +75,6 @@ public abstract class ReflectedFormatter extends AbstractFormatter<Object>
                     throw new IllegalArgumentException("The format Methods must have the Object to format and a FormatContext as parameters");
                 }
             }
-        }
-        if (this.formats.isEmpty())
-        {
-            throw new AnnotationMissingException(Format.class);
         }
     }
 

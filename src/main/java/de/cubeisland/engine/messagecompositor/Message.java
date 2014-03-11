@@ -190,35 +190,28 @@ class Message
 
     private void stateType(char curChar)
     {
+        if (typeBuffer.length() == 0)
+        {
+            if (curChar == MACRO_SEPARATOR || curChar == MACRO_LABEL || curChar == MACRO_END)
+            {
+                this.resetMacro(curChar);
+                return;
+            }
+        }
         if (curChar == MACRO_BEGIN || curChar == MACRO_ESCAPE)
         {
             this.resetMacro(curChar);
         }
         else if (curChar == MACRO_SEPARATOR)
         {
-            if (this.typeBuffer.length() == 0)
-            {
-                this.resetMacro(curChar);
-                return;
-            }
             this.startArgument();
         }
         else if (curChar == MACRO_LABEL)
         {
-            if (this.typeBuffer.length() == 0)
-            {
-                this.resetMacro(curChar);
-                return;
-            }
             this.label();
         }
         else if (curChar == MACRO_END)
         {
-            if (this.typeBuffer.length() == 0)
-            {
-                this.resetMacro(curChar);
-                return;
-            }
             this.format();
         }
         else if (this.isLetter(curChar) || Character.isDigit(curChar))
@@ -233,31 +226,21 @@ class Message
 
     private void stateLabel(char curChar)
     {
-        if (curChar == MACRO_ESCAPE)
+        if (this.escaped())
         {
-            if (this.escaped())
-            {
-                this.label();
-                return;
-            }
+            // ignore what got escaped, as the label is not read
+            this.label();
+        }
+        else if (curChar == MACRO_ESCAPE)
+        {
             this.escape();
         }
         else if (curChar == MACRO_SEPARATOR)
         {
-            if (this.escaped())
-            {
-                this.label();
-                return;
-            }
             this.startArgument();
         }
         else if (curChar == MACRO_END)
         {
-            if (this.escaped())
-            {
-                this.label();
-                return;
-            }
             this.format();
         }
         else
@@ -406,23 +389,18 @@ class Message
         final Object messageArgument = messageArgs.length > pos ? messageArgs[pos] : null;
         state = State.NONE;
         String type = typeBuffer.toString();
+        Macro matched = null;
         if (!type.isEmpty())
         {
-            Macro matched = compositor.matchMacroFor(messageArgument, type);
-            if (matched != null)
-            {
-                compositor
-                    .format(new MacroContext(compositor, matched, type, locale, typeArguments), messageArgument, finalString);
-                this.adjustCurPos(matched, manualPos);
-                return;
-            }
+            matched = compositor.matchMacroFor(messageArgument, type);
         }
-        // else without type or not found:
-        Macro matched = compositor.matchMacroFor(messageArgument, compositor.defaultMacros);
+        if (matched == null)
+        {
+            matched = compositor.matchMacroFor(messageArgument, compositor.defaultMacros);
+        }
         if (matched != null)
         {
-            compositor
-                .format(new MacroContext(compositor, matched, null, locale, typeArguments), messageArgument, finalString);
+            compositor.format(new MacroContext(compositor, matched, type, locale, typeArguments), messageArgument, finalString);
             this.adjustCurPos(matched, manualPos);
             return;
         }
