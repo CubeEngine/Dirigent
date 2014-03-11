@@ -90,213 +90,209 @@ class Message
 
     private void chooseState(char curChar)
     {
-        switch (this.state)
+        if (this.state == State.NONE)
         {
-        case NONE:
             this.stateNone(curChar);
-            break;
-        case START:
+        }
+        else if (this.state == State.START)
+        {
             this.stateStart(curChar);
-            break;
-        case POS:
+        }
+        else if (this.state == State.POS)
+        {
             this.statePos(curChar);
-            break;
-        case TYPE:
+        }
+        else if (this.state == State.TYPE)
+        {
             this.stateType(curChar);
-            break;
-        case LABEL:
+        }
+        else if (this.state == State.LABEL)
+        {
             this.stateLabel(curChar);
-            break;
-        case ARGUMENTS:
+        }
+        else if (this.state == State.ARGUMENTS)
+        {
             this.stateArguments(curChar);
-            break;
         }
     }
 
     private void stateNone(char curChar)
     {
-        switch (curChar)
+        if (this.escaped())
         {
-        case MACRO_BEGIN:
-            if (this.escaped())
+            if (curChar != MACRO_BEGIN && curChar != MACRO_ESCAPE)
             {
-                break;
-            }
-            this.startMacro();
-            return;
-        case MACRO_ESCAPE:
-            if (this.escaped())
-            {
-                break;
-            }
-            this.escape();
-            return;
-        case MACRO_SEPARATOR:
-        case MACRO_END:
-        default:
-            if (this.escaped())
-            {
-                // re-add escaping char
                 this.none(MACRO_ESCAPE);
             }
-            break;
+            this.none(curChar);
         }
-        this.none(curChar);
+        else if (curChar == MACRO_BEGIN)
+        {
+            this.startMacro();
+        }
+        else if (curChar == MACRO_ESCAPE)
+        {
+            this.escape();
+        }
+        else
+        {
+            this.none(curChar);
+        }
     }
 
     private void stateStart(char curChar)
     {
-        switch (curChar)
+        if (curChar == MACRO_BEGIN || curChar == MACRO_ESCAPE || curChar == MACRO_SEPARATOR)
         {
-        case MACRO_BEGIN:
-        case MACRO_ESCAPE:
-        case MACRO_SEPARATOR:
-            break;
-        case MACRO_END:
-            this.format();
-            return;
-        default:
-            // expecting position OR type
-            if (Character.isDigit(curChar)) // pos
-            {
-                this.position(curChar);
-                return;
-            }
-            if (this.isLetter(curChar)) // type
-            {
-                this.type(curChar);
-                return;
-            }
-            break;
+            this.resetMacro(curChar);
         }
-        this.resetMacro(curChar);
+        else if (curChar == MACRO_END)
+        {
+            this.format();
+        }
+        else if (Character.isDigit(curChar))
+        {
+            this.position(curChar);
+        }
+        else if (this.isLetter(curChar))
+        {
+            this.type(curChar);
+        }
+        else
+        {
+            this.resetMacro(curChar);
+        }
     }
 
     private void statePos(char curChar)
     {
-        switch (curChar)
+        if (curChar == MACRO_BEGIN || curChar == MACRO_ESCAPE)
         {
-        case MACRO_BEGIN:
-        case MACRO_ESCAPE:
-            break;
-        case MACRO_SEPARATOR:
-            this.type(null);
-            return;
-        case MACRO_END:
-            this.format();
-            return;
-        default:
-            if (Character.isDigit(curChar)) // pos
-            {
-                this.position(curChar);
-                return;
-            }
-            break;
+            this.resetMacro(curChar);
         }
-        this.resetMacro(curChar);
+        else if (curChar == MACRO_SEPARATOR)
+        {
+            this.type(null);
+        }
+        else if (curChar == MACRO_END)
+        {
+            this.format();
+        }
+        else if (Character.isDigit(curChar)) // pos
+        {
+            this.position(curChar);
+        }
+        else
+        {
+            this.resetMacro(curChar);
+        }
     }
 
     private void stateType(char curChar)
     {
-        switch (curChar)
+        if (curChar == MACRO_BEGIN || curChar == MACRO_ESCAPE)
         {
-        case MACRO_BEGIN:
-        case MACRO_ESCAPE:
-            break;
-        case MACRO_SEPARATOR:
+            this.resetMacro(curChar);
+        }
+        else if (curChar == MACRO_SEPARATOR)
+        {
             if (this.typeBuffer.length() == 0)
             {
-                break;
-            }
-            this.startArgument();
-            return;
-        case MACRO_LABEL:
-            if (this.typeBuffer.length() == 0)
-            {
-                break;
-            }
-            this.label();
-            return;
-        case MACRO_END:
-            if (this.typeBuffer.length() == 0)
-            {
-                break;
-            }
-            this.format();
-            return;
-        default:
-            if (this.isLetter(curChar) || Character.isDigit(curChar))
-            {
-                this.type(curChar);
+                this.resetMacro(curChar);
                 return;
             }
-            break;
+            this.startArgument();
         }
-        this.resetMacro(curChar);
+        else if (curChar == MACRO_LABEL)
+        {
+            if (this.typeBuffer.length() == 0)
+            {
+                this.resetMacro(curChar);
+                return;
+            }
+            this.label();
+        }
+        else if (curChar == MACRO_END)
+        {
+            if (this.typeBuffer.length() == 0)
+            {
+                this.resetMacro(curChar);
+                return;
+            }
+            this.format();
+        }
+        else if (this.isLetter(curChar) || Character.isDigit(curChar))
+        {
+            this.type(curChar);
+        }
+        else
+        {
+            this.resetMacro(curChar);
+        }
     }
 
     private void stateLabel(char curChar)
     {
-        switch (curChar)
+        if (curChar == MACRO_ESCAPE)
         {
-        case MACRO_ESCAPE:
             if (this.escaped())
             {
-                break;
+                this.label();
+                return;
             }
             this.escape();
-            return;
-        case MACRO_SEPARATOR:
+        }
+        else if (curChar == MACRO_SEPARATOR)
+        {
             if (this.escaped())
             {
-                break;
+                this.label();
+                return;
             }
             this.startArgument();
-            return;
-        case MACRO_END:
+        }
+        else if (curChar == MACRO_END)
+        {
             if (this.escaped())
             {
-                break;
+                this.label();
+                return;
             }
             this.format();
-            return;
-        default:
-            break;
         }
-        this.label();
+        else
+        {
+            this.label();
+        }
     }
 
     private void stateArguments(char curChar)
     {
-        switch (curChar)
+        if (this.escaped())
         {
-        case MACRO_ESCAPE:
-            if (this.escaped()) // "\\\\"
+            if (curChar == MACRO_ESCAPE || curChar == MACRO_SEPARATOR || curChar == MACRO_END)
             {
                 this.argument(curChar);
-                break;
+                return;
             }
-            this.escape();
-            break;
-        case MACRO_SEPARATOR:
-            if (this.escaped())
-            {
-                this.argument(curChar);
-                break;
-            }
-            this.startArgument();
-            break;
-        case MACRO_END:
-            if (this.escaped())
-            {
-                this.argument(curChar);
-                break;
-            }
-            this.format();
-            break;
-        default:
+            this.argument(MACRO_ESCAPE);
             this.argument(curChar);
-            break;
+        }
+        else if (curChar == MACRO_ESCAPE)
+        {
+            this.escape();
+        }
+        else if (curChar == MACRO_SEPARATOR)
+        {
+            this.startArgument();
+        }
+        else if (curChar == MACRO_END)
+        {
+            this.format();
+        }
+        else
+        {
+            this.argument(curChar);
         }
     }
 
