@@ -46,6 +46,15 @@ public class MacroContext
     public static final char MAP = '=';
     public static final char ESCAPE = '\\';
 
+    /**
+     * Creates a MacroContext for given macro
+     *
+     * @param compositor the compositor used
+     * @param macro the macro this context is created for
+     * @param type the name of the macro
+     * @param locale the locale
+     * @param typeArguments the arguments of the macro
+     */
     public MacroContext(MessageCompositor compositor, Macro macro, String type, Locale locale, List<String> typeArguments)
     {
         this.compositor = compositor;

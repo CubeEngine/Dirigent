@@ -39,7 +39,7 @@ class Message
     public static final char MACRO_SEPARATOR = ':';
     public static final char MACRO_LABEL = '#';
 
-    enum State
+    private enum State
     {
         NONE,
         START,
