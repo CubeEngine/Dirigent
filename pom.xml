@@ -4,7 +4,7 @@
 
   <groupId>de.cubeisland.engine</groupId>
   <artifactId>messagecompositor</artifactId>
-  <version>0.0.2-SNAPSHOT</version>
+  <version>1.0.0</version>
 
   <name>MessageCompositor</name>
   <description>A readable and compact message composing library</description>
@@ -27,7 +27,7 @@
     <url>https://github.com/CubeEngineDev/MessageCompositor</url>
     <connection>scm:git:https://github.com/CubeEngineDev/MessageCompositor</connection>
     <developerConnection>scm:git:https://github.com/CubeEngineDev/MessageCompositor</developerConnection>
-    <tag>HEAD</tag>
+    <tag>messagecompositor-1.0.0</tag>
   </scm>
 
   <distributionManagement>
