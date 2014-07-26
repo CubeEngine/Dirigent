@@ -25,7 +25,6 @@ package de.cubeisland.engine.messagecompositor;
 import java.util.Locale;
 
 import de.cubeisland.engine.messagecompositor.macro.Macro;
-import de.cubeisland.engine.messagecompositor.macro.MacroContext;
 import de.cubeisland.engine.messagecompositor.macro.Reader;
 
 /**
@@ -146,22 +145,4 @@ public interface MessageCompositor
      * @return the read value or null
      */
     <T> T read(Macro macro, String value, Class<T> clazz);
-
-    /**
-     * This Method is called right before a processed Macro is appended to the final String
-     *
-     * @param context         the context
-     * @param messageArgument the messageArgument (can be null)
-     * @param finalString     the StringBuilder containing the final String
-     */
-    void postFormat(MacroContext context, Object messageArgument, StringBuilder finalString);
-
-    /**
-     * This Method is called right after a processed Macro was appended to the final String
-     *
-     * @param context         the context
-     * @param messageArgument the messageArgument (can be null)
-     * @param finalString     the StringBuilder containing the final String
-     */
-    void preFormat(MacroContext context, Object messageArgument, StringBuilder finalString);
 }

@@ -22,6 +22,7 @@
  */
 package de.cubeisland.engine.messagecompositor.macro;
 
+import java.util.List;
 import java.util.Set;
 
 public interface Macro
@@ -32,4 +33,8 @@ public interface Macro
      * @return the names
      */
     Set<String> names();
+
+    List<PostProcessor> getPostProcessors();
+
+    void addPostProcessor(PostProcessor postProcessor);
 }

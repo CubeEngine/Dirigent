@@ -22,32 +22,7 @@
  */
 package de.cubeisland.engine.messagecompositor.macro;
 
-import java.util.ArrayList;
-import java.util.List;
-
-/**
- * A Macro that accepts no additional input
- */
-public abstract class ConstantMacro implements Macro
+public interface PostProcessor
 {
-    private final List<PostProcessor> postProcessors = new ArrayList<PostProcessor>();
-
-    public List<PostProcessor> getPostProcessors()
-    {
-        return postProcessors;
-    }
-
-    public void addPostProcessor(PostProcessor postProcessor)
-    {
-        this.postProcessors.add(postProcessor);
-    }
-
-    /**
-     * Processes a macro without additional input
-     *
-     * @param context the context
-     *
-     * @return the processed macro-result
-     */
-    public abstract String process(MacroContext context);
+    String process(String processed, MacroContext context);
 }

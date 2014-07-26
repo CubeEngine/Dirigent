@@ -24,13 +24,16 @@ package de.cubeisland.engine.messagecompositor.macro;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public abstract class AbstractFormatter<T> implements Formatter<T>
 {
     protected final Class<T> tClass;
+    private final List<PostProcessor> postProcessors = new ArrayList<PostProcessor>();
     protected Set<String> names = new HashSet<String>();
 
     @SuppressWarnings("unchecked")
@@ -56,6 +59,16 @@ public abstract class AbstractFormatter<T> implements Formatter<T>
     public static Set<String> toSet(String... names)
     {
         return new HashSet<String>(Arrays.asList(names));
+    }
+
+    public List<PostProcessor> getPostProcessors()
+    {
+        return postProcessors;
+    }
+
+    public void addPostProcessor(PostProcessor postProcessor)
+    {
+        this.postProcessors.add(postProcessor);
     }
 
     public boolean isApplicable(Class<?> objectType)

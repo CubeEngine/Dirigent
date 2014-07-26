@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -35,6 +36,7 @@ import de.cubeisland.engine.messagecompositor.macro.ConstantMacro;
 import de.cubeisland.engine.messagecompositor.macro.Formatter;
 import de.cubeisland.engine.messagecompositor.macro.Macro;
 import de.cubeisland.engine.messagecompositor.macro.MacroContext;
+import de.cubeisland.engine.messagecompositor.macro.PostProcessor;
 import de.cubeisland.engine.messagecompositor.macro.Reader;
 
 public class DefaultMessageCompositor implements MessageCompositor
@@ -47,6 +49,7 @@ public class DefaultMessageCompositor implements MessageCompositor
     private Map<String, Reader> readers = new HashMap<String, Reader>();
     private Map<Class<? extends Macro>, Map<String, Reader>> mappedReaders = new HashMap<Class<? extends Macro>, Map<String, Reader>>();
     private Map<Class<? extends Macro>, Reader> defaultReaders = new HashMap<Class<? extends Macro>, Reader>();
+    private LinkedHashSet<PostProcessor> defaultPostProcessors = new LinkedHashSet<PostProcessor>();
 
     /**
      * Creates a MessageCompositor with the default locale
@@ -64,6 +67,11 @@ public class DefaultMessageCompositor implements MessageCompositor
     public DefaultMessageCompositor(Locale defaultLocale)
     {
         this.defaultLocale = defaultLocale;
+    }
+
+    public void addDefaultPostProcessor(PostProcessor postProcessor)
+    {
+        this.defaultPostProcessors.add(postProcessor);
     }
 
     public final String composeMessage(String sourceMessage, Object... messageArguments)
@@ -178,9 +186,8 @@ public class DefaultMessageCompositor implements MessageCompositor
             {
                 cMacro = (ConstantMacro)macro;
             }
-            else if (messageArgument != null
-                  && macro instanceof Formatter
-                  && ((Formatter)macro).isApplicable(messageArgument.getClass()))
+            else if (messageArgument != null && macro instanceof Formatter && ((Formatter)macro).isApplicable(
+                messageArgument.getClass()))
             {
                 return macro;
             }
@@ -200,32 +207,31 @@ public class DefaultMessageCompositor implements MessageCompositor
     }
 
     @SuppressWarnings("unchecked")
-    final void format(MacroContext context, Object messageArguments, StringBuilder finalString)
+    final String format(MacroContext context, Object arg)
     {
-        this.preFormat(context, messageArguments, finalString);
         Macro macro = context.getMacro();
+        String processed;
         if (macro instanceof Formatter)
         {
-            finalString.append(((Formatter)macro).process(messageArguments, context));
+            processed = ((Formatter)macro).process(arg, context);
         }
         else if (macro instanceof ConstantMacro)
         {
-            finalString.append(((ConstantMacro)macro).process(context));
+            processed = ((ConstantMacro)macro).process(context);
         }
         else
         {
             throw new IllegalArgumentException("Unknown Macro! " + macro.getClass().getName());
         }
-        this.postFormat(context, messageArguments, finalString);
-    }
-
-    public void preFormat(MacroContext context, Object messageArgument, StringBuilder finalString)
-    {
-        // implement preFormat behaviour
-    }
-
-    public void postFormat(MacroContext context, Object messageArgument, StringBuilder finalString)
-    {
-        // implement postFormat behaviour
+        Collection<PostProcessor> postProcessors = macro.getPostProcessors();
+        if (postProcessors.isEmpty())
+        {
+            postProcessors = this.defaultPostProcessors;
+        }
+        for (PostProcessor postProcessor : postProcessors)
+        {
+            processed = postProcessor.process(processed, context);
+        }
+        return processed;
     }
 }

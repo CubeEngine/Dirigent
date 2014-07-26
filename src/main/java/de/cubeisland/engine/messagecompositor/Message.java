@@ -22,14 +22,14 @@
  */
 package de.cubeisland.engine.messagecompositor;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-
 import de.cubeisland.engine.messagecompositor.exception.MissingMacroException;
 import de.cubeisland.engine.messagecompositor.macro.Formatter;
 import de.cubeisland.engine.messagecompositor.macro.Macro;
 import de.cubeisland.engine.messagecompositor.macro.MacroContext;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 class Message
 {
@@ -400,7 +400,8 @@ class Message
         }
         if (matched != null)
         {
-            compositor.format(new MacroContext(compositor, matched, type, locale, typeArguments), messageArgument, finalString);
+            MacroContext ctx = new MacroContext(sourceMessage, compositor, matched, type, locale, typeArguments);
+            finalString.append(compositor.format(ctx, messageArgument));
             this.adjustCurPos(matched, manualPos);
             return;
         }

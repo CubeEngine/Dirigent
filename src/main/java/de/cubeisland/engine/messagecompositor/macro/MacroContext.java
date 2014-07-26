@@ -35,6 +35,7 @@ import de.cubeisland.engine.messagecompositor.MessageCompositor;
  */
 public class MacroContext
 {
+    private final String sourceMessage;
     private final MessageCompositor compositor;
     private final Macro macro;
     private final Locale locale;
@@ -49,14 +50,17 @@ public class MacroContext
     /**
      * Creates a MacroContext for given macro
      *
+     * @param sourceMessage
      * @param compositor the compositor used
      * @param macro the macro this context is created for
      * @param type the name of the macro
      * @param locale the locale
      * @param typeArguments the arguments of the macro
      */
-    public MacroContext(MessageCompositor compositor, Macro macro, String type, Locale locale, List<String> typeArguments)
+    public MacroContext(String sourceMessage, MessageCompositor compositor, Macro macro, String type, Locale locale,
+                        List<String> typeArguments)
     {
+        this.sourceMessage = sourceMessage;
         this.compositor = compositor;
         this.macro = macro;
         this.locale = locale;
@@ -221,5 +225,10 @@ public class MacroContext
     public final String getType()
     {
         return type;
+    }
+
+    public String getSourceMessage()
+    {
+        return sourceMessage;
     }
 }
