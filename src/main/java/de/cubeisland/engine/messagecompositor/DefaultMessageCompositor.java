@@ -69,9 +69,10 @@ public class DefaultMessageCompositor implements MessageCompositor
         this.defaultLocale = defaultLocale;
     }
 
-    public void addDefaultPostProcessor(PostProcessor postProcessor)
+    public MessageCompositor addDefaultPostProcessor(PostProcessor postProcessor)
     {
         this.defaultPostProcessors.add(postProcessor);
+        return this;
     }
 
     public final String composeMessage(String sourceMessage, Object... messageArguments)

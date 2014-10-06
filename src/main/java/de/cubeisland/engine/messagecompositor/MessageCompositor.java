@@ -25,6 +25,7 @@ package de.cubeisland.engine.messagecompositor;
 import java.util.Locale;
 
 import de.cubeisland.engine.messagecompositor.macro.Macro;
+import de.cubeisland.engine.messagecompositor.macro.PostProcessor;
 import de.cubeisland.engine.messagecompositor.macro.Reader;
 
 /**
@@ -145,4 +146,12 @@ public interface MessageCompositor
      * @return the read value or null
      */
     <T> T read(Macro macro, String value, Class<T> clazz);
+
+    /**
+     * Adds a default post processor to this compositor
+     *
+     * @param postProcessor the post processor to add
+     * @return fluent interface
+     */
+    MessageCompositor addDefaultPostProcessor(PostProcessor postProcessor);
 }
