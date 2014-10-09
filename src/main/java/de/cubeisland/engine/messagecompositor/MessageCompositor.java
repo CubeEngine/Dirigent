@@ -29,7 +29,7 @@ import de.cubeisland.engine.messagecompositor.macro.PostProcessor;
 import de.cubeisland.engine.messagecompositor.macro.Reader;
 
 /**
- * A message-compositor processing macros {[[<position>:]type[#<label>][:<args>]]} or just {[pos]}
+ * A message-compositor processing macros {[[&lt;position&gt;:]type[#&lt;label&gt;][:&lt;args&gt;]]} or just {[pos]}
  */
 public interface MessageCompositor
 {
@@ -116,6 +116,7 @@ public interface MessageCompositor
     /**
      * Reads a value for a key
      *
+     * @param <T>   the type of the macro value
      * @param key   the key
      * @param value the value to read
      * @param clazz the class to cast into
@@ -127,6 +128,7 @@ public interface MessageCompositor
     /**
      * Reads a value for a key and macro
      *
+     * @param <T>   the type of the macro value
      * @param macro the macro
      * @param key   the key
      * @param value the value to read
@@ -139,6 +141,7 @@ public interface MessageCompositor
     /**
      * Reads a value for a macro
      *
+     * @param <T>   the type of the macro value
      * @param macro the macro
      * @param value the value to read
      * @param clazz the class to cast into

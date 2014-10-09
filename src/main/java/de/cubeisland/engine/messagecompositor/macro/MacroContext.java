@@ -50,7 +50,7 @@ public class MacroContext
     /**
      * Creates a MacroContext for given macro
      *
-     * @param sourceMessage
+     * @param sourceMessage the parsed message
      * @param compositor the compositor used
      * @param macro the macro this context is created for
      * @param type the name of the macro
@@ -167,6 +167,7 @@ public class MacroContext
     /**
      * Attempts to read an indexed argument
      *
+     * @param <T>   the type of the argument value
      * @param i     the index
      * @param clazz the class to cast into
      *
@@ -197,6 +198,7 @@ public class MacroContext
     /**
      * Attempts to read a mapped argument for given key
      *
+     * @param <T>   the type of the argument value
      * @param key   the key
      * @param clazz the class to cast into
      *
