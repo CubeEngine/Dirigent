@@ -1,5 +1,7 @@
 MessageCompositor
-=========
+=================
+
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/de.cubeisland.engine/messagecompositor/badge.svg?style=flat)](https://maven-badges.herokuapp.com/maven-central/de.cubeisland.engine/messagecompositor)
 
 A compact formatting framework intended to be used in conjuction with translated messages.
 
