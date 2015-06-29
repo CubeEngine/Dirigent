@@ -31,7 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-class Message
+class OldMessage
 {
     public static final char MACRO_BEGIN = '{';
     public static final char MACRO_END = '}';
@@ -63,7 +63,7 @@ class Message
     private boolean escape = false;
     int curPos = 0;
 
-    Message(DefaultMessageCompositor compositor, Locale locale, String sourceMessage, Object[] messageArgs)
+    OldMessage(DefaultMessageCompositor compositor, Locale locale, String sourceMessage, Object[] messageArgs)
     {
         this.compositor = compositor;
         this.locale = locale;

@@ -82,7 +82,7 @@ public class DefaultMessageCompositor implements MessageCompositor
 
     public final String composeMessage(Locale locale, String sourceMessage, Object... messageArguments)
     {
-        return new Message(this, locale, sourceMessage, messageArguments).process();
+        return new OldMessage(this, locale, sourceMessage, messageArguments).process();
     }
 
     public final MessageCompositor registerMacro(Macro macro)
