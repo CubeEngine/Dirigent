@@ -28,9 +28,11 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 
+import de.cubeisland.engine.messagecompositor.macro.AbstractFormatter;
 import de.cubeisland.engine.messagecompositor.macro.MacroContext;
 import de.cubeisland.engine.messagecompositor.macro.Reader;
-import de.cubeisland.engine.messagecompositor.macro.AbstractFormatter;
+
+import static java.text.DateFormat.SHORT;
 
 public class DateFormatter extends AbstractFormatter<Date>
 {
@@ -44,7 +46,11 @@ public class DateFormatter extends AbstractFormatter<Date>
         SimpleDateFormat sdf = context.readMapped("format", SimpleDateFormat.class);
         if (sdf == null)
         {
-            DateFormat instance = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, context.getLocale());
+            DateFormat instance = DateFormat.getDateTimeInstance(SHORT, SHORT, context.getLocale());
+            if ("notime".equalsIgnoreCase(context.getArg(0)))
+            {
+                instance = DateFormat.getDateInstance(SHORT, context.getLocale());
+            }
             return instance.format(object);
         }
         return sdf.format(object);

@@ -27,9 +27,9 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
 import de.cubeisland.engine.messagecompositor.macro.MacroContext;
-import de.cubeisland.engine.messagecompositor.macro.reflected.ReflectedFormatter;
 import de.cubeisland.engine.messagecompositor.macro.reflected.Format;
 import de.cubeisland.engine.messagecompositor.macro.reflected.Names;
+import de.cubeisland.engine.messagecompositor.macro.reflected.ReflectedFormatter;
 
 @Names("decimal")
 public class DecimalFormatter extends ReflectedFormatter
