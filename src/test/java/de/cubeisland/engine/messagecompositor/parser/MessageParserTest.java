@@ -18,5 +18,8 @@ public class MessageParserTest
         MessageParser.readMessage("{1:name#with index and comment:and parameter=with value:multiple:and one=more}");
         MessageParser.readMessage("text and a macro {1:name#with index and comment:and parameter=with value:multiple:and one=more} more text");
         MessageParser.readMessage("text and a macro {1:name#with index and comment:and parameter=with value:multiple:and one=more} more text");
+
+        MessageParser.readMessage("illegal macro {starts but wont end");
+        MessageParser.readMessage("illegal macro {starts:has arguments but wont end");
     }
 }

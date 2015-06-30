@@ -31,10 +31,21 @@ public class MessageParser
             switch (c)
             {
                 case MACRO_BEGIN: // start macro
-                    elements.add(readMacro(message));
+                    try
+                    {
+
+                        elements.add(readMacro(message));
+                        message.setCheckPoint();
+                    }
+                    catch (IllegalMacroException e)
+                    {
+                        elements.add(new ErrorText(message.fromCheckPoint()));
+                        return new Message(elements);
+                    }
                     break;
                 default: // start normal text
                     elements.add(readString(message));
+                    message.setCheckPoint();
             }
         }
 
@@ -92,7 +103,7 @@ public class MessageParser
         }
         if (!ended)
         {
-            throw new IllegalArgumentException(); // TODO message macro not closed / checkpoint?
+            throw new IllegalMacroException("macro");
         }
         if (name == null)
         {
@@ -130,12 +141,12 @@ public class MessageParser
             }
             else // NaN invalid index
             {
-                throw new IllegalArgumentException(); // TODO invalid index
+                throw new IllegalMacroException("index");
             }
         }
         if (!ended) // index did not end
         {
-            throw new IllegalArgumentException(); // TODO index not closed
+            throw new IllegalMacroException("index");
         }
         return parseInt(sb.toString());
     }
@@ -167,7 +178,7 @@ public class MessageParser
         }
         if (!ended)
         {
-            throw new IllegalArgumentException(); // TODO name not closed
+            throw new IllegalMacroException("name");
         }
         return sb.toString();
     }
@@ -189,7 +200,7 @@ public class MessageParser
         }
         if (!ended)
         {
-            throw new IllegalArgumentException(); // TODO arguments not closed
+            throw new IllegalMacroException("arguments");
         }
         return list;
     }
@@ -221,7 +232,7 @@ public class MessageParser
         }
         if (!ended)
         {
-            throw new IllegalArgumentException(); // TODO argument not closed
+            throw new IllegalMacroException("argument");
         }
         if (argumentValue == null)
         {
@@ -246,7 +257,7 @@ public class MessageParser
         }
         if (!ended)
         {
-            throw new IllegalArgumentException(); // TODO argument not closed
+            throw new IllegalMacroException("argument-value");
         }
         return sb.toString();
     }
