@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-
 import de.cubeisland.engine.messagecompositor.macro.ConstantMacro;
 import de.cubeisland.engine.messagecompositor.macro.Formatter;
 import de.cubeisland.engine.messagecompositor.macro.Macro;

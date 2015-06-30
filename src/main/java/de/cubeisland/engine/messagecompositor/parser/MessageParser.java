@@ -1,14 +1,8 @@
 package de.cubeisland.engine.messagecompositor.parser;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import de.cubeisland.engine.messagecompositor.RawMessage;
-import de.cubeisland.engine.messagecompositor.parser.ArgumentElement;
-import de.cubeisland.engine.messagecompositor.parser.Element;
-import de.cubeisland.engine.messagecompositor.parser.MacroElement;
-import de.cubeisland.engine.messagecompositor.parser.Message;
-import de.cubeisland.engine.messagecompositor.parser.StringElement;
 
 import static java.lang.Integer.parseInt;
 
@@ -31,7 +25,7 @@ public class MessageParser
 
     private static Message readMessage(RawMessage message)
     {
-        final LinkedList<Element> elements = new LinkedList<Element>();
+        final List<MessageComponent> elements = new ArrayList<MessageComponent>();
         for (char c : message) // Read entire the raw message
         {
             switch (c)
@@ -47,7 +41,7 @@ public class MessageParser
         return new Message(elements);
     }
 
-    private static StringElement readString(RawMessage message)
+    private static Text readString(RawMessage message)
     {
         StringBuilder sb = new StringBuilder().append(message.current());
         for (char c : message)
@@ -56,7 +50,7 @@ public class MessageParser
             {
                 case MACRO_BEGIN: // end normal text
                     message.prev();
-                    return new StringElement(sb.toString());
+                    return new Text(sb.toString());
                 case MACRO_ESCAPE: // escaped text
                     if (message.hasNext())
                     {
@@ -67,15 +61,15 @@ public class MessageParser
                     sb.append(c);
             }
         }
-        return new StringElement(sb.toString());
+        return new Text(sb.toString());
     }
 
-    private static MacroElement readMacro(RawMessage message)
+    private static Macro readMacro(RawMessage message)
     {
         boolean ended = false;
         Integer index = null;
         String name = null;
-        List<ArgumentElement> arguments = null;
+        List<Argument> args = null;
         for (char c : message) // read the macro
         {
             if (c == MACRO_END) // end macro
@@ -93,14 +87,26 @@ public class MessageParser
             }
             else // start arguments
             {
-                arguments = readArguments(message);
+                args = readArguments(message);
             }
         }
         if (!ended)
         {
             throw new IllegalArgumentException(); // TODO message macro not closed / checkpoint?
         }
-        return new MacroElement(index, name, arguments);
+        if (name == null)
+        {
+            if (index == null)
+            {
+                return new DefaultMacro();
+            }
+            return new IndexedDefaultMacro(index);
+        }
+        if (index == null)
+        {
+            return new NamedMacro(name, args);
+        }
+        return new CompleteMacro(index, name, args);
     }
 
     private static int readIndex(RawMessage message)
@@ -166,10 +172,10 @@ public class MessageParser
         return sb.toString();
     }
 
-    private static List<ArgumentElement> readArguments(RawMessage message)
+    private static List<Argument> readArguments(RawMessage message)
     {
         boolean ended = false;
-        List<ArgumentElement> list = new ArrayList<ArgumentElement>();
+        List<Argument> list = new ArrayList<Argument>();
         list.add(readArgument(message)); // read first argument
         for (Character c : message)
         {
@@ -188,7 +194,7 @@ public class MessageParser
         return list;
     }
 
-    private static ArgumentElement readArgument(RawMessage message)
+    private static Argument readArgument(RawMessage message)
     {
         StringBuilder sb = new StringBuilder().append(message.current());
         String argumentValue = null;
@@ -219,9 +225,9 @@ public class MessageParser
         }
         if (argumentValue == null)
         {
-            return new ArgumentElement(null, sb.toString());
+            return new Flag(sb.toString());
         }
-        return new ArgumentElement(sb.toString(), argumentValue);
+        return new Parameter(sb.toString(), argumentValue);
     }
 
     private static String readArgumentValue(RawMessage message)

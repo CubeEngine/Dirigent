@@ -25,7 +25,6 @@ package de.cubeisland.engine.messagecompositor;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
-
 import de.cubeisland.engine.messagecompositor.macro.example.DateFormatter;
 import de.cubeisland.engine.messagecompositor.macro.example.DateFormatter.DateReader;
 import de.cubeisland.engine.messagecompositor.macro.example.DecimalFormatter;

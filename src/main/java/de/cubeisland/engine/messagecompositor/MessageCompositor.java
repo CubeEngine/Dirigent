@@ -23,7 +23,6 @@
 package de.cubeisland.engine.messagecompositor;
 
 import java.util.Locale;
-
 import de.cubeisland.engine.messagecompositor.macro.Macro;
 import de.cubeisland.engine.messagecompositor.macro.PostProcessor;
 import de.cubeisland.engine.messagecompositor.macro.Reader;

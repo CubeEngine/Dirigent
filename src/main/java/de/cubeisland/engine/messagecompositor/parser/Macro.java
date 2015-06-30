@@ -1,6 +1,5 @@
 package de.cubeisland.engine.messagecompositor.parser;
 
-public interface Element
+public interface Macro extends MessageComponent
 {
-
 }

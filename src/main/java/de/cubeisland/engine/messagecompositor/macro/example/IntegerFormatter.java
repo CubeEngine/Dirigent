@@ -24,7 +24,6 @@ package de.cubeisland.engine.messagecompositor.macro.example;
 
 import java.util.Arrays;
 import java.util.HashSet;
-
 import de.cubeisland.engine.messagecompositor.macro.AbstractFormatter;
 import de.cubeisland.engine.messagecompositor.macro.MacroContext;
 

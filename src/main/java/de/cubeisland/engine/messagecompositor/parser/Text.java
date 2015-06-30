@@ -1,10 +1,10 @@
 package de.cubeisland.engine.messagecompositor.parser;
 
-public class StringElement implements Element
+public class Text implements MessageComponent
 {
     private String string;
 
-    public StringElement(String string)
+    public Text(String string)
     {
         this.string = string;
     }

@@ -23,7 +23,6 @@
 package de.cubeisland.engine.messagecompositor.macro.reflected;
 
 import java.util.Date;
-
 import junit.framework.TestCase;
 
 public class ReflectedFormatterTest extends TestCase

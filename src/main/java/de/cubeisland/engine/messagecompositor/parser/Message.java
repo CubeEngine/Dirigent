@@ -1,13 +1,20 @@
 package de.cubeisland.engine.messagecompositor.parser;
 
-import java.util.LinkedList;
+import java.util.List;
+
+import static java.util.Collections.unmodifiableList;
 
 public class Message
 {
-    private LinkedList<Element> elements = new LinkedList<Element>();
+    private final List<MessageComponent> components;
 
-    public Message(LinkedList<Element> elements)
+    public Message(List<MessageComponent> components)
     {
-        this.elements = elements;
+        this.components = unmodifiableList(components);
+    }
+
+    public List<MessageComponent> getComponents()
+    {
+        return components;
     }
 }

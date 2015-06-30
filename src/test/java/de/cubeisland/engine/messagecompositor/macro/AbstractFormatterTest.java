@@ -23,7 +23,6 @@
 package de.cubeisland.engine.messagecompositor.macro;
 
 import java.util.Date;
-
 import de.cubeisland.engine.messagecompositor.macro.example.DateFormatter;
 import junit.framework.TestCase;
 

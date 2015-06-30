@@ -23,7 +23,6 @@
 package de.cubeisland.engine.messagecompositor.macro.reflected;
 
 import java.util.Date;
-
 import de.cubeisland.engine.messagecompositor.macro.MacroContext;
 
 @Names({"test","name"})
