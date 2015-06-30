@@ -20,12 +20,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package de.cubeisland.engine.messagecompositor.parser;
+package de.cubeisland.engine.messagecompositor.parser.component.macro;
 
-public class IllegalMacroException extends RuntimeException
+public class IndexedDefaultMacro extends DefaultMacro implements Indexed
 {
-    public IllegalMacroException(String message)
+    private final int index;
+
+    public IndexedDefaultMacro(int index)
     {
-        super(message);
+        this.index = index;
+    }
+
+    public int getIndex()
+    {
+        return index;
     }
 }

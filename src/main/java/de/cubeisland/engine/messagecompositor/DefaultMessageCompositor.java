@@ -234,4 +234,9 @@ public class DefaultMessageCompositor implements MessageCompositor
         }
         return processed;
     }
+
+    public de.cubeisland.engine.messagecompositor.parser.formatter.Formatter findFormatter(String name, Object arg)
+    {
+        return null;
+    }
 }

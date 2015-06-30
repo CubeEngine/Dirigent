@@ -22,10 +22,17 @@
  */
 package de.cubeisland.engine.messagecompositor.parser;
 
-public class IllegalMacroException extends RuntimeException
+import java.util.Locale;
+import de.cubeisland.engine.messagecompositor.parser.formatter.Formatter;
+import de.cubeisland.engine.messagecompositor.parser.formatter.PostProcessor;
+
+public interface MessageCompositor<MessageT>
 {
-    public IllegalMacroException(String message)
-    {
-        super(message);
-    }
+    MessageT composeMessage(String source, Object... args);
+    MessageT composeMessage(Locale locale, String source, Object... args);
+
+    MessageCompositor registerFormatter(Formatter<?> formatter);
+    MessageCompositor addPostProcessor(PostProcessor postProcessor);
+
+    Formatter findFormatter(String name, Object arg);
 }

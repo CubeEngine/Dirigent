@@ -26,6 +26,7 @@ import java.util.Locale;
 import de.cubeisland.engine.messagecompositor.macro.Macro;
 import de.cubeisland.engine.messagecompositor.macro.PostProcessor;
 import de.cubeisland.engine.messagecompositor.macro.Reader;
+import de.cubeisland.engine.messagecompositor.parser.formatter.Formatter;
 
 /**
  * A message-compositor processing macros {[[&lt;position&gt;:]type[#&lt;label&gt;][:&lt;args&gt;]]} or just {[pos]}
@@ -156,4 +157,6 @@ public interface MessageCompositor
      * @return fluent interface
      */
     MessageCompositor addDefaultPostProcessor(PostProcessor postProcessor);
+
+    Formatter findFormatter(String name, Object arg);
 }

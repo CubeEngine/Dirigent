@@ -20,12 +20,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package de.cubeisland.engine.messagecompositor.parser;
+package de.cubeisland.engine.messagecompositor.parser.formatter;
 
-public class IllegalMacroException extends RuntimeException
+import java.util.List;
+import java.util.Set;
+import de.cubeisland.engine.messagecompositor.parser.component.MessageComponent;
+import de.cubeisland.engine.messagecompositor.parser.component.Text;
+import de.cubeisland.engine.messagecompositor.parser.component.argument.Argument;
+
+import static java.util.Collections.singleton;
+
+public class DefaultFormatter extends Formatter<Object>
 {
-    public IllegalMacroException(String message)
+    @Override
+    public boolean isApplicable(Object arg)
     {
-        super(message);
+        return true;
+    }
+
+    @Override
+    protected MessageComponent format(Object arg, List<Argument> arguments)
+    {
+        return new Text(String.valueOf(arg));
+    }
+
+    @Override
+    public Set<String> names()
+    {
+        return singleton((String)null);
     }
 }

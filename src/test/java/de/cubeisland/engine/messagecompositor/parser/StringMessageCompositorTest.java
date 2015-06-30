@@ -24,26 +24,24 @@ package de.cubeisland.engine.messagecompositor.parser;
 
 import org.junit.Test;
 
-public class MessageParserTest
+import static org.junit.Assert.*;
+
+public class StringMessageCompositorTest
 {
     @Test
-    public void testReadMessage() throws Exception
+    public void testCompositor() throws Exception
     {
-        MessageParser.parseMessage("only text");
-        MessageParser.parseMessage("{}");
-        MessageParser.parseMessage("{name}");
-        MessageParser.parseMessage("{0}");
-        MessageParser.parseMessage("{1:name#with index and comment}");
-        MessageParser.parseMessage("{1:name#with index and comment:and parameter}");
-        MessageParser.parseMessage("{1:name#with index and comment:and parameter=with value}");
-        MessageParser.parseMessage("{1:name#with index and comment:and parameter=with value:multiple}");
-        MessageParser.parseMessage("{1:name#with index and comment:and parameter=with value:multiple:and one=more}");
-        MessageParser.parseMessage(
-            "text and a macro {1:name#with index and comment:and parameter=with value:multiple:and one=more} more text");
-        MessageParser.parseMessage(
-            "text and a macro {1:name#with index and comment:and parameter=with value:multiple:and one=more} more text");
+        StringMessageCompositor compositor = new StringMessageCompositor();
+        String msg = "This is a pure String message";
+        assertEquals(msg, compositor.composeMessage(msg));
 
-        MessageParser.parseMessage("illegal macro {starts but wont end");
-        MessageParser.parseMessage("illegal macro {starts:has arguments but wont end");
+        msg = "This is a {} String message";
+        assertEquals(msg, compositor.composeMessage(msg, "{}"));
+
+        msg = "This is a {1}{} String message";
+        assertEquals(msg, compositor.composeMessage(msg, "{}", "{1}"));
+
+        msg = "This is a {} String message";
+        assertEquals("This is a cool String message", compositor.composeMessage(msg, "cool"));
     }
 }

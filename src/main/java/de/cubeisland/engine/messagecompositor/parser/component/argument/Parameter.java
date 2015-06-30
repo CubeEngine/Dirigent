@@ -20,12 +20,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package de.cubeisland.engine.messagecompositor.parser;
+package de.cubeisland.engine.messagecompositor.parser.component.argument;
 
-public class IllegalMacroException extends RuntimeException
+public class Parameter implements Argument
 {
-    public IllegalMacroException(String message)
+    private final String name;
+    private final String value;
+
+    public Parameter(String name, String value)
     {
-        super(message);
+        this.name = name;
+        this.value = value;
     }
 }

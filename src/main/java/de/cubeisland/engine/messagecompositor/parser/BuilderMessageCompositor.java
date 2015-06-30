@@ -22,10 +22,29 @@
  */
 package de.cubeisland.engine.messagecompositor.parser;
 
-public class IllegalMacroException extends RuntimeException
+import de.cubeisland.engine.messagecompositor.parser.component.MessageComponent;
+import de.cubeisland.engine.messagecompositor.parser.component.Text;
+
+public abstract class BuilderMessageCompositor<MessageT, BuilderT> extends AbstractMessageCompositor<MessageT>
 {
-    public IllegalMacroException(String message)
+    @Override
+    protected MessageT composeMessage(Message message)
     {
-        super(message);
+        BuilderT builder = newBuilder();
+        for (MessageComponent component : message.getComponents())
+        {
+            if (component instanceof Text)
+            {
+                build(((Text)component), builder);
+            }
+            buildOther(component, builder);
+            // TODO
+        }
+        return finalize(builder);
     }
+
+    protected abstract void build(Text component, BuilderT builder);
+    protected abstract void buildOther(MessageComponent component, BuilderT builder);
+    protected abstract BuilderT newBuilder();
+    protected abstract MessageT finalize(BuilderT builderT);
 }
