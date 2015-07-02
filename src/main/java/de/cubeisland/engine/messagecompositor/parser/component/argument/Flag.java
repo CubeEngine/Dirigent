@@ -30,4 +30,9 @@ public class Flag implements Argument
     {
         this.value = value;
     }
+
+    public String getValue()
+    {
+        return value;
+    }
 }

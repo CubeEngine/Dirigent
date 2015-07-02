@@ -40,7 +40,6 @@ import de.cubeisland.engine.messagecompositor.parser.formatter.Formatter;
 import de.cubeisland.engine.messagecompositor.parser.formatter.PostProcessor;
 
 import static java.util.Collections.emptyList;
-import static java.util.Collections.unmodifiableList;
 
 public abstract class AbstractMessageCompositor<MessageT> implements MessageCompositor<MessageT>
 {
@@ -59,7 +58,7 @@ public abstract class AbstractMessageCompositor<MessageT> implements MessageComp
 
     public MessageT composeMessage(Locale locale, String source, Object... args)
     {
-        Message message = check(MessageParser.parseMessage(source), args);
+        Message message = check(locale, MessageParser.parseMessage(source), args);
         return composeMessage(message);
     }
 
@@ -103,7 +102,7 @@ public abstract class AbstractMessageCompositor<MessageT> implements MessageComp
         return this;
     }
 
-    private Message check(Message message, Object[] args)
+    private Message check(Locale locale, Message message, Object[] args)
     {
         List<MessageComponent> list = new ArrayList<MessageComponent>();
         int argumentsIndex = 0;
@@ -144,7 +143,7 @@ public abstract class AbstractMessageCompositor<MessageT> implements MessageComp
                 else
                 {
                     @SuppressWarnings("unchecked")
-                    MessageComponent processed = found.process(arg, arguments);
+                    MessageComponent processed = found.process(locale, arg, arguments);
                     list.add(processed);
                 }
                 if (forIndex == argumentsIndex)
@@ -165,7 +164,7 @@ public abstract class AbstractMessageCompositor<MessageT> implements MessageComp
                 MessageComponent component = list.get(i);
                 for (PostProcessor processor : postProcessors)
                 {
-                    component = processor.process(component, Collections.<Argument>emptyList());
+                    component = processor.process(locale, component, Collections.<Argument>emptyList());
                 }
                 list.set(i, component);
             }

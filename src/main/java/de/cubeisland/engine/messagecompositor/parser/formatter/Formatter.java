@@ -24,6 +24,7 @@ package de.cubeisland.engine.messagecompositor.parser.formatter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import de.cubeisland.engine.messagecompositor.parser.component.argument.Argument;
 import de.cubeisland.engine.messagecompositor.parser.component.MessageComponent;
@@ -34,14 +35,14 @@ public abstract class Formatter<T>
 
     public abstract boolean isApplicable(Object arg);
 
-    protected abstract MessageComponent format(T arg, List<Argument> arguments);
+    protected abstract MessageComponent format(T arg, Context context);
 
-    public final MessageComponent process(T arg, List<Argument> arguments)
+    public final MessageComponent process(Locale locale, T arg, List<Argument> arguments)
     {
-        MessageComponent result = format(arg, arguments);
+        MessageComponent result = format(arg, new Context(locale, arguments));
         for (PostProcessor processor : postProcessors)
         {
-            result = processor.process(result, arguments);
+            result = processor.process(locale, result, arguments);
         }
         return result;
     }

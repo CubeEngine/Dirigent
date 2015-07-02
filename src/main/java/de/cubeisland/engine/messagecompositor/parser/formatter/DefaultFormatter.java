@@ -22,11 +22,9 @@
  */
 package de.cubeisland.engine.messagecompositor.parser.formatter;
 
-import java.util.List;
 import java.util.Set;
 import de.cubeisland.engine.messagecompositor.parser.component.MessageComponent;
 import de.cubeisland.engine.messagecompositor.parser.component.Text;
-import de.cubeisland.engine.messagecompositor.parser.component.argument.Argument;
 
 import static java.util.Collections.singleton;
 
@@ -39,7 +37,7 @@ public class DefaultFormatter extends Formatter<Object>
     }
 
     @Override
-    protected MessageComponent format(Object arg, List<Argument> arguments)
+    protected MessageComponent format(Object arg, Context context)
     {
         return new Text(String.valueOf(arg));
     }

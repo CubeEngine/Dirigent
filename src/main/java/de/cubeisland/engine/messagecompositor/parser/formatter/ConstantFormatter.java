@@ -22,9 +22,7 @@
  */
 package de.cubeisland.engine.messagecompositor.parser.formatter;
 
-import java.util.List;
 import de.cubeisland.engine.messagecompositor.parser.component.MessageComponent;
-import de.cubeisland.engine.messagecompositor.parser.component.argument.Argument;
 
 public abstract class ConstantFormatter extends Formatter<Void>
 {
@@ -33,10 +31,10 @@ public abstract class ConstantFormatter extends Formatter<Void>
         return true;
     }
 
-    public final MessageComponent format(Void arg, List<Argument> arguments)
+    public final MessageComponent format(Void arg, Context context)
     {
-        return format(arguments);
+        return format(context);
     }
 
-    public abstract MessageComponent format(List<Argument> arguments);
+    public abstract MessageComponent format(Context context);
 }

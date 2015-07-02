@@ -22,26 +22,109 @@
  */
 package de.cubeisland.engine.messagecompositor.parser;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import de.cubeisland.engine.messagecompositor.parser.component.MessageComponent;
+import de.cubeisland.engine.messagecompositor.parser.component.Text;
+import de.cubeisland.engine.messagecompositor.parser.component.argument.Argument;
+import de.cubeisland.engine.messagecompositor.parser.formatter.PostProcessor;
+import de.cubeisland.engine.messagecompositor.parser.formatter.example.DateFormatter;
+import de.cubeisland.engine.messagecompositor.parser.formatter.example.DecimalFormatter;
+import de.cubeisland.engine.messagecompositor.parser.formatter.example.IntegerFormatter;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
 public class StringMessageCompositorTest
 {
-    @Test
-    public void testCompositor() throws Exception
+    private StringMessageCompositor compositor;
+
+    @Before
+    public void setUp() throws Exception
     {
-        StringMessageCompositor compositor = new StringMessageCompositor();
+        compositor = new StringMessageCompositor();
+        
+        compositor.registerFormatter(new DateFormatter());
+        compositor.registerFormatter(new IntegerFormatter());
+        compositor.registerFormatter(new DecimalFormatter());
+    }
+
+    private String compose(String raw, Object... args)
+    {
+        return compositor.composeMessage(raw, args);
+    }
+
+
+    @Test
+    public void testString() throws Exception
+    {
         String msg = "This is a pure String message";
-        assertEquals(msg, compositor.composeMessage(msg));
+        assertEquals(msg, compose(msg));
 
         msg = "This is a {} String message";
-        assertEquals(msg, compositor.composeMessage(msg, "{}"));
+        assertEquals(msg, compose(msg, "{}"));
 
         msg = "This is a {1}{} String message";
-        assertEquals(msg, compositor.composeMessage(msg, "{}", "{1}"));
+        assertEquals(msg, compose(msg, "{}", "{1}"));
 
-        msg = "This is a {} String message";
-        assertEquals("This is a cool String message", compositor.composeMessage(msg, "cool"));
+        assertEquals("This is a cool String message", compose("This is a {} String message", "cool"));
+    }
+
+
+    @Test
+    public void testNumbers()
+    {
+        assertEquals("This is a 42 message", compose("This is a {number} message", 42));
+        assertEquals("Numbers: 1 2 3", compose("Numbers: {number} {2:number} {number}", 1, 3, 2));
+        assertEquals("Decimal: 4,321 9,88 5,43210", compose("Decimal: {decimal} {2:decimal:2} {decimal:5}", 4.321, 5.4321, 9.87654321));
+    }
+
+
+    @Test
+    public void testDates()
+    {
+        Calendar instance = Calendar.getInstance();
+        instance.set(2014, Calendar.AUGUST, 1, 1, 0, 0);
+        Date date = new Date(instance.getTimeInMillis());
+        assertEquals("Year: 2014", compose("Year: {date:format=YYYY}", date));
+        assertEquals("Date is: 2014-08-01", compose("Date is: {date:format=YYYY-MM-dd}", date));
+        assertEquals("No Args: 01.08.14 01:00", compose("No Args: {date#will use default short conversion}", date));
+    }
+
+    @Test
+    public void testPostProcessor() throws Exception
+    {
+        compositor.findFormatter(null, "").addPostProcessor(new PostProcessor()
+        {
+            public MessageComponent process(Locale locale, MessageComponent component, List<Argument> arguments)
+            {
+                if (component instanceof Text)
+                {
+                    return new Text(((Text)component).getString() + "!");
+                }
+                return component;
+            }
+        });
+
+        assertEquals("Postprocessor will add an exclamationpoint!", compose(
+            "Postprocessor will add an exclamationpoint{}", ""));
+
+        compositor.addPostProcessor(new PostProcessor()
+        {
+            public MessageComponent process(Locale locale, MessageComponent component, List<Argument> arguments)
+            {
+                if (component instanceof Text)
+                {
+                    return new Text("#" + ((Text)component).getString() + "#");
+                }
+                return component;
+            }
+        });
+
+        assertEquals("#sharp#", compose("sharp"));
+
     }
 }

@@ -23,10 +23,11 @@
 package de.cubeisland.engine.messagecompositor.parser.formatter;
 
 import java.util.List;
+import java.util.Locale;
 import de.cubeisland.engine.messagecompositor.parser.component.MessageComponent;
 import de.cubeisland.engine.messagecompositor.parser.component.argument.Argument;
 
 public interface PostProcessor
 {
-    MessageComponent process(MessageComponent component, List<Argument> arguments);
+    MessageComponent process(Locale locale, MessageComponent component, List<Argument> arguments);
 }
