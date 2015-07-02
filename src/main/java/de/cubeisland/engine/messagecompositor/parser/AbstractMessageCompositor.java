@@ -23,14 +23,23 @@
 package de.cubeisland.engine.messagecompositor.parser;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import de.cubeisland.engine.messagecompositor.parser.component.MessageComponent;
+import de.cubeisland.engine.messagecompositor.parser.component.MissingMacro;
+import de.cubeisland.engine.messagecompositor.parser.component.Text;
+import de.cubeisland.engine.messagecompositor.parser.component.argument.Argument;
+import de.cubeisland.engine.messagecompositor.parser.component.macro.Indexed;
+import de.cubeisland.engine.messagecompositor.parser.component.macro.Macro;
+import de.cubeisland.engine.messagecompositor.parser.component.macro.NamedMacro;
 import de.cubeisland.engine.messagecompositor.parser.formatter.DefaultFormatter;
 import de.cubeisland.engine.messagecompositor.parser.formatter.Formatter;
 import de.cubeisland.engine.messagecompositor.parser.formatter.PostProcessor;
 
+import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
 
 public abstract class AbstractMessageCompositor<MessageT> implements MessageCompositor<MessageT>
@@ -50,7 +59,7 @@ public abstract class AbstractMessageCompositor<MessageT> implements MessageComp
 
     public MessageT composeMessage(Locale locale, String source, Object... args)
     {
-        Message message = MessageParser.parseMessage(source).check(this, args, unmodifiableList(postProcessors));
+        Message message = check(MessageParser.parseMessage(source), args);
         return composeMessage(message);
     }
 
@@ -92,5 +101,80 @@ public abstract class AbstractMessageCompositor<MessageT> implements MessageComp
             list.add(formatter);
         }
         return this;
+    }
+
+    private Message check(Message message, Object[] args)
+    {
+        List<MessageComponent> list = new ArrayList<MessageComponent>();
+        int argumentsIndex = 0;
+        for (MessageComponent component : message.getComponents())
+        {
+            if (component instanceof Text)
+            {
+                list.add(component);
+            }
+            else if (component instanceof Macro)
+            {
+                int forIndex = argumentsIndex;
+                if (component instanceof Indexed)
+                {
+                    forIndex = ((Indexed)component).getIndex();
+                }
+                String name = null; // DefaultMacro
+                List<Argument> arguments = emptyList();
+                if (component instanceof NamedMacro)
+                {
+                    name = ((NamedMacro)component).getName();
+                    arguments = ((NamedMacro)component).getArgs();
+                }
+                Object arg;
+                try
+                {
+                    arg = args[forIndex];
+                }
+                catch (ArrayIndexOutOfBoundsException ignored)
+                {
+                    arg = null; // Might be a constant macro
+                }
+                Formatter found = this.findFormatter(name, arg);
+                if (found == null)
+                {
+                    list.add(new MissingMacro(((Macro)component), arg));
+                }
+                else
+                {
+                    @SuppressWarnings("unchecked")
+                    MessageComponent processed = found.process(arg, arguments);
+                    list.add(processed);
+                }
+                if (forIndex == argumentsIndex)
+                {
+                    argumentsIndex++;
+                }
+            }
+            else
+            {
+                // TODO   list.add(new WTFIsThis(component));
+            }
+        }
+
+        if (!postProcessors.isEmpty())
+        {
+            for (int i = 0; i < list.size(); i++)
+            {
+                MessageComponent component = list.get(i);
+                for (PostProcessor processor : postProcessors)
+                {
+                    component = processor.process(component, Collections.<Argument>emptyList());
+                }
+                list.set(i, component);
+            }
+        }
+        if (list.equals(message.getComponents()))
+        {
+            return message;
+        }
+
+        return new Message(list);
     }
 }
