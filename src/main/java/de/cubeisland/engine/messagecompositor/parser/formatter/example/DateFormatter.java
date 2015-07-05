@@ -25,7 +25,6 @@ package de.cubeisland.engine.messagecompositor.parser.formatter.example;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import de.cubeisland.engine.messagecompositor.macro.MacroContext;
 import de.cubeisland.engine.messagecompositor.parser.component.MessageComponent;
 import de.cubeisland.engine.messagecompositor.parser.component.Text;
 import de.cubeisland.engine.messagecompositor.parser.formatter.AbstractFormatter;
@@ -39,22 +38,6 @@ public class DateFormatter extends AbstractFormatter<Date>
     {
         super(Date.class, "date");
     }
-
-    public String process(Date object, MacroContext context)
-    {
-        SimpleDateFormat sdf = context.readMapped("format", SimpleDateFormat.class);
-        if (sdf == null)
-        {
-            DateFormat instance = getDateTimeInstance(SHORT, SHORT, context.getLocale());
-            if ("notime".equalsIgnoreCase(context.getArg(0)))
-            {
-                instance = getDateInstance(SHORT, context.getLocale());
-            }
-            return instance.format(object);
-        }
-        return sdf.format(object);
-    }
-
 
     @Override
     protected MessageComponent format(Date arg, Context c)
