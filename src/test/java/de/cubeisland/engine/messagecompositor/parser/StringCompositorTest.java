@@ -38,14 +38,14 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-public class StringMessageCompositorTest
+public class StringCompositorTest
 {
-    private StringMessageCompositor compositor;
+    private StringCompositor compositor;
 
     @Before
     public void setUp() throws Exception
     {
-        compositor = new StringMessageCompositor();
+        compositor = new StringCompositor();
         
         compositor.registerFormatter(new DateFormatter());
         compositor.registerFormatter(new IntegerFormatter());

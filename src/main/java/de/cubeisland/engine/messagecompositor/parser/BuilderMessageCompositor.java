@@ -24,27 +24,32 @@ package de.cubeisland.engine.messagecompositor.parser;
 
 import de.cubeisland.engine.messagecompositor.parser.component.MessageComponent;
 import de.cubeisland.engine.messagecompositor.parser.component.Text;
+import de.cubeisland.engine.messagecompositor.parser.formatter.MessageBuilder;
 
-public abstract class BuilderMessageCompositor<MessageT, BuilderT> extends AbstractMessageCompositor<MessageT>
+public class BuilderMessageCompositor<MessageT, BuilderT> extends AbstractMessageCompositor<MessageT>
 {
+    private MessageBuilder<MessageT, BuilderT> mBuilder;
+
+    public BuilderMessageCompositor(MessageBuilder<MessageT, BuilderT> mBuilder)
+    {
+        this.mBuilder = mBuilder;
+    }
+
     @Override
     protected MessageT composeMessage(Message message)
     {
-        BuilderT builder = newBuilder();
+        BuilderT builder = mBuilder.newBuilder();
         for (MessageComponent component : message.getComponents())
         {
             if (component instanceof Text)
             {
-                build(((Text)component), builder);
+                mBuilder.build(((Text)component), builder);
             }
-            buildOther(component, builder);
+            mBuilder.buildOther(component, builder);
             // TODO
         }
-        return finalize(builder);
+        return mBuilder.finalize(builder);
     }
 
-    protected abstract void build(Text component, BuilderT builder);
-    protected abstract void buildOther(MessageComponent component, BuilderT builder);
-    protected abstract BuilderT newBuilder();
-    protected abstract MessageT finalize(BuilderT builderT);
+
 }

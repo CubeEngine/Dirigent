@@ -24,30 +24,31 @@ package de.cubeisland.engine.messagecompositor.parser;
 
 import de.cubeisland.engine.messagecompositor.parser.component.MessageComponent;
 import de.cubeisland.engine.messagecompositor.parser.component.Text;
+import de.cubeisland.engine.messagecompositor.parser.formatter.MessageBuilder;
 
-public class StringMessageCompositor extends BuilderMessageCompositor<String, StringBuilder>
+public class StringMessageBuilder extends MessageBuilder<String, StringBuilder>
 {
     @Override
-    protected void build(Text component, StringBuilder builder)
+    public void build(Text component, StringBuilder builder)
     {
         builder.append(component.getString());
     }
 
     @Override
-    protected void buildOther(MessageComponent component, StringBuilder builder)
-    {
-        return; // TODO
-    }
-
-    @Override
-    protected StringBuilder newBuilder()
+    public StringBuilder newBuilder()
     {
         return new StringBuilder();
     }
 
     @Override
-    protected String finalize(StringBuilder stringBuilder)
+    public String finalize(StringBuilder stringBuilder)
     {
         return stringBuilder.toString();
+    }
+
+    @Override
+    public void buildOther(MessageComponent component, StringBuilder builder)
+    {
+        return; // TODO
     }
 }
