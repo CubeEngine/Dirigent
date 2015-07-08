@@ -29,5 +29,5 @@ import de.cubeisland.engine.messagecompositor.parser.component.argument.Argument
 
 public interface PostProcessor
 {
-    MessageComponent process(Locale locale, MessageComponent component, List<Argument> arguments);
+    MessageComponent process(MessageComponent component, Context context);
 }

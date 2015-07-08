@@ -35,6 +35,8 @@ import de.cubeisland.engine.messagecompositor.parser.component.argument.Argument
 import de.cubeisland.engine.messagecompositor.parser.component.macro.Indexed;
 import de.cubeisland.engine.messagecompositor.parser.component.macro.Macro;
 import de.cubeisland.engine.messagecompositor.parser.component.macro.NamedMacro;
+import de.cubeisland.engine.messagecompositor.parser.formatter.ConstantFormatter;
+import de.cubeisland.engine.messagecompositor.parser.formatter.Context;
 import de.cubeisland.engine.messagecompositor.parser.formatter.DefaultFormatter;
 import de.cubeisland.engine.messagecompositor.parser.formatter.Formatter;
 import de.cubeisland.engine.messagecompositor.parser.formatter.PostProcessor;
@@ -105,6 +107,7 @@ public abstract class AbstractMessageCompositor<MessageT> implements MessageComp
     private Message check(Locale locale, Message message, Object[] args)
     {
         List<MessageComponent> list = new ArrayList<MessageComponent>();
+        Context context = new Context(locale);
         int argumentsIndex = 0;
         for (MessageComponent component : message.getComponents())
         {
@@ -140,15 +143,19 @@ public abstract class AbstractMessageCompositor<MessageT> implements MessageComp
                 {
                     list.add(new MissingMacro(((Macro)component), arg));
                 }
-                else
+                else if (found instanceof ConstantFormatter)
                 {
-                    @SuppressWarnings("unchecked")
-                    MessageComponent processed = found.process(locale, arg, arguments);
-                    list.add(processed);
+                    arg = null;
                 }
+                @SuppressWarnings("unchecked")
+                MessageComponent processed = found.process(arg, context.with(arguments));
+                list.add(processed);
                 if (forIndex == argumentsIndex)
                 {
-                    argumentsIndex++;
+                    if (!(found instanceof ConstantFormatter))
+                    {
+                        argumentsIndex++;
+                    }
                 }
             }
             else
@@ -164,7 +171,7 @@ public abstract class AbstractMessageCompositor<MessageT> implements MessageComp
                 MessageComponent component = list.get(i);
                 for (PostProcessor processor : postProcessors)
                 {
-                    component = processor.process(locale, component, Collections.<Argument>emptyList());
+                    component = processor.process(component, context.with(Collections.<Argument>emptyList()));
                 }
                 list.set(i, component);
             }

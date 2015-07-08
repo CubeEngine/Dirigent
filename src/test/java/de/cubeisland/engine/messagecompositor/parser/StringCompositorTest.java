@@ -24,11 +24,9 @@ package de.cubeisland.engine.messagecompositor.parser;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
-import java.util.Locale;
 import de.cubeisland.engine.messagecompositor.parser.component.MessageComponent;
 import de.cubeisland.engine.messagecompositor.parser.component.Text;
-import de.cubeisland.engine.messagecompositor.parser.component.argument.Argument;
+import de.cubeisland.engine.messagecompositor.parser.formatter.Context;
 import de.cubeisland.engine.messagecompositor.parser.formatter.PostProcessor;
 import de.cubeisland.engine.messagecompositor.parser.formatter.example.DateFormatter;
 import de.cubeisland.engine.messagecompositor.parser.formatter.example.DecimalFormatter;
@@ -99,7 +97,7 @@ public class StringCompositorTest
     {
         compositor.findFormatter(null, "").addPostProcessor(new PostProcessor()
         {
-            public MessageComponent process(Locale locale, MessageComponent component, List<Argument> arguments)
+            public MessageComponent process(MessageComponent component, Context context)
             {
                 if (component instanceof Text)
                 {
@@ -114,7 +112,7 @@ public class StringCompositorTest
 
         compositor.addPostProcessor(new PostProcessor()
         {
-            public MessageComponent process(Locale locale, MessageComponent component, List<Argument> arguments)
+            public MessageComponent process(MessageComponent component, Context context)
             {
                 if (component instanceof Text)
                 {

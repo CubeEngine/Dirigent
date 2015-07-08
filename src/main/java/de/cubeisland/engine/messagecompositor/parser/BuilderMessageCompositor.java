@@ -22,8 +22,7 @@
  */
 package de.cubeisland.engine.messagecompositor.parser;
 
-import de.cubeisland.engine.messagecompositor.parser.component.MessageComponent;
-import de.cubeisland.engine.messagecompositor.parser.component.Text;
+import de.cubeisland.engine.messagecompositor.parser.component.ChainedComponent;
 import de.cubeisland.engine.messagecompositor.parser.formatter.MessageBuilder;
 
 public class BuilderMessageCompositor<MessageT, BuilderT> extends AbstractMessageCompositor<MessageT>
@@ -39,17 +38,7 @@ public class BuilderMessageCompositor<MessageT, BuilderT> extends AbstractMessag
     protected MessageT composeMessage(Message message)
     {
         BuilderT builder = mBuilder.newBuilder();
-        for (MessageComponent component : message.getComponents())
-        {
-            if (component instanceof Text)
-            {
-                mBuilder.build(((Text)component), builder);
-            }
-            mBuilder.buildOther(component, builder);
-            // TODO
-        }
+        mBuilder.buildChain(new ChainedComponent(message.getComponents()), builder);
         return mBuilder.finalize(builder);
     }
-
-
 }

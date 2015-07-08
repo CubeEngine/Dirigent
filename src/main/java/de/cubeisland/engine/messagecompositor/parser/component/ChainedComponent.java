@@ -20,35 +20,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package de.cubeisland.engine.messagecompositor.parser.formatter;
+package de.cubeisland.engine.messagecompositor.parser.component;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
-import de.cubeisland.engine.messagecompositor.parser.component.MessageComponent;
 
-public abstract class Formatter<T>
+public class ChainedComponent implements MessageComponent
 {
-    private List<PostProcessor> postProcessors = new ArrayList<PostProcessor>();
+    private List<MessageComponent> chained;
 
-    public abstract boolean isApplicable(Object arg);
-
-    protected abstract MessageComponent format(T arg, Context context);
-
-    public final MessageComponent process(T arg, Context context)
+    public ChainedComponent(MessageComponent... chained)
     {
-        MessageComponent result = format(arg, context);
-        for (PostProcessor processor : postProcessors)
-        {
-            result = processor.process(result, context);
-        }
-        return result;
+        this.chained = Arrays.asList(chained);
     }
 
-    public final void addPostProcessor(PostProcessor pp)
+    public ChainedComponent(List<MessageComponent> components)
     {
-        postProcessors.add(pp);
+        this.chained = components;
     }
 
-    public abstract Set<String> names();
+    public List<MessageComponent> getChained()
+    {
+        return chained;
+    }
 }

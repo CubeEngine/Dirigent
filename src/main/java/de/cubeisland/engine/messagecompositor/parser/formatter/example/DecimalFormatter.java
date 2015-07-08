@@ -23,11 +23,9 @@
 package de.cubeisland.engine.messagecompositor.parser.formatter.example;
 
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import de.cubeisland.engine.messagecompositor.parser.component.MessageComponent;
 import de.cubeisland.engine.messagecompositor.parser.component.Text;
-import de.cubeisland.engine.messagecompositor.parser.component.argument.Flag;
 import de.cubeisland.engine.messagecompositor.parser.formatter.Context;
 import de.cubeisland.engine.messagecompositor.parser.formatter.reflected.Format;
 import de.cubeisland.engine.messagecompositor.parser.formatter.reflected.Names;
