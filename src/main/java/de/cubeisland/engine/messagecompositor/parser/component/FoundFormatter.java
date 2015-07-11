@@ -22,18 +22,39 @@
  */
 package de.cubeisland.engine.messagecompositor.parser.component;
 
-public class ErrorText extends Text implements ErrorComponent
-{
-    private String error;
+import java.util.List;
+import de.cubeisland.engine.messagecompositor.parser.component.argument.Argument;
+import de.cubeisland.engine.messagecompositor.parser.formatter.Context;
+import de.cubeisland.engine.messagecompositor.parser.formatter.Formatter;
 
-    public ErrorText(String string, String error)
+public class FoundFormatter implements MessageComponent
+{
+    private final Formatter found;
+    private final Object arg;
+    private final List<Argument> arguments;
+    private Context context;
+
+    public FoundFormatter(Formatter found, Object arg, List<Argument> arguments, Context context)
     {
-        super(string);
-        this.error = error;
+
+        this.found = found;
+        this.arg = arg;
+        this.arguments = arguments;
+        this.context = context;
     }
 
-    public String getError()
+    public Formatter getFound()
     {
-        return error;
+        return found;
+    }
+
+    public Object getArg()
+    {
+        return arg;
+    }
+
+    public Context getContext()
+    {
+        return context.with(arguments);
     }
 }

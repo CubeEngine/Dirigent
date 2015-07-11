@@ -23,6 +23,8 @@
 package de.cubeisland.engine.messagecompositor.parser.formatter;
 
 import de.cubeisland.engine.messagecompositor.parser.component.ChainedComponent;
+import de.cubeisland.engine.messagecompositor.parser.component.ErrorComponent;
+import de.cubeisland.engine.messagecompositor.parser.component.FoundFormatter;
 import de.cubeisland.engine.messagecompositor.parser.component.MessageComponent;
 import de.cubeisland.engine.messagecompositor.parser.component.Text;
 
@@ -35,7 +37,11 @@ public abstract class MessageBuilder<MessageT, BuilderT>
 
     public void buildAny(MessageComponent component, BuilderT builder)
     {
-        if (component instanceof ChainedComponent)
+        if (component instanceof FoundFormatter)
+        {
+            buildFormatted(((FoundFormatter)component), builder);
+        }
+        else if (component instanceof ChainedComponent)
         {
             buildChain(((ChainedComponent)component), builder);
         }
@@ -43,12 +49,25 @@ public abstract class MessageBuilder<MessageT, BuilderT>
         {
             build(((Text)component), builder);
         }
+        else if (component instanceof ErrorComponent)
+        {
+            build(((ErrorComponent)component), builder);
+        }
         else
         {
             buildOther(component, builder);
         }
         // TODO
     }
+
+    public final void buildFormatted(FoundFormatter component, BuilderT builder)
+    {
+        @SuppressWarnings("unchecked")
+        MessageComponent processed = component.getFound().process(component.getArg(), component.getContext());
+        buildAny(processed, builder);
+    }
+
+    public abstract void build(ErrorComponent component, BuilderT builder);
 
     public void buildChain(ChainedComponent chained, BuilderT builder)
     {
@@ -59,6 +78,4 @@ public abstract class MessageBuilder<MessageT, BuilderT>
     }
 
     public abstract void buildOther(MessageComponent component, BuilderT builder);
-
-
 }

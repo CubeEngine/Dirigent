@@ -22,6 +22,8 @@
  */
 package de.cubeisland.engine.messagecompositor.parser;
 
+import de.cubeisland.engine.messagecompositor.parser.component.ErrorComponent;
+import de.cubeisland.engine.messagecompositor.parser.component.ErrorText;
 import de.cubeisland.engine.messagecompositor.parser.component.MessageComponent;
 import de.cubeisland.engine.messagecompositor.parser.component.Text;
 import de.cubeisland.engine.messagecompositor.parser.formatter.MessageBuilder;
@@ -44,6 +46,16 @@ public class StringMessageBuilder extends MessageBuilder<String, StringBuilder>
     public String finalize(StringBuilder stringBuilder)
     {
         return stringBuilder.toString();
+    }
+
+    @Override
+    public void build(ErrorComponent component, StringBuilder builder)
+    {
+        if (component instanceof ErrorText)
+        {
+            builder.append(((ErrorText)component).getString());
+        }
+        builder.append(component.getError());
     }
 
     @Override

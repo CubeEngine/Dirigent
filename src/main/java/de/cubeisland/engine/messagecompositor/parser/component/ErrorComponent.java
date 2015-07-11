@@ -22,18 +22,7 @@
  */
 package de.cubeisland.engine.messagecompositor.parser.component;
 
-public class ErrorText extends Text implements ErrorComponent
+public interface ErrorComponent extends MessageComponent
 {
-    private String error;
-
-    public ErrorText(String string, String error)
-    {
-        super(string);
-        this.error = error;
-    }
-
-    public String getError()
-    {
-        return error;
-    }
+    String getError();
 }

@@ -24,7 +24,7 @@ package de.cubeisland.engine.messagecompositor.parser.component;
 
 import de.cubeisland.engine.messagecompositor.parser.component.macro.Macro;
 
-public class MissingMacro implements MessageComponent
+public class MissingMacro implements ErrorComponent
 {
     private Macro missing;
     private Object arg;
@@ -43,5 +43,10 @@ public class MissingMacro implements MessageComponent
     public Object getArg()
     {
         return arg;
+    }
+
+    public String getError()
+    {
+        return "Macro not found";
     }
 }

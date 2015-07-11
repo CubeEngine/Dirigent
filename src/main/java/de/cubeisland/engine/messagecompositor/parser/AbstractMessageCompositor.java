@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import de.cubeisland.engine.messagecompositor.parser.component.FoundFormatter;
 import de.cubeisland.engine.messagecompositor.parser.component.MessageComponent;
 import de.cubeisland.engine.messagecompositor.parser.component.MissingMacro;
 import de.cubeisland.engine.messagecompositor.parser.component.Text;
@@ -143,13 +144,16 @@ public abstract class AbstractMessageCompositor<MessageT> implements MessageComp
                 {
                     list.add(new MissingMacro(((Macro)component), arg));
                 }
-                else if (found instanceof ConstantFormatter)
+                if (found instanceof ConstantFormatter)
                 {
                     arg = null;
                 }
-                @SuppressWarnings("unchecked")
-                MessageComponent processed = found.process(arg, context.with(arguments));
-                list.add(processed);
+
+                if (found != null)
+                {
+                    list.add(new FoundFormatter(found, arg, arguments, context));
+                }
+
                 if (forIndex == argumentsIndex)
                 {
                     if (!(found instanceof ConstantFormatter))
@@ -157,6 +161,7 @@ public abstract class AbstractMessageCompositor<MessageT> implements MessageComp
                         argumentsIndex++;
                     }
                 }
+
             }
             else
             {
