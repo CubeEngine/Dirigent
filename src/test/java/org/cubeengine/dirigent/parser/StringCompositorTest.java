@@ -24,6 +24,7 @@ package org.cubeengine.dirigent.parser;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 import org.cubeengine.dirigent.parser.component.MessageComponent;
 import org.cubeengine.dirigent.parser.component.Text;
 import org.cubeengine.dirigent.parser.formatter.Context;
@@ -52,7 +53,7 @@ public class StringCompositorTest
 
     private String compose(String raw, Object... args)
     {
-        return compositor.composeMessage(raw, args);
+        return compositor.composeMessage(Locale.GERMAN, raw, args);
     }
 
 
