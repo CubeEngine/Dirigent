@@ -1,5 +1,7 @@
-MessageCompositor
+![Dirigent](https://github.com/CubeEngine/Dirigent/blob/master/Dirigent.png?raw=true)
 =================
+
+Directs your composition
 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/de.cubeisland.engine/messagecompositor/badge.svg?style=flat)](https://maven-badges.herokuapp.com/maven-central/de.cubeisland.engine/messagecompositor)
 
