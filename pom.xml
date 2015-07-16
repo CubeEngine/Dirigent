@@ -8,7 +8,7 @@
         <version>7</version>
     </parent>
 
-    <groupId>de.cubeisland.engine</groupId>
+    <groupId>org.cubeengine</groupId>
     <artifactId>dirigent</artifactId>
     <version>1.1.1-SNAPSHOT</version>
 
