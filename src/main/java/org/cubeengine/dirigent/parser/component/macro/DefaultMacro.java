@@ -29,7 +29,7 @@ public class DefaultMacro implements Macro
 {
     public static final DefaultMacro DEFAULT_MACRO = new DefaultMacro();
 
-    private DefaultMacro()
+    DefaultMacro()
     {
     }
 }

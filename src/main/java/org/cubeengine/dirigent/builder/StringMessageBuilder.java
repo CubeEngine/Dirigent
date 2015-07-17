@@ -23,7 +23,6 @@
 package org.cubeengine.dirigent.builder;
 
 import org.cubeengine.dirigent.parser.component.ErrorComponent;
-import org.cubeengine.dirigent.parser.Parser.ErrorText;
 import org.cubeengine.dirigent.Component;
 import org.cubeengine.dirigent.parser.component.Text;
 
@@ -50,9 +49,9 @@ public class StringMessageBuilder extends MessageBuilder<String, StringBuilder>
     @Override
     public void build(ErrorComponent component, StringBuilder builder)
     {
-        if (component instanceof ErrorText)
+        if (component instanceof Text)
         {
-            builder.append(((ErrorText)component).getString());
+            builder.append(((Text)component).getString());
         }
         builder.append(component.getError());
     }
