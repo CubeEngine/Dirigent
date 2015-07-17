@@ -23,11 +23,15 @@
 package org.cubeengine.dirigent.parser.component;
 
 import java.util.List;
-import org.cubeengine.dirigent.parser.component.argument.Argument;
-import org.cubeengine.dirigent.parser.formatter.Context;
-import org.cubeengine.dirigent.parser.formatter.Formatter;
+import org.cubeengine.dirigent.Component;
+import org.cubeengine.dirigent.parser.component.macro.argument.Argument;
+import org.cubeengine.dirigent.formatter.Context;
+import org.cubeengine.dirigent.formatter.Formatter;
 
-public class FoundFormatter implements MessageComponent
+/**
+ * A Component containing the formatter found for a macro
+ */
+public class FoundFormatter implements Component
 {
     private final Formatter found;
     private final Object arg;

@@ -20,16 +20,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.cubeengine.dirigent.parser.component.macro;
+package org.cubeengine.dirigent.builder;
 
-/**
- * An empty Macro
- */
-public class DefaultMacro implements Macro
+import org.cubeengine.dirigent.builder.BuilderMessageCompositor;
+import org.cubeengine.dirigent.builder.StringMessageBuilder;
+
+public class StringCompositor extends BuilderMessageCompositor<String, StringBuilder>
 {
-    public static final DefaultMacro DEFAULT_MACRO = new DefaultMacro();
-
-    private DefaultMacro()
+    public StringCompositor()
     {
+        super(new StringMessageBuilder());
     }
 }

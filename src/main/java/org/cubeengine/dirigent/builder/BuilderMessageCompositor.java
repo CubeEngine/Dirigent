@@ -20,16 +20,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.cubeengine.dirigent.parser.component.macro;
+package org.cubeengine.dirigent.builder;
 
-/**
- * An empty Macro
- */
-public class DefaultMacro implements Macro
+import org.cubeengine.dirigent.AbstractDirigent;
+import org.cubeengine.dirigent.Message;
+import org.cubeengine.dirigent.parser.component.ChainedComponent;
+
+public class BuilderMessageCompositor<MessageT, BuilderT> extends AbstractDirigent<MessageT>
 {
-    public static final DefaultMacro DEFAULT_MACRO = new DefaultMacro();
+    private MessageBuilder<MessageT, BuilderT> mBuilder;
 
-    private DefaultMacro()
+    public BuilderMessageCompositor(MessageBuilder<MessageT, BuilderT> mBuilder)
     {
+        this.mBuilder = mBuilder;
+    }
+
+    @Override
+    protected MessageT compose(Message message)
+    {
+        BuilderT builder = mBuilder.newBuilder();
+        mBuilder.buildChain(new ChainedComponent(message.getComponents()), builder);
+        return mBuilder.finalize(builder);
     }
 }

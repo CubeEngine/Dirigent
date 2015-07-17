@@ -20,16 +20,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.cubeengine.dirigent.parser.component.macro;
+package org.cubeengine.dirigent.parser.component.macro.argument;
 
 /**
- * An empty Macro
+ * A Macro Argument
  */
-public class DefaultMacro implements Macro
+public interface Argument
 {
-    public static final DefaultMacro DEFAULT_MACRO = new DefaultMacro();
 
-    private DefaultMacro()
-    {
-    }
 }

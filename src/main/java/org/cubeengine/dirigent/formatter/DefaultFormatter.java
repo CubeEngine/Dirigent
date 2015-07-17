@@ -20,16 +20,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.cubeengine.dirigent.parser.component.macro;
+package org.cubeengine.dirigent.formatter;
 
-/**
- * An empty Macro
- */
-public class DefaultMacro implements Macro
+import java.util.Set;
+import org.cubeengine.dirigent.Component;
+import org.cubeengine.dirigent.parser.component.Text;
+
+import static java.util.Collections.singleton;
+
+public class DefaultFormatter extends Formatter<Object>
 {
-    public static final DefaultMacro DEFAULT_MACRO = new DefaultMacro();
-
-    private DefaultMacro()
+    @Override
+    public boolean isApplicable(Object arg)
     {
+        return true;
+    }
+
+    @Override
+    protected Component format(Object arg, Context context)
+    {
+        return new Text(String.valueOf(arg));
+    }
+
+    @Override
+    public Set<String> names()
+    {
+        return singleton((String)null);
     }
 }

@@ -22,7 +22,13 @@
  */
 package org.cubeengine.dirigent.parser.component;
 
-public interface ErrorComponent extends MessageComponent
+import org.cubeengine.dirigent.Component;
+
+/**
+ * Represents any kind of error when composing a message.
+ * Implementations of {@link org.cubeengine.dirigent.Dirigent} may choose how to handle these errors.
+ */
+public interface ErrorComponent extends Component
 {
     String getError();
 }

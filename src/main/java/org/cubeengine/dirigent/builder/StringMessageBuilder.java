@@ -20,16 +20,46 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.cubeengine.dirigent.parser.component.macro;
+package org.cubeengine.dirigent.builder;
 
-/**
- * An empty Macro
- */
-public class DefaultMacro implements Macro
+import org.cubeengine.dirigent.parser.component.ErrorComponent;
+import org.cubeengine.dirigent.parser.Parser.ErrorText;
+import org.cubeengine.dirigent.Component;
+import org.cubeengine.dirigent.parser.component.Text;
+
+public class StringMessageBuilder extends MessageBuilder<String, StringBuilder>
 {
-    public static final DefaultMacro DEFAULT_MACRO = new DefaultMacro();
-
-    private DefaultMacro()
+    @Override
+    public void build(Text component, StringBuilder builder)
     {
+        builder.append(component.getString());
+    }
+
+    @Override
+    public StringBuilder newBuilder()
+    {
+        return new StringBuilder();
+    }
+
+    @Override
+    public String finalize(StringBuilder stringBuilder)
+    {
+        return stringBuilder.toString();
+    }
+
+    @Override
+    public void build(ErrorComponent component, StringBuilder builder)
+    {
+        if (component instanceof ErrorText)
+        {
+            builder.append(((ErrorText)component).getString());
+        }
+        builder.append(component.getError());
+    }
+
+    @Override
+    public void buildOther(Component component, StringBuilder builder)
+    {
+        return; // TODO
     }
 }

@@ -20,16 +20,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.cubeengine.dirigent.parser.component.macro;
+package org.cubeengine.dirigent.formatter.reflected;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
 /**
- * An empty Macro
+ * This Annotation is used for ReflectedFormatter to declare the format methods
  */
-public class DefaultMacro implements Macro
+public @interface Format
 {
-    public static final DefaultMacro DEFAULT_MACRO = new DefaultMacro();
-
-    private DefaultMacro()
-    {
-    }
 }

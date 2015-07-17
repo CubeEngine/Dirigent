@@ -20,16 +20,39 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.cubeengine.dirigent.parser.component.macro;
+package org.cubeengine.dirigent.formatter.example;
 
-/**
- * An empty Macro
- */
-public class DefaultMacro implements Macro
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import org.cubeengine.dirigent.Component;
+import org.cubeengine.dirigent.parser.component.Text;
+import org.cubeengine.dirigent.formatter.AbstractFormatter;
+import org.cubeengine.dirigent.formatter.Context;
+
+import static java.text.DateFormat.*;
+
+public class DateFormatter extends AbstractFormatter<Date>
 {
-    public static final DefaultMacro DEFAULT_MACRO = new DefaultMacro();
-
-    private DefaultMacro()
+    public DateFormatter()
     {
+        super(Date.class, "date");
+    }
+
+    @Override
+    protected Component format(Date arg, Context c)
+    {
+        String formatString = c.get("format");
+        boolean notime = c.has("notime");
+        DateFormat format = null;
+        if (formatString != null)
+        {
+            format = new SimpleDateFormat(formatString);
+        }
+        if (format == null)
+        {
+            format = notime ? getDateInstance(SHORT, c.getLocale()) : getDateTimeInstance(SHORT, SHORT, c.getLocale());
+        }
+        return new Text(format.format(arg));
     }
 }

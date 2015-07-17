@@ -22,7 +22,12 @@
  */
 package org.cubeengine.dirigent.parser.component;
 
-public class Text implements MessageComponent
+import org.cubeengine.dirigent.Component;
+
+/**
+ * A simple Component for Strings
+ */
+public class Text implements Component
 {
     private String string;
 

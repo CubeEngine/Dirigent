@@ -22,8 +22,11 @@
  */
 package org.cubeengine.dirigent.parser.component.macro;
 
-import org.cubeengine.dirigent.parser.component.MessageComponent;
+import org.cubeengine.dirigent.Component;
 
-public interface Macro extends MessageComponent
+/**
+ * A Macro that can be processed by a formatter
+ */
+public interface Macro extends Component
 {
 }

@@ -20,16 +20,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.cubeengine.dirigent.parser.component.macro;
+package org.cubeengine.dirigent.formatter.example;
 
-/**
- * An empty Macro
- */
-public class DefaultMacro implements Macro
+import org.cubeengine.dirigent.Component;
+import org.cubeengine.dirigent.parser.component.Text;
+import org.cubeengine.dirigent.formatter.AbstractFormatter;
+import org.cubeengine.dirigent.formatter.Context;
+
+public class IntegerFormatter extends AbstractFormatter<Integer>
 {
-    public static final DefaultMacro DEFAULT_MACRO = new DefaultMacro();
-
-    private DefaultMacro()
+    public IntegerFormatter()
     {
+        super(Integer.class, "number");
+    }
+
+    @Override
+    protected Component format(Integer arg, Context context)
+    {
+        return new Text(String.valueOf(arg));
     }
 }

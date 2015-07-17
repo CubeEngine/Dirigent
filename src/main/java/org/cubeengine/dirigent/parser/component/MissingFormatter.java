@@ -20,16 +20,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.cubeengine.dirigent.parser.component.macro;
+package org.cubeengine.dirigent.parser.component;
+
+import org.cubeengine.dirigent.parser.component.macro.Macro;
 
 /**
- * An empty Macro
+ * A Component signaling a no Formatter could be found for a macro
  */
-public class DefaultMacro implements Macro
+public class MissingFormatter implements ErrorComponent
 {
-    public static final DefaultMacro DEFAULT_MACRO = new DefaultMacro();
+    private Macro missing;
+    private Object arg;
 
-    private DefaultMacro()
+    public MissingFormatter(Macro missing, Object arg)
     {
+        this.missing = missing;
+        this.arg = arg;
+    }
+
+    public Macro getMissing()
+    {
+        return missing;
+    }
+
+    public Object getArg()
+    {
+        return arg;
+    }
+
+    public String getError()
+    {
+        return "Formatter not found";
     }
 }

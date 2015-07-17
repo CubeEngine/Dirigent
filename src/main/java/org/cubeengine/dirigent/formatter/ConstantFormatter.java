@@ -20,16 +20,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.cubeengine.dirigent.parser.component.macro;
+package org.cubeengine.dirigent.formatter;
 
-/**
- * An empty Macro
- */
-public class DefaultMacro implements Macro
+import org.cubeengine.dirigent.Component;
+
+public abstract class ConstantFormatter extends Formatter<Void>
 {
-    public static final DefaultMacro DEFAULT_MACRO = new DefaultMacro();
-
-    private DefaultMacro()
+    public boolean isApplicable(Object arg)
     {
+        return true;
     }
+
+    public final Component format(Void arg, Context context)
+    {
+        return format(context);
+    }
+
+    public abstract Component format(Context context);
 }

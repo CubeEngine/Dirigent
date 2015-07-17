@@ -22,7 +22,10 @@
  */
 package org.cubeengine.dirigent.parser.component.macro;
 
-public interface Indexed
+/**
+ * A Macro that has a position
+ */
+public interface Indexed extends Macro
 {
     int getIndex();
 }

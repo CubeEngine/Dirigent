@@ -22,13 +22,28 @@
  */
 package org.cubeengine.dirigent.parser;
 
-/**
- * This Exception is thrown whenever an error occurred parsing a macro
- */
-public class IllegalMacroException extends RuntimeException
+import org.junit.Test;
+
+public class ParserTest
 {
-    public IllegalMacroException(String message)
+    @Test
+    public void testReadMessage() throws Exception
     {
-        super(message);
+        Parser.parseMessage("only text");
+        Parser.parseMessage("{}");
+        Parser.parseMessage("{name}");
+        Parser.parseMessage("{0}");
+        Parser.parseMessage("{1:name#with index and comment}");
+        Parser.parseMessage("{1:name#with index and comment:and parameter}");
+        Parser.parseMessage("{1:name#with index and comment:and parameter=with value}");
+        Parser.parseMessage("{1:name#with index and comment:and parameter=with value:multiple}");
+        Parser.parseMessage("{1:name#with index and comment:and parameter=with value:multiple:and one=more}");
+        Parser.parseMessage(
+            "text and a macro {1:name#with index and comment:and parameter=with value:multiple:and one=more} more text");
+        Parser.parseMessage(
+            "text and a macro {1:name#with index and comment:and parameter=with value:multiple:and one=more} more text");
+
+        Parser.parseMessage("illegal macro {starts but wont end");
+        Parser.parseMessage("illegal macro {starts:has arguments but wont end");
     }
 }

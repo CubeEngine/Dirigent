@@ -25,10 +25,13 @@ package org.cubeengine.dirigent.parser.component.macro;
 import java.util.Collections;
 import java.util.List;
 
-import org.cubeengine.dirigent.parser.component.argument.Argument;
+import org.cubeengine.dirigent.parser.component.macro.argument.Argument;
 
 import static java.util.Collections.unmodifiableList;
 
+/**
+ * A Macro with a name and an optional list of Arguments
+ */
 public class NamedMacro implements Macro
 {
     private final String name;

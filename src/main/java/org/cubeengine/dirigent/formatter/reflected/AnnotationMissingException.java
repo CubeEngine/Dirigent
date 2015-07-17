@@ -20,16 +20,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.cubeengine.dirigent.parser.component.macro;
+package org.cubeengine.dirigent.formatter.reflected;
+
+import java.lang.annotation.Annotation;
 
 /**
- * An empty Macro
+ * This Exception is thrown whenever a ReflectedFormatter is missing the @Names Annotation or has no valid @Format annotated method
  */
-public class DefaultMacro implements Macro
+public class AnnotationMissingException extends RuntimeException
 {
-    public static final DefaultMacro DEFAULT_MACRO = new DefaultMacro();
-
-    private DefaultMacro()
+    public AnnotationMissingException(Class<? extends Annotation> clazz)
     {
+        super("This formatter is missing a @" + clazz.getName() + " Annotation!");
     }
 }

@@ -22,6 +22,9 @@
  */
 package org.cubeengine.dirigent.parser.component.macro;
 
+/**
+ * A Macro with position and no name
+ */
 public class IndexedDefaultMacro extends DefaultMacro implements Indexed
 {
     private final int index;

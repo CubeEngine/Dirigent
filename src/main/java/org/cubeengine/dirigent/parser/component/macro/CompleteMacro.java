@@ -23,8 +23,11 @@
 package org.cubeengine.dirigent.parser.component.macro;
 
 import java.util.List;
-import org.cubeengine.dirigent.parser.component.argument.Argument;
+import org.cubeengine.dirigent.parser.component.macro.argument.Argument;
 
+/**
+ * A complete Macro with name, position and optional Arguments
+ */
 public class CompleteMacro extends NamedMacro implements Indexed
 {
     private int index;

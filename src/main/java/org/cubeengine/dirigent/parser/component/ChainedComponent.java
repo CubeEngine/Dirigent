@@ -24,22 +24,26 @@ package org.cubeengine.dirigent.parser.component;
 
 import java.util.Arrays;
 import java.util.List;
+import org.cubeengine.dirigent.Component;
 
-public class ChainedComponent implements MessageComponent
+/**
+ * Multiple Components chained one after the other
+ */
+public class ChainedComponent implements Component
 {
-    private List<MessageComponent> chained;
+    private List<Component> chained;
 
-    public ChainedComponent(MessageComponent... chained)
+    public ChainedComponent(Component... chained)
     {
         this.chained = Arrays.asList(chained);
     }
 
-    public ChainedComponent(List<MessageComponent> components)
+    public ChainedComponent(List<Component> components)
     {
         this.chained = components;
     }
 
-    public List<MessageComponent> getChained()
+    public List<Component> getChained()
     {
         return chained;
     }

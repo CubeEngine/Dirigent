@@ -20,16 +20,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.cubeengine.dirigent.parser.component.macro;
+package org.cubeengine.dirigent;
+
+import java.util.List;
+
+import static java.util.Collections.unmodifiableList;
 
 /**
- * An empty Macro
+ * A parsed Message
  */
-public class DefaultMacro implements Macro
+public class Message
 {
-    public static final DefaultMacro DEFAULT_MACRO = new DefaultMacro();
+    private final List<Component> components;
 
-    private DefaultMacro()
+    public Message(List<Component> components)
     {
+        this.components = unmodifiableList(components);
+    }
+
+    /**
+     * Returns the components of the parsed message
+     * @return the components
+     */
+    public List<Component> getComponents()
+    {
+        return components;
     }
 }
