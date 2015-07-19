@@ -22,43 +22,29 @@
  */
 package org.cubeengine.dirigent.builder;
 
-import org.cubeengine.dirigent.parser.component.ErrorComponent;
-import org.cubeengine.dirigent.Component;
-import org.cubeengine.dirigent.parser.component.Text;
+import org.cubeengine.dirigent.AbstractDirigent;
+import org.cubeengine.dirigent.Message;
+import org.cubeengine.dirigent.parser.component.ChainedComponent;
 
-public class StringMessageBuilder extends MessageBuilder<String, StringBuilder>
+/**
+ * A Dirigent implementation using Builders
+ * @param <MessageT> the resulting MessageType
+ * @param <BuilderT> the Builder Type
+ */
+public class BuilderDirigent<MessageT, BuilderT> extends AbstractDirigent<MessageT>
 {
-    @Override
-    public void build(Text component, StringBuilder builder)
+    private MessageBuilder<MessageT, BuilderT> mBuilder;
+
+    public BuilderDirigent(MessageBuilder<MessageT, BuilderT> mBuilder)
     {
-        builder.append(component.getString());
+        this.mBuilder = mBuilder;
     }
 
     @Override
-    public StringBuilder newBuilder()
+    protected MessageT compose(Message message)
     {
-        return new StringBuilder();
-    }
-
-    @Override
-    public String finalize(StringBuilder stringBuilder)
-    {
-        return stringBuilder.toString();
-    }
-
-    @Override
-    public void build(ErrorComponent component, StringBuilder builder)
-    {
-        if (component instanceof Text)
-        {
-            builder.append(((Text)component).getString());
-        }
-        builder.append(component.getError());
-    }
-
-    @Override
-    public void buildOther(Component component, StringBuilder builder)
-    {
-        return; // TODO
+        BuilderT builder = mBuilder.newBuilder();
+        mBuilder.buildChain(new ChainedComponent(message.getComponents()), builder);
+        return mBuilder.finalize(builder);
     }
 }

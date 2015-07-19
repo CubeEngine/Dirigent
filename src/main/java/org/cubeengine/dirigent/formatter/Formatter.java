@@ -27,14 +27,37 @@ import java.util.List;
 import java.util.Set;
 import org.cubeengine.dirigent.Component;
 
+/**
+ * A Formatter for T.
+ * PostProcessors can be added to run after formatting
+  *
+ * @param <T> the ObjectType to format
+ */
 public abstract class Formatter<T>
 {
     private List<PostProcessor> postProcessors = new ArrayList<PostProcessor>();
 
+    /**
+     * Returns true if given argument can be formatted with this Formatter
+     * @param arg the argument
+     * @return whether the argument can be formatted
+     */
     public abstract boolean isApplicable(Object arg);
 
+    /**
+     * Formats the argument into a Component for given Context
+     * @param arg the argument
+     * @param context the Context
+     * @return the resulting Component
+     */
     protected abstract Component format(T arg, Context context);
 
+    /**
+     * Formats the argument into a Component for given Context. Then runs all PostProcessors.
+     * @param arg the argument
+     * @param context the Context
+     * @return the resulting processed Component
+     */
     public final Component process(T arg, Context context)
     {
         Component result = format(arg, context);
@@ -45,10 +68,18 @@ public abstract class Formatter<T>
         return result;
     }
 
+    /**
+     * Adds a PostProcessor to this Formatter
+     * @param pp the PostProcessor to add
+     */
     public final void addPostProcessor(PostProcessor pp)
     {
         postProcessors.add(pp);
     }
 
+    /**
+     * Returns the names of this formatter
+     * @return the names
+     */
     public abstract Set<String> names();
 }

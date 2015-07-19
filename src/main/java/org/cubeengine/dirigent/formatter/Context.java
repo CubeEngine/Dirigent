@@ -28,6 +28,9 @@ import org.cubeengine.dirigent.parser.component.macro.argument.Argument;
 import org.cubeengine.dirigent.parser.component.macro.argument.Flag;
 import org.cubeengine.dirigent.parser.component.macro.argument.Parameter;
 
+/**
+ * The Context of a Macro including Locale and the arguments of the Macro if any
+ */
 public class Context
 {
     private Locale locale;
@@ -38,22 +41,40 @@ public class Context
         this.locale = locale;
     }
 
+    /**
+     * Returns the Locale
+     * @return the locale
+     */
     public Locale getLocale()
     {
         return locale;
     }
 
+    /**
+     * Returns the list of arguments
+     * @return the list of arguments
+     */
     public List<Argument> getArgumentList()
     {
         return argumentList;
     }
 
+    /**
+     * Replaces the list of arguments allowing to reuse the context
+     * @param list the list to replace with
+     * @return fluent interface
+     */
     public Context with(List<Argument> list)
     {
         this.argumentList = list;
         return this;
     }
 
+    /**
+     * Returns the Arguments value for given name or null if not found
+     * @param name the name
+     * @return the value of the Argument by name
+     */
     public String get(String name)
     {
         for (Argument argument : argumentList)
@@ -69,6 +90,11 @@ public class Context
         return null;
     }
 
+    /**
+     * Gets the Value of an Argument at a position
+     * @param i the position
+     * @return the Argument value
+     */
     public String getFlag(int i)
     {
         if (argumentList.size() >= i + 1)
@@ -82,6 +108,11 @@ public class Context
         return null;
     }
 
+    /**
+     * Returns whether the list of arguments contains given flag
+     * @param flag the flag to check for
+     * @return whether the list of arguments contains given flag
+     */
     public boolean has(String flag)
     {
         for (Argument argument : argumentList)

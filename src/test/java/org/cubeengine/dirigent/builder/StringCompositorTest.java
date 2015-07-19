@@ -39,12 +39,12 @@ import static org.junit.Assert.*;
 
 public class StringCompositorTest
 {
-    private StringCompositor compositor;
+    private BuilderDirigent<String, StringBuilder> compositor;
 
     @Before
     public void setUp() throws Exception
     {
-        compositor = new StringCompositor();
+        compositor = new BuilderDirigent<String, StringBuilder>(new StringMessageBuilder());
         
         compositor.registerFormatter(new DateFormatter());
         compositor.registerFormatter(new IntegerFormatter());

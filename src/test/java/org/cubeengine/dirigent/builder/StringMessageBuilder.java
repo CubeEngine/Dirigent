@@ -22,24 +22,46 @@
  */
 package org.cubeengine.dirigent.builder;
 
-import org.cubeengine.dirigent.AbstractDirigent;
-import org.cubeengine.dirigent.Message;
-import org.cubeengine.dirigent.parser.component.ChainedComponent;
+import org.cubeengine.dirigent.parser.component.ErrorComponent;
+import org.cubeengine.dirigent.Component;
+import org.cubeengine.dirigent.parser.component.Text;
 
-public class BuilderMessageCompositor<MessageT, BuilderT> extends AbstractDirigent<MessageT>
+/**
+ * Builds a String using a StringBuilder
+ */
+public class StringMessageBuilder extends MessageBuilder<String, StringBuilder>
 {
-    private MessageBuilder<MessageT, BuilderT> mBuilder;
-
-    public BuilderMessageCompositor(MessageBuilder<MessageT, BuilderT> mBuilder)
+    @Override
+    public void build(Text component, StringBuilder builder)
     {
-        this.mBuilder = mBuilder;
+        builder.append(component.getString());
     }
 
     @Override
-    protected MessageT compose(Message message)
+    public StringBuilder newBuilder()
     {
-        BuilderT builder = mBuilder.newBuilder();
-        mBuilder.buildChain(new ChainedComponent(message.getComponents()), builder);
-        return mBuilder.finalize(builder);
+        return new StringBuilder();
+    }
+
+    @Override
+    public String finalize(StringBuilder stringBuilder)
+    {
+        return stringBuilder.toString();
+    }
+
+    @Override
+    public void build(ErrorComponent component, StringBuilder builder)
+    {
+        if (component instanceof Text)
+        {
+            builder.append(((Text)component).getString());
+        }
+        builder.append(component.getError());
+    }
+
+    @Override
+    public void buildOther(Component component, StringBuilder builder)
+    {
+        throw new IllegalStateException("Custom components not supported"); // No custom Components
     }
 }

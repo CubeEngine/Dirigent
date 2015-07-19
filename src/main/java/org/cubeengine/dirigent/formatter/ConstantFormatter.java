@@ -24,6 +24,9 @@ package org.cubeengine.dirigent.formatter;
 
 import org.cubeengine.dirigent.Component;
 
+/**
+ * A Formatter for Constant Expressions. This Formatter does not consume arguments.
+ */
 public abstract class ConstantFormatter extends Formatter<Void>
 {
     public boolean isApplicable(Object arg)
@@ -36,5 +39,10 @@ public abstract class ConstantFormatter extends Formatter<Void>
         return format(context);
     }
 
+    /**
+     * Formats the Constant expression
+     * @param context the contect
+     * @return the resulting Component
+     */
     public abstract Component format(Context context);
 }

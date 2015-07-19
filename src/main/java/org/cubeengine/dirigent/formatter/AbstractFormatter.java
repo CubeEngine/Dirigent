@@ -30,6 +30,10 @@ import java.util.Set;
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableSet;
 
+/**
+ * A Formatter for one specific class
+ * @param <T> the class to format
+ */
 public abstract class AbstractFormatter<T> extends Formatter<T>
 {
     private final Class<T> clazz;

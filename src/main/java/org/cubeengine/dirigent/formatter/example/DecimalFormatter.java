@@ -33,6 +33,9 @@ import org.cubeengine.dirigent.formatter.Context;
 
 import static java.text.NumberFormat.getInstance;
 
+/**
+ * Formats {@link Float}, {@link Double} and {@link BigDecimal}s
+ */
 @Names("decimal")
 public class DecimalFormatter extends ReflectedFormatter
 {

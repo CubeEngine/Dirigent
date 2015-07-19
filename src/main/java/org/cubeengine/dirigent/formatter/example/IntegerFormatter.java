@@ -27,6 +27,9 @@ import org.cubeengine.dirigent.parser.component.Text;
 import org.cubeengine.dirigent.formatter.AbstractFormatter;
 import org.cubeengine.dirigent.formatter.Context;
 
+/**
+ * Formats an {@link Integer}
+ */
 public class IntegerFormatter extends AbstractFormatter<Integer>
 {
     public IntegerFormatter()

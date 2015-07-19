@@ -24,6 +24,9 @@ package org.cubeengine.dirigent.formatter;
 
 import org.cubeengine.dirigent.Component;
 
+/**
+ * Processes a Component afterwards
+ */
 public interface PostProcessor
 {
     Component process(Component component, Context context);

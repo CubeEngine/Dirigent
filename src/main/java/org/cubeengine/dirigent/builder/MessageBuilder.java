@@ -28,14 +28,32 @@ import org.cubeengine.dirigent.parser.component.FoundFormatter;
 import org.cubeengine.dirigent.Component;
 import org.cubeengine.dirigent.parser.component.Text;
 
+/**
+ * Uses a Builder to construct a message
+ * @param <MessageT> the resulting MessageType
+ * @param <BuilderT> the Builder Type
+ */
 public abstract class MessageBuilder<MessageT, BuilderT>
 {
+    /**
+     * Constructs a new Builder
+     * @return the new Builder
+     */
     public abstract BuilderT newBuilder();
+
+    /**
+     * Returns the built message
+     * @param builderT the builder
+     * @return the built message
+     */
     public abstract MessageT finalize(BuilderT builderT);
 
-    public abstract void build(Text component, BuilderT builder);
-
-    public void buildAny(Component component, BuilderT builder)
+    /**
+     * Appends a Component to the builder
+     * @param component the component
+     * @param builder the builder
+     */
+    public final void buildAny(Component component, BuilderT builder)
     {
         if (component instanceof FoundFormatter)
         {
@@ -57,17 +75,38 @@ public abstract class MessageBuilder<MessageT, BuilderT>
         {
             buildOther(component, builder);
         }
-        // TODO
     }
 
+    /**
+     * Appends a {@link Text} Component to the builder
+     * @param component the text
+     * @param builder the builder
+     */
+    public abstract void build(Text component, BuilderT builder);
+
+    /**
+     * Appends a {@link FoundFormatter} Component to the builder
+     * @param component the found formatter
+     * @param builder the builder
+     */
     public final void buildFormatted(FoundFormatter component, BuilderT builder)
     {
         @SuppressWarnings("unchecked") Component processed = component.getFound().process(component.getArg(), component.getContext());
         buildAny(processed, builder);
     }
 
+    /**
+     * Handles an {@link ErrorComponent}
+     * @param component the component
+     * @param builder the builder
+     */
     public abstract void build(ErrorComponent component, BuilderT builder);
 
+    /**
+     * Appends a chain of Components to the builder
+     * @param chained the chained Components
+     * @param builder the builder
+     */
     public void buildChain(ChainedComponent chained, BuilderT builder)
     {
         for (Component component : chained.getChained())
@@ -76,5 +115,12 @@ public abstract class MessageBuilder<MessageT, BuilderT>
         }
     }
 
+    /**
+     * Appends a Component to the builder.
+     * Implement this to handle custom Components
+     *
+     * @param component the component
+     * @param builder the builder
+     */
     public abstract void buildOther(Component component, BuilderT builder);
 }

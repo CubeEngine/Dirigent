@@ -32,6 +32,9 @@ import org.cubeengine.dirigent.formatter.Context;
 
 import static java.text.DateFormat.*;
 
+/**
+ * Formats a {@link Date} allowing multiple formats
+ */
 public class DateFormatter extends AbstractFormatter<Date>
 {
     public DateFormatter()

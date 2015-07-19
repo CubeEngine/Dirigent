@@ -28,6 +28,9 @@ import org.cubeengine.dirigent.parser.component.Text;
 
 import static java.util.Collections.singleton;
 
+/**
+ * The default Formatter using {@link String#valueOf} to convert it into {@link Text}
+ */
 public class DefaultFormatter extends Formatter<Object>
 {
     @Override
