@@ -51,6 +51,11 @@ public class RawMessage implements Iterator<Character>, Iterable<Character>
         return message[++i];
     }
 
+    public void remove()
+    {
+        throw new UnsupportedOperationException();
+    }
+
     public void prev()
     {
         i--;

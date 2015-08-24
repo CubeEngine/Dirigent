@@ -88,8 +88,8 @@ public class StringCompositorTest
         Calendar instance = Calendar.getInstance();
         instance.set(2014, Calendar.AUGUST, 1, 1, 0, 0);
         Date date = new Date(instance.getTimeInMillis());
-        assertEquals("Year: 2014", compose("Year: {date:format=YYYY}", date));
-        assertEquals("Date is: 2014-08-01", compose("Date is: {date:format=YYYY-MM-dd}", date));
+        assertEquals("Year: 2014", compose("Year: {date:format=yyyy}", date));
+        assertEquals("Date is: 2014-08-01", compose("Date is: {date:format=yyyy-MM-dd}", date));
         assertEquals("No Args: 01.08.14 01:00", compose("No Args: {date#will use default short conversion}", date));
     }
 
