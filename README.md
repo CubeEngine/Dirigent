@@ -4,6 +4,7 @@
 Directs your composition
 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.cubeengine/dirigent/badge.svg?style=flat)](https://maven-badges.herokuapp.com/maven-central/org.cubeengine/dirigent)
+[![Build Status](https://travis-ci.org/CubeEngine/Dirigent.svg?branch=master)](https://travis-ci.org/CubeEngine/Dirigent)
 
 A compact formatting framework intended to be used in conjuction with translated messages.
 
