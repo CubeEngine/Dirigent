@@ -43,7 +43,7 @@ public abstract class ConstantFormatter extends Formatter<Void>
 
     /**
      * Formats the Constant expression
-     * @param context the contect
+     * @param context the context
      * @return the resulting Component
      */
     public abstract Component format(Context context);
