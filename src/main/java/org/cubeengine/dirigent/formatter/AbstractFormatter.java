@@ -78,7 +78,7 @@ public abstract class AbstractFormatter<T> extends Formatter<T>
     @Override
     public boolean isApplicable(Object arg)
     {
-        return clazz.isAssignableFrom(arg.getClass());
+        return arg != null && clazz.isAssignableFrom(arg.getClass());
     }
 
     @Override
