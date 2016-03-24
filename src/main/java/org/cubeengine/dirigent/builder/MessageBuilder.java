@@ -57,19 +57,19 @@ public abstract class MessageBuilder<MessageT, BuilderT>
     {
         if (component instanceof FoundFormatter)
         {
-            buildFormatted(((FoundFormatter)component), builder);
+            buildFormatted((FoundFormatter)component, builder);
         }
         else if (component instanceof ChainedComponent)
         {
-            buildChain(((ChainedComponent)component), builder);
+            buildChain((ChainedComponent)component, builder);
         }
         else if (component instanceof Text)
         {
-            build(((Text)component), builder);
+            build((Text)component, builder);
         }
         else if (component instanceof ErrorComponent)
         {
-            build(((ErrorComponent)component), builder);
+            build((ErrorComponent)component, builder);
         }
         else
         {

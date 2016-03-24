@@ -27,7 +27,6 @@ import java.util.List;
 import org.cubeengine.dirigent.Message;
 import org.cubeengine.dirigent.parser.component.ErrorComponent;
 import org.cubeengine.dirigent.parser.component.macro.CompleteMacro;
-import org.cubeengine.dirigent.parser.component.macro.DefaultMacro;
 import org.cubeengine.dirigent.parser.component.macro.IndexedDefaultMacro;
 import org.cubeengine.dirigent.parser.component.macro.Macro;
 import org.cubeengine.dirigent.Component;
