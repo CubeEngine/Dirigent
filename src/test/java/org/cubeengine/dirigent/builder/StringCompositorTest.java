@@ -44,7 +44,7 @@ public class StringCompositorTest
     @Before
     public void setUp() throws Exception
     {
-        compositor = new BuilderDirigent<String, StringBuilder>(new StringMessageBuilder());
+        compositor = new StringBuilderDirigent();
         
         compositor.registerFormatter(new DateFormatter());
         compositor.registerFormatter(new IntegerFormatter());
