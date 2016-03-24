@@ -34,6 +34,7 @@ public class IndexedDefaultMacro extends DefaultMacro implements Indexed
         this.index = index;
     }
 
+    @Override
     public int getIndex()
     {
         return index;

@@ -29,11 +29,13 @@ import org.cubeengine.dirigent.Component;
  */
 public abstract class ConstantFormatter extends Formatter<Void>
 {
+    @Override
     public boolean isApplicable(Object arg)
     {
         return true;
     }
 
+    @Override
     public final Component format(Void arg, Context context)
     {
         return format(context);

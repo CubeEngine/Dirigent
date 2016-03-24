@@ -313,6 +313,7 @@ public class Parser
             this.error = error;
         }
 
+        @Override
         public String getError()
         {
             return error;

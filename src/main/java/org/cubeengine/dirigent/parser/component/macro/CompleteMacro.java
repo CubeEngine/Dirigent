@@ -38,6 +38,7 @@ public class CompleteMacro extends NamedMacro implements Indexed
         this.index = index;
     }
 
+    @Override
     public int getIndex()
     {
         return index;

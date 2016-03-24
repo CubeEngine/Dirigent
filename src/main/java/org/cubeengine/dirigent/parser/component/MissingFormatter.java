@@ -48,6 +48,7 @@ public class MissingFormatter implements ErrorComponent
         return arg;
     }
 
+    @Override
     public String getError()
     {
         return "Formatter not found";

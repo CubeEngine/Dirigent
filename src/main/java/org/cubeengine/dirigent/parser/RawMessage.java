@@ -36,21 +36,25 @@ public class RawMessage implements Iterator<Character>, Iterable<Character>
         this.message = message.toCharArray();
     }
 
+    @Override
     public Iterator<Character> iterator()
     {
         return this;
     }
 
+    @Override
     public boolean hasNext()
     {
         return message.length > i + 1;
     }
 
+    @Override
     public Character next()
     {
         return message[++i];
     }
 
+    @Override
     public void remove()
     {
         throw new UnsupportedOperationException();

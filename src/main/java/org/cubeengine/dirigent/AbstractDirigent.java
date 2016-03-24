@@ -59,11 +59,13 @@ public abstract class AbstractDirigent<MessageT> implements Dirigent<MessageT>
         registerFormatter(new DefaultFormatter());
     }
 
+    @Override
     public MessageT compose(String source, Object... args)
     {
         return this.compose(Locale.getDefault(), source, args);
     }
 
+    @Override
     public MessageT compose(Locale locale, String source, Object... args)
     {
         Message message = check(locale, Parser.parseMessage(source), args);
@@ -77,6 +79,7 @@ public abstract class AbstractDirigent<MessageT> implements Dirigent<MessageT>
      */
     protected abstract MessageT compose(Message message);
 
+    @Override
     public Formatter findFormatter(String name, Object arg)
     {
         List<Formatter> list = this.formatters.get(name);
@@ -94,12 +97,14 @@ public abstract class AbstractDirigent<MessageT> implements Dirigent<MessageT>
         return null;
     }
 
+    @Override
     public Dirigent addPostProcessor(PostProcessor postProcessor)
     {
         postProcessors.add(postProcessor);
         return this;
     }
 
+    @Override
     public Dirigent registerFormatter(Formatter<?> formatter)
     {
         for (String name : formatter.names())
