@@ -114,6 +114,10 @@ public abstract class ReflectedFormatter extends Formatter<Object>
     @Override
     public boolean isApplicable(Object arg)
     {
+        if (arg == null)
+        {
+            return false;
+        }
         for (Class<?> tClass : formats.keySet())
         {
             if (tClass.isAssignableFrom(arg.getClass()))
