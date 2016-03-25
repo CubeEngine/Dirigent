@@ -199,7 +199,7 @@ public class Parser
                 break;
             }
 
-            if (!commentEscaped && comment && c == MACRO_ESCAPE)
+            if (comment && !commentEscaped && c == MACRO_ESCAPE)
             {
                 commentEscaped = true;
             }
@@ -210,7 +210,6 @@ public class Parser
             else if (!comment) // if not comment add to name
             {
                 sb.append(c);
-                commentEscaped = false;
             }
             else if (commentEscaped)
             {
