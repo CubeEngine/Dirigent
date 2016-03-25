@@ -281,15 +281,24 @@ public class Parser
     {
         StringBuilder sb = new StringBuilder();
         boolean ended = false;
+        boolean escaped = false;
         for (Character c : message) // read argument-value
         {
-            if (c == MACRO_SEPARATOR || c == MACRO_END) // end of argument
+            if (!escaped && (c == MACRO_SEPARATOR || c == MACRO_END)) // end of argument
             {
                 message.prev();
                 ended = true;
                 break;
             }
-            sb.append(c);
+            if (!escaped && c == MACRO_ESCAPE)
+            {
+                escaped = true;
+            }
+            else
+            {
+                sb.append(c);
+                escaped = false;
+            }
         }
         if (!ended)
         {
