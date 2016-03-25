@@ -26,6 +26,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import org.cubeengine.dirigent.Component;
+import org.cubeengine.dirigent.formatter.MirrorFormatter;
 import org.cubeengine.dirigent.parser.component.Text;
 import org.cubeengine.dirigent.formatter.Context;
 import org.cubeengine.dirigent.formatter.PostProcessor;
@@ -49,6 +50,7 @@ public class StringCompositorTest
         compositor.registerFormatter(new DateFormatter());
         compositor.registerFormatter(new IntegerFormatter());
         compositor.registerFormatter(new DecimalFormatter());
+        compositor.registerFormatter(new MirrorFormatter("mirror"));
     }
 
     private String compose(String raw, Object... args)
@@ -91,6 +93,15 @@ public class StringCompositorTest
         assertEquals("Year: 2014", compose("Year: {date:format=yyyy}", date));
         assertEquals("Date is: 2014-08-01", compose("Date is: {date:format=yyyy-MM-dd}", date));
         assertEquals("No Args: 01.08.14 01:00", compose("No Args: {date#will use default short conversion}", date));
+    }
+
+    @Test
+    public void testConstantFormatter() throws Exception
+    {
+        final String msg = "Use of a mirror {mirror:flag:param=test:par2=42:t}";
+        assertEquals(msg, compose(msg));
+
+        assertEquals("Test: 1 and {mirror:4} with 2", compose("Test: {number} and {mirror:4} with {number}", 1, 2));
     }
 
     @Test
