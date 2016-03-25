@@ -153,14 +153,10 @@ public abstract class AbstractDirigent<MessageT> implements Dirigent<MessageT>
                     name = ((NamedMacro)component).getName();
                     arguments = ((NamedMacro)component).getArgs();
                 }
-                Object arg;
-                try
+                Object arg = null; // may be null because it might be a constant macro
+                if (forIndex < args.length)
                 {
                     arg = args[forIndex];
-                }
-                catch (ArrayIndexOutOfBoundsException ignored)
-                {
-                    arg = null; // Might be a constant macro
                 }
                 Formatter found = this.findFormatter(name, arg);
                 if (found == null)
