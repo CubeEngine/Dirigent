@@ -98,12 +98,6 @@ public class Parser
                 case MACRO_BEGIN: // end normal text
                     message.prev();
                     return new Text(sb.toString());
-                case MACRO_ESCAPE: // escaped text
-                    if (message.hasNext())
-                    {
-                        c = message.next();
-                    }
-                    sb.append(c);
                 default: // more normal text
                     sb.append(c);
             }
@@ -192,9 +186,10 @@ public class Parser
         StringBuilder sb = new StringBuilder().append(message.current());
         boolean ended = false;
         boolean comment = false;
+        boolean commentEscaped = false;
         for (Character c : message) // read the name
         {
-            if (c == MACRO_SEPARATOR || c == MACRO_END) // end of name
+            if (!commentEscaped && (c == MACRO_SEPARATOR || c == MACRO_END)) // end of name
             {
                 if (c == MACRO_END) // end of macro
                 {
@@ -203,13 +198,23 @@ public class Parser
                 ended = true;
                 break;
             }
-            if (c == MACRO_LABEL) // start of comment
+
+            if (!commentEscaped && comment && c == MACRO_ESCAPE)
+            {
+                commentEscaped = true;
+            }
+            else if (!commentEscaped && c == MACRO_LABEL) // start of comment
             {
                 comment = true;
             }
             else if (!comment) // if not comment add to name
             {
                 sb.append(c);
+                commentEscaped = false;
+            }
+            else if (commentEscaped)
+            {
+                commentEscaped = false;
             }
         }
         if (!ended)

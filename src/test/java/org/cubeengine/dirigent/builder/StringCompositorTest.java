@@ -59,11 +59,13 @@ public class StringCompositorTest
         return compositor.compose(Locale.GERMAN, raw, args);
     }
 
-
     @Test
     public void testString() throws Exception
     {
         String msg = "This is a pure String message";
+        assertEquals(msg, compose(msg));
+
+        msg = "Another pure String \\with escape character";
         assertEquals(msg, compose(msg));
 
         msg = "This is a {} String message";
@@ -75,6 +77,10 @@ public class StringCompositorTest
         assertEquals("This is a cool String message", compose("This is a {} String message", "cool"));
     }
 
+    @Test
+    public void testLabelEscaping() {
+        assertEquals("This is a 42.0 message.", this.compositor.compose(Locale.US, "This is a {decimal#test\\:2:1} message.", 42d));
+    }
 
     @Test
     public void testNumbers()
