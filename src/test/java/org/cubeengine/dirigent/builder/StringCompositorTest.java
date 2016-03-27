@@ -71,6 +71,12 @@ public class StringCompositorTest
         msg = "This is a {} String message";
         assertEquals(msg, compose(msg, "{}"));
 
+        msg = "This is a \\{} String message";
+        assertEquals(msg.replaceAll("\\\\\\{", "{"), compose(msg));
+
+        msg = "This \\is a \\{} String \\message";
+        assertEquals(msg.replaceAll("\\\\\\{", "{"), compose(msg));
+
         msg = "This is a {1}{} String message";
         assertEquals(msg, compose(msg, "{}", "{1}"));
 
@@ -88,6 +94,8 @@ public class StringCompositorTest
         assertEquals("This is a 42 message", compose("This is a {number} message", 42));
         assertEquals("Numbers: 1 2 3", compose("Numbers: {number} {2:number} {number}", 1, 3, 2));
         assertEquals("Decimal: 4,321 9,88 5,43210", compose("Decimal: {decimal} {2:decimal:2} {decimal:5}", 4.321, 5.4321, 9.87654321));
+        assertEquals("Decimal: 04,321", compose("Decimal: {decimal:2\\:3}", 4.321));
+        assertEquals("Decimal: 4.423,321", compose("Decimal: {decimal:2\\:3}", 4423.321));
         assertEquals("Decimal: 4,321 9,88 5,43210", compose("Decimal: {decimal} {2:decimal:2} {decimal:5}", 4.321f, 5.4321f, BigDecimal.valueOf(9.87654321)));
     }
 

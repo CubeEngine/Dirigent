@@ -24,12 +24,12 @@ package org.cubeengine.dirigent.formatter.example;
 
 import java.math.BigDecimal;
 import java.text.NumberFormat;
+import org.cubeengine.dirigent.Component;
+import org.cubeengine.dirigent.formatter.Context;
 import org.cubeengine.dirigent.formatter.reflected.Format;
 import org.cubeengine.dirigent.formatter.reflected.Names;
 import org.cubeengine.dirigent.formatter.reflected.ReflectedFormatter;
-import org.cubeengine.dirigent.Component;
 import org.cubeengine.dirigent.parser.component.Text;
-import org.cubeengine.dirigent.formatter.Context;
 
 import static java.text.NumberFormat.getInstance;
 
@@ -70,12 +70,25 @@ public class DecimalFormatter extends ReflectedFormatter
         {
             try
             {
-                Integer decimalPlaces = Integer.valueOf(arg);
+                final String[] parts = arg.split(":", 2);
+                final Integer decimalPlaces;
+                if (parts.length == 1)
+                {
+                    decimalPlaces = Integer.valueOf(parts[0]);
+                }
+                else
+                {
+                    final Integer integerDigits = Integer.valueOf(parts[0]);
+                    decimalPlaces = Integer.valueOf(parts[1]);
+
+                    decimalFormat.setMinimumIntegerDigits(integerDigits);
+                }
+
                 decimalFormat.setMaximumFractionDigits(decimalPlaces);
                 decimalFormat.setMinimumFractionDigits(decimalPlaces);
                 return new Text(decimalFormat.format(number));
             }
-            catch (NumberFormatException e)
+            catch (final NumberFormatException e)
             {
                 throw new IllegalArgumentException(
                     "The 'decimal' type does not allow arguments other than integer for decimal places", e);

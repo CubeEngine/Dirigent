@@ -24,14 +24,14 @@ package org.cubeengine.dirigent.parser;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.cubeengine.dirigent.Component;
 import org.cubeengine.dirigent.Message;
 import org.cubeengine.dirigent.parser.component.ErrorComponent;
+import org.cubeengine.dirigent.parser.component.Text;
 import org.cubeengine.dirigent.parser.component.macro.CompleteMacro;
 import org.cubeengine.dirigent.parser.component.macro.IndexedDefaultMacro;
 import org.cubeengine.dirigent.parser.component.macro.Macro;
-import org.cubeengine.dirigent.Component;
 import org.cubeengine.dirigent.parser.component.macro.NamedMacro;
-import org.cubeengine.dirigent.parser.component.Text;
 import org.cubeengine.dirigent.parser.component.macro.argument.Argument;
 import org.cubeengine.dirigent.parser.component.macro.argument.Flag;
 import org.cubeengine.dirigent.parser.component.macro.argument.Parameter;
@@ -54,12 +54,12 @@ public class Parser
     private Parser()
     {}
 
-    public static Message parseMessage(String message)
+    public static Message parseMessage(final String message)
     {
         return readMessage(new RawMessage(message));
     }
 
-    private static Message readMessage(RawMessage message)
+    private static Message readMessage(final RawMessage message)
     {
         final List<Component> elements = new ArrayList<Component>();
         for (char c : message) // Read entire the raw message
@@ -88,7 +88,7 @@ public class Parser
         return new Message(elements);
     }
 
-    private static Text readString(RawMessage message)
+    private static Text readString(final RawMessage message)
     {
         StringBuilder sb = new StringBuilder().append(message.current());
         for (char c : message)
@@ -98,6 +98,12 @@ public class Parser
                 case MACRO_BEGIN: // end normal text
                     message.prev();
                     return new Text(sb.toString());
+                case MACRO_ESCAPE:
+                    c = message.next();
+                    if (c != MACRO_BEGIN)
+                    {
+                        sb.append(MACRO_ESCAPE);
+                    }
                 default: // more normal text
                     sb.append(c);
             }
@@ -105,7 +111,7 @@ public class Parser
         return new Text(sb.toString());
     }
 
-    private static Macro readMacro(RawMessage message)
+    private static Macro readMacro(final RawMessage message)
     {
         boolean ended = false;
         Integer index = null;
@@ -150,7 +156,7 @@ public class Parser
         return new CompleteMacro(index, name, args);
     }
 
-    private static int readIndex(RawMessage message)
+    private static int readIndex(final RawMessage message)
     {
         StringBuilder sb = new StringBuilder().append(message.current());
         boolean ended = false;
@@ -181,15 +187,14 @@ public class Parser
         return parseInt(sb.toString());
     }
 
-    private static String readName(RawMessage message)
+    private static String readName(final RawMessage message)
     {
         StringBuilder sb = new StringBuilder().append(message.current());
         boolean ended = false;
         boolean comment = false;
-        boolean commentEscaped = false;
         for (Character c : message) // read the name
         {
-            if (!commentEscaped && (c == MACRO_SEPARATOR || c == MACRO_END)) // end of name
+            if (c == MACRO_SEPARATOR || c == MACRO_END) // end of name
             {
                 if (c == MACRO_END) // end of macro
                 {
@@ -199,21 +204,17 @@ public class Parser
                 break;
             }
 
-            if (comment && !commentEscaped && c == MACRO_ESCAPE)
+            if (comment && c == MACRO_ESCAPE)
             {
-                commentEscaped = true;
+                message.next();
             }
-            else if (!commentEscaped && c == MACRO_LABEL) // start of comment
+            else if (c == MACRO_LABEL) // start of comment
             {
                 comment = true;
             }
             else if (!comment) // if not comment add to name
             {
                 sb.append(c);
-            }
-            else if (commentEscaped)
-            {
-                commentEscaped = false;
             }
         }
         if (!ended)
@@ -265,6 +266,10 @@ public class Parser
             {
                 argumentValue = readArgumentValue(message);
             }
+            else if (c == MACRO_ESCAPE)
+            {
+                sb.append(message.next());
+            }
             else
             {
                 sb.append(c);
@@ -285,23 +290,21 @@ public class Parser
     {
         StringBuilder sb = new StringBuilder();
         boolean ended = false;
-        boolean escaped = false;
         for (Character c : message) // read argument-value
         {
-            if (!escaped && (c == MACRO_SEPARATOR || c == MACRO_END)) // end of argument
+            if (c == MACRO_SEPARATOR || c == MACRO_END) // end of argument
             {
                 message.prev();
                 ended = true;
                 break;
             }
-            if (!escaped && c == MACRO_ESCAPE)
+            if (c == MACRO_ESCAPE)
             {
-                escaped = true;
+                sb.append(message.next());
             }
             else
             {
                 sb.append(c);
-                escaped = false;
             }
         }
         if (!ended)
