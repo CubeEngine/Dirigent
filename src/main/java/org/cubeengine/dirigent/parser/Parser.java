@@ -52,7 +52,8 @@ public class Parser
     public static final char ARGUMENT_VALUE = '=';
 
     private Parser()
-    {}
+    {
+    }
 
     public static Message parseMessage(final String message)
     {
@@ -98,17 +99,19 @@ public class Parser
                 case MACRO_BEGIN: // end normal text
                     message.prev();
                     return new Text(sb.toString());
-                case MACRO_ESCAPE:
-                    if (message.hasNext()){
+                case MACRO_ESCAPE: // escape sign is just handled as an escape before a macro begins
+                    if (message.hasNext())
+                    {
                         c = message.next();
                         if (c != MACRO_BEGIN)
                         {
                             sb.append(MACRO_ESCAPE);
                         }
                     }
-                default: // more normal text
-                    sb.append(c);
+                    break;
             }
+
+            sb.append(c);
         }
         return new Text(sb.toString());
     }
