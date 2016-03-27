@@ -99,10 +99,12 @@ public class Parser
                     message.prev();
                     return new Text(sb.toString());
                 case MACRO_ESCAPE:
-                    c = message.next();
-                    if (c != MACRO_BEGIN)
-                    {
-                        sb.append(MACRO_ESCAPE);
+                    if (message.hasNext()){
+                        c = message.next();
+                        if (c != MACRO_BEGIN)
+                        {
+                            sb.append(MACRO_ESCAPE);
+                        }
                     }
                 default: // more normal text
                     sb.append(c);

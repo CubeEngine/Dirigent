@@ -68,6 +68,9 @@ public class StringCompositorTest
         msg = "Another pure String \\with escape character";
         assertEquals(msg, compose(msg));
 
+        msg = "Another pure String \\with escape character\\";
+        assertEquals(msg, compose(msg));
+
         msg = "This is a {} String message";
         assertEquals(msg, compose(msg, "{}"));
 
