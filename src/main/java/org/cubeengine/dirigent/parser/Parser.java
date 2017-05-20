@@ -57,15 +57,19 @@ public class Parser
 
     public static Message parseMessage(final String message)
     {
+        if (message.indexOf('{') == -1)
+        {
+            return new Message(new Text(message));
+        }
         return readMessage(new RawMessage(message));
     }
 
     private static Message readMessage(final RawMessage message)
     {
         final List<Component> elements = new ArrayList<Component>();
-        for (char c : message) // Read entire the raw message
+        while (message.hasNext()) // Read entire the raw message
         {
-            switch (c)
+            switch (message.next())
             {
                 case MACRO_BEGIN: // start macro
                     try
@@ -92,8 +96,10 @@ public class Parser
     private static Text readString(final RawMessage message)
     {
         StringBuilder sb = new StringBuilder().append(message.current());
-        for (char c : message)
+        char c;
+        while (message.hasNext())
         {
+            c = message.next();
             switch (c)
             {
                 case MACRO_BEGIN: // end normal text
@@ -122,8 +128,10 @@ public class Parser
         Integer index = null;
         String name = null;
         List<Argument> args = null;
-        for (char c : message) // read the macro
+        char c;
+        while (message.hasNext()) // read the macro
         {
+            c = message.next();
             if (c == MACRO_END) // end macro
             {
                 ended = true;
@@ -165,8 +173,10 @@ public class Parser
     {
         StringBuilder sb = new StringBuilder().append(message.current());
         boolean ended = false;
-        for (Character c : message) // read the index
+        char c;
+        while (message.hasNext()) // read the index
         {
+            c = message.next();
             if (Character.isDigit(c)) // more digits
             {
                 sb.append(c);
@@ -197,8 +207,10 @@ public class Parser
         StringBuilder sb = new StringBuilder().append(message.current());
         boolean ended = false;
         boolean comment = false;
-        for (Character c : message) // read the name
+        char c;
+        while (message.hasNext()) // read the name
         {
+            c = message.next();
             if (c == MACRO_SEPARATOR || c == MACRO_END) // end of name
             {
                 if (c == MACRO_END) // end of macro
@@ -234,8 +246,10 @@ public class Parser
         boolean ended = false;
         List<Argument> list = new ArrayList<Argument>();
         list.add(readArgument(message)); // read first argument
-        for (Character c : message)
+        char c;
+        while (message.hasNext())
         {
+            c = message.next();
             if (c == MACRO_END) // end of name
             {
                 message.prev();
@@ -256,8 +270,10 @@ public class Parser
         StringBuilder sb = new StringBuilder().append(message.current());
         String argumentValue = null;
         boolean ended = false;
-        for (Character c : message) // read the argument
+        char c;
+        while (message.hasNext()) // read the argument
         {
+            c = message.next();
             if (c == MACRO_SEPARATOR || c == MACRO_END) // end of argument
             {
                 if (c == MACRO_END) // end of macro
@@ -295,8 +311,10 @@ public class Parser
     {
         StringBuilder sb = new StringBuilder();
         boolean ended = false;
-        for (Character c : message) // read argument-value
+        char c;
+        while (message.hasNext()) // read argument-value
         {
+            c = message.next();
             if (c == MACRO_SEPARATOR || c == MACRO_END) // end of argument
             {
                 message.prev();

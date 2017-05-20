@@ -23,51 +23,38 @@
 package org.cubeengine.dirigent.parser;
 
 import java.util.Arrays;
-import java.util.Iterator;
 
-public class RawMessage implements Iterator<Character>, Iterable<Character>
+public class RawMessage
 {
     private final char[] message;
-    private int i = -1;
+    private int i = 0;
     private int checkpoint = 0;
+    private char current;
 
     public RawMessage(String message)
     {
         this.message = message.toCharArray();
     }
 
-    @Override
-    public Iterator<Character> iterator()
-    {
-        return this;
-    }
-
-    @Override
     public boolean hasNext()
     {
-        return message.length > i + 1;
+        return message.length != i;
     }
 
-    @Override
-    public Character next()
+    public char next()
     {
-        return message[++i];
-    }
-
-    @Override
-    public void remove()
-    {
-        throw new UnsupportedOperationException();
+        current = message[i++];
+        return current;
     }
 
     public void prev()
     {
-        i--;
+        current = message[--i];
     }
 
-    public Character current()
+    public char current()
     {
-        return message[i];
+        return current;
     }
 
     public String fromCheckPoint()
@@ -77,6 +64,6 @@ public class RawMessage implements Iterator<Character>, Iterable<Character>
 
     public void setCheckPoint()
     {
-        checkpoint = i;
+        checkpoint = i - 1;
     }
 }

@@ -24,6 +24,7 @@ package org.cubeengine.dirigent;
 
 import java.util.List;
 
+import static java.util.Collections.singletonList;
 import static java.util.Collections.unmodifiableList;
 
 /**
@@ -36,6 +37,11 @@ public class Message
     public Message(List<Component> components)
     {
         this.components = unmodifiableList(components);
+    }
+
+    public Message(Component component)
+    {
+        this.components = singletonList(component);
     }
 
     /**
