@@ -35,13 +35,12 @@ public class ParserTest
         Parser.parseMessage("{0}");
         Parser.parseMessage("{1:name#with index and comment}");
         Parser.parseMessage("{1:name#with index and comment:and parameter}");
+        Parser.parseMessage("{1:name#with index and comment:#parameterwithhash}");
         Parser.parseMessage("{1:name#with index and comment:and parameter=with value}");
         Parser.parseMessage("{1:name#with index and comment:and parameter=with value:multiple}");
         Parser.parseMessage("{1:name#with index and comment:and parameter=with value:multiple:and one=more}");
-        Parser.parseMessage(
-            "text and a macro {1:name#with index and comment:and parameter=with value:multiple:and one=more} more text");
-        Parser.parseMessage(
-            "text and a macro {1:name#with index and comment:and parameter=with value:multiple:and one=more} more text");
+        Parser.parseMessage("text and a macro {1:name#with index and comment:and parameter=with value:multiple:and one=more} more text");
+        Parser.parseMessage("text and a macro {1:name#with index and comment:and parameter=with value:multiple:and one=more} more text");
 
         Parser.parseMessage("illegal macro {starts but wont end");
         Parser.parseMessage("illegal macro {starts:has arguments but wont end");
