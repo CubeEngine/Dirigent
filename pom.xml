@@ -27,7 +27,7 @@
     <scm>
         <url>https://github.com/CubeEngine/Dirigent</url>
         <connection>scm:git:https://github.com/CubeEngine/Dirigent</connection>
-        <developerConnection>scm:git:https://github.com/CubeEngine/Dirigent</developerConnection>
+        <developerConnection>scm:git:git@github.com:CubeEngine/Dirigent</developerConnection>
         <tag>HEAD</tag>
     </scm>
 
