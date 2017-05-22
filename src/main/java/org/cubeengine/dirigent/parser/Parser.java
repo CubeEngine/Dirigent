@@ -49,7 +49,7 @@ public class Parser
 {
     // DON'T LOOK AT THIS!                                    |  some text          |            | index     |   | name  || label   | |  the parameters                      |         | broken macro            |
     private static final Pattern TEXT_AND_MACRO = compile(
-        "\\G((?:\\\\[{\\\\]|[^{])*)(\\{(?:(?:(0|[1-9]\\d*):)?([^:#}]+)(?:#[^:}]+)?((?::[^=:}]+(?:=(?:\\\\[:}\\\\]|[^:}])+)?)+)?)?}|(\\{(?:\\\\[{\\\\]|[^{])*))?");
+        "\\G((?:\\\\[{\\\\]|[^{])*)(?:(\\{(?:(?:(0|[1-9]\\d*):)?([^:#}]+)(?:#[^:}]+)?((?::[^=:}]+(?:=(?:\\\\[:}\\\\]|[^:}])+)?)+)?)?})|(\\{(?:\\\\[{\\\\]|[^{])*))?");
     private static final Pattern INTEGER = compile("(?:0|[1-9]\\d*)");
     private static final Pattern ARGUMENT = compile("\\G:([^=:]+)(?:=((?:\\\\[:}\\\\]|[^:}])+))?");
 
@@ -86,11 +86,6 @@ public class Parser
         String brokenMacroRest;
         while (matcher.find())
         {
-            if (matcher.group(GROUP_WHOLE_MATCH).isEmpty())
-            {
-                continue;
-            }
-            System.out.println("Offset: " + matcher.end());
             prefix = matcher.group(GROUP_TEXT_PREFIX);
             if (prefix.length() > 0)
             {
@@ -129,12 +124,13 @@ public class Parser
                     }
                 }
 
-                brokenMacroRest = matcher.group(GROUP_BROKEN_MACRO);
-                if (brokenMacroRest != null)
-                {
-                    components.add(new IllegalMacro(stripBackslashes(brokenMacroRest, "\\{"),
-                                                    "Encountered macro start, but no valid macro followed."));
-                }
+            }
+
+            brokenMacroRest = matcher.group(GROUP_BROKEN_MACRO);
+            if (brokenMacroRest != null)
+            {
+                components.add(new IllegalMacro(stripBackslashes(brokenMacroRest, "\\{"),
+                                                "Encountered macro start, but no valid macro followed."));
             }
         }
 
