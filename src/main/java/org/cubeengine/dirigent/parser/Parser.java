@@ -1,17 +1,17 @@
 /**
  * The MIT License
  * Copyright (c) 2013 Cube Island
- *
+ * <p>
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * <p>
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * <p>
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -27,7 +27,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.cubeengine.dirigent.Component;
 import org.cubeengine.dirigent.Message;
 import org.cubeengine.dirigent.parser.component.Text;
@@ -48,10 +47,22 @@ import static org.cubeengine.dirigent.parser.component.macro.DefaultMacro.DEFAUL
  */
 public class Parser
 {
-    // DON'T LOOK AT THIS!                                  |  some text          |      |  the index        | |the type|  |the label| |  the parameters                      |  some more text            |
-    private static final Pattern TEXT_AND_MACRO = compile("^((?:\\\\[{\\\\]|[^{])*)(?:\\{(?:(?:(0|[1-9]\\d*):)?([^:#}]+)(?:#([^:}]+))?(:[^=:}]+(?:=(?:\\\\[:}\\\\]|[^:}])+)?)*)?}|(\\{(?:\\\\[{\\\\]|[^{])*))?");
-    private static final Pattern INTEGER        = compile("^(?:0|[1-9]\\d*)$");
-    private static final Pattern ARGUMENT       = compile("^:([^=:]+)(?:=((?:\\\\[:}\\\\]|[^:}])+))?");
+    // DON'T LOOK AT THIS!                                    |  some text          |            | index     |   | name  || label   | |  the parameters                      |         | broken macro            |
+    private static final Pattern TEXT_AND_MACRO = compile(
+        "\\G((?:\\\\[{\\\\]|[^{])*)(\\{(?:(?:(0|[1-9]\\d*):)?([^:#}]+)(?:#[^:}]+)?((?::[^=:}]+(?:=(?:\\\\[:}\\\\]|[^:}])+)?)+)?)?}|(\\{(?:\\\\[{\\\\]|[^{])*))?");
+    private static final Pattern INTEGER = compile("(?:0|[1-9]\\d*)");
+    private static final Pattern ARGUMENT = compile("\\G:([^=:]+)(?:=((?:\\\\[:}\\\\]|[^:}])+))?");
+
+    private static final int GROUP_WHOLE_MATCH = 0;
+    private static final int GROUP_TEXT_PREFIX = 1;
+    private static final int GROUP_WHOLE_MACRO = 2;
+    private static final int GROUP_INDEX = 3;
+    private static final int GROUP_NAME = 4;
+    private static final int GROUP_PARAMS = 5;
+    private static final int GROUP_BROKEN_MACRO = 6;
+
+    private static final int GROUP_PARAM_NAME = 1;
+    private static final int GROUP_PARAM_VALUE = 2;
 
     private Parser()
     {
@@ -72,54 +83,59 @@ public class Parser
         String name;
         //String label;
         String params;
-        String suffix;
-        int offset = 0;
+        String brokenMacroRest;
         while (matcher.find())
         {
-            offset = matcher.end();
-            System.out.println("Offset: " + offset);
-            prefix = matcher.group(1);
+            if (matcher.group(GROUP_WHOLE_MATCH).isEmpty())
+            {
+                continue;
+            }
+            System.out.println("Offset: " + matcher.end());
+            prefix = matcher.group(GROUP_TEXT_PREFIX);
             if (prefix.length() > 0)
             {
                 components.add(new Text(stripBackslashes(prefix, "\\{")));
             }
 
-            index = matcher.group(2);
-            name = matcher.group(3);
-            boolean noIndex = index == null;
-            boolean noName = name == null;
-            if (noIndex && noName)
+            if (matcher.group(GROUP_WHOLE_MACRO) != null)
             {
-                components.add(DEFAULT_MACRO);
-            }
-            else
-            {
-                //label = matcher.group(4);
-                params = matcher.group(5);
 
-                if (noIndex)
+                index = matcher.group(GROUP_INDEX);
+                name = matcher.group(GROUP_NAME);
+                boolean noIndex = index == null;
+                boolean noName = name == null;
+                if (noIndex && noName)
                 {
-                    if (params == null && INTEGER.matcher(name).matches())
-                    {
-                        components.add(new IndexedDefaultMacro(parseInt(name)));
-                    }
-                    else
-                    {
-                        components.add(new NamedMacro(name, parseArguments(params)));
-                    }
+                    components.add(DEFAULT_MACRO);
                 }
                 else
                 {
-                    components.add(new CompleteMacro(parseInt(index), name, parseArguments(params)));
+                    params = matcher.group(GROUP_PARAMS);
+
+                    if (noIndex)
+                    {
+                        if (params == null && INTEGER.matcher(name).matches())
+                        {
+                            components.add(new IndexedDefaultMacro(parseInt(name)));
+                        }
+                        else
+                        {
+                            components.add(new NamedMacro(name, parseArguments(params)));
+                        }
+                    }
+                    else
+                    {
+                        components.add(new CompleteMacro(parseInt(index), name, parseArguments(params)));
+                    }
+                }
+
+                brokenMacroRest = matcher.group(GROUP_BROKEN_MACRO);
+                if (brokenMacroRest != null)
+                {
+                    components.add(new IllegalMacro(stripBackslashes(brokenMacroRest, "\\{"),
+                                                    "Encountered macro start, but no valid macro followed."));
                 }
             }
-
-            suffix = matcher.group(6);
-            if (suffix != null)
-            {
-                components.add(new IllegalMacro(stripBackslashes(suffix, "\\{"), "Encountered macro start, but no valid macro followed."));
-            }
-
         }
 
         return new Message(components);
@@ -138,8 +154,8 @@ public class Parser
         String value;
         while (matcher.find())
         {
-            name = matcher.group(1);
-            value = matcher.group(2);
+            name = matcher.group(GROUP_PARAM_NAME);
+            value = matcher.group(GROUP_PARAM_VALUE);
             if (value == null)
             {
                 args.add(new Flag(name));
@@ -171,12 +187,12 @@ public class Parser
             for (i = 0; i < input.length() - 1; ++i)
             {
                 c = input.charAt(i);
-                if (c != '\\' || charset.indexOf(input.charAt(i + 1)) == -1) {
+                if (c != '\\' || charset.indexOf(input.charAt(i + 1)) == -1)
+                {
                     stripped.append(c);
                 }
             }
             return stripped.append(i).toString();
         }
     }
-
 }

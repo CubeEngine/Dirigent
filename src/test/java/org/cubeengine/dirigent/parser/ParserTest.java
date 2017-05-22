@@ -110,7 +110,7 @@ public class ParserTest
             parseMessage("{1:name#with index and comment:and parameter=with value}"));
 
         assertEquals(
-            msg(complete(1, "name", arg("amd parameter", "with value"), arg("multiple"))),
+            msg(complete(1, "name", arg("and parameter", "with value"), arg("multiple"))),
             parseMessage("{1:name#with index and comment:and parameter=with value:multiple}"));
 
         assertEquals(
