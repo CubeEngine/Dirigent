@@ -95,19 +95,6 @@ public class Context
      *
      * @param i the position
      * @return the Argument value
-     * @deprecated use {@link #get(int)} instead.
-     */
-    @Deprecated
-    public String getFlag(int i)
-    {
-        return get(i);
-    }
-
-    /**
-     * Gets the Value of an Argument at a position.
-     *
-     * @param i the position
-     * @return the Argument value
      */
     public String get(int i)
     {
@@ -124,14 +111,14 @@ public class Context
 
     /**
      * Returns whether the list of arguments contains given flag
-     * @param flag the flag to check for
+     * @param value the flag to check for
      * @return whether the list of arguments contains given flag
      */
-    public boolean has(String flag)
+    public boolean has(String value)
     {
         for (Argument argument : argumentList)
         {
-            if (argument instanceof Value && ((Value)argument).getValue().equals(flag))
+            if (argument instanceof Value && ((Value)argument).getValue().equals(value))
             {
                 return true;
             }

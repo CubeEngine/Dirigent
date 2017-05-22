@@ -47,8 +47,8 @@ import static org.cubeengine.dirigent.parser.component.macro.DefaultMacro.DEFAUL
  */
 public class Parser
 {
-    // DON'T LOOK AT THIS!                                    |  some text          |            | index     |   | name  || label   | |  the parameters                      |         | broken macro            |
     private static final Pattern TEXT_AND_MACRO = compile(
+        //  |  some text          |             | index     |   | name  || label                    | |  the parameters                                        |         | broken macro            |
         "\\G((?:\\\\[{\\\\]|[^{])*)(?:(\\{(?:(?:(0|[1-9]\\d*):)?([^:#}]+)(?:#(?:\\\\[:}\\\\]|[^:}])+)?((?::(?:\\\\[=:}\\\\]|[^=:}])+(?:=(?:\\\\[:}\\\\]|[^:}])+)?)+)?)?})|(\\{(?:\\\\[{\\\\]|[^{])*))?");
     private static final Pattern INTEGER = compile("(?:0|[1-9]\\d*)");
     private static final Pattern ARGUMENT = compile("\\G:((?:\\\\[=:}\\\\]|[^=:}])+)(?:=((?:\\\\[:}\\\\]|[^:}])+))?");
