@@ -23,14 +23,17 @@
 package org.cubeengine.dirigent.parser;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.cubeengine.dirigent.Component;
 import org.cubeengine.dirigent.Message;
-import org.cubeengine.dirigent.parser.component.ErrorComponent;
 import org.cubeengine.dirigent.parser.component.Text;
 import org.cubeengine.dirigent.parser.component.macro.CompleteMacro;
+import org.cubeengine.dirigent.parser.component.macro.IllegalMacro;
 import org.cubeengine.dirigent.parser.component.macro.IndexedDefaultMacro;
-import org.cubeengine.dirigent.parser.component.macro.Macro;
 import org.cubeengine.dirigent.parser.component.macro.NamedMacro;
 import org.cubeengine.dirigent.parser.component.macro.argument.Argument;
 import org.cubeengine.dirigent.parser.component.macro.argument.Flag;
@@ -44,12 +47,10 @@ import static org.cubeengine.dirigent.parser.component.macro.DefaultMacro.DEFAUL
  */
 public class Parser
 {
-    public static final char MACRO_BEGIN = '{';
-    public static final char MACRO_END = '}';
-    public static final char MACRO_ESCAPE = '\\';
-    public static final char MACRO_SEPARATOR = ':';
-    public static final char MACRO_LABEL = '#';
-    public static final char ARGUMENT_VALUE = '=';
+    // DON'T LOOK AT THIS!                                          |  some text          |      |  the index        | |the type|  |the label| |  the parameters                      |  some more text            |
+    private static final Pattern TEXT_AND_MACRO = Pattern.compile("^((?:\\\\[{\\\\]|[^{])*)(?:\\{(?:(?:(0|[1-9]\\d*):)?([^:#}]+)(?:#([^:}]+))?(:[^=:}]+(?:=(?:\\\\[:}\\\\]|[^:}])+)?)*)?}|(\\{(?:\\\\[{\\\\]|[^{])*))?");
+    private static final Pattern INTEGER = Pattern.compile("^(?:0|[1-9]\\d*)$");
+    private static final Pattern ARGUMENT = Pattern.compile("^:([^=:]+)(?:=((?:\\\\[:}\\\\]|[^:}])+))?");
 
     private Parser()
     {
@@ -61,300 +62,117 @@ public class Parser
         {
             return new Message(new Text(message));
         }
-        return readMessage(new RawMessage(message));
-    }
 
-    private static Message readMessage(final RawMessage message)
-    {
-        final List<Component> elements = new ArrayList<Component>();
-        while (message.hasNext()) // Read entire the raw message
+        Matcher matcher = TEXT_AND_MACRO.matcher(message);
+
+        List<Component> components = new ArrayList<Component>();
+        String prefix;
+        String index;
+        String name;
+        //String label;
+        String params;
+        String suffix;
+        while (matcher.find())
         {
-            switch (message.next())
+            prefix = matcher.group(1);
+            if (prefix.length() > 0)
             {
-                case MACRO_BEGIN: // start macro
-                    try
-                    {
-
-                        elements.add(readMacro(message));
-                        message.setCheckPoint();
-                    }
-                    catch (IllegalMacroException e)
-                    {
-                        elements.add(new IllegalMacro(message.fromCheckPoint(), e.getMessage()));
-                        return new Message(elements);
-                    }
-                    break;
-                default: // start normal text
-                    elements.add(readString(message));
-                    message.setCheckPoint();
-            }
-        }
-
-        return new Message(elements);
-    }
-
-    private static Text readString(final RawMessage message)
-    {
-        StringBuilder sb = new StringBuilder().append(message.current());
-        char c;
-        while (message.hasNext())
-        {
-            c = message.next();
-            switch (c)
-            {
-                case MACRO_BEGIN: // end normal text
-                    message.prev();
-                    return new Text(sb.toString());
-                case MACRO_ESCAPE: // escape sign is just handled as an escape before a macro begins
-                    if (message.hasNext())
-                    {
-                        c = message.next();
-                        if (c != MACRO_BEGIN)
-                        {
-                            sb.append(MACRO_ESCAPE);
-                        }
-                    }
-                    break;
+                components.add(new Text(stripBackslashes(prefix, "\\{")));
             }
 
-            sb.append(c);
-        }
-        return new Text(sb.toString());
-    }
-
-    private static Macro readMacro(final RawMessage message)
-    {
-        boolean ended = false;
-        Integer index = null;
-        String name = null;
-        List<Argument> args = null;
-        char c;
-        while (message.hasNext()) // read the macro
-        {
-            c = message.next();
-            if (c == MACRO_END) // end macro
+            index = matcher.group(2);
+            name = matcher.group(3);
+            boolean noIndex = index == null;
+            boolean noName = name == null;
+            if (noIndex && noName)
             {
-                ended = true;
-                break;
-            }
-            if (name == null && index == null && Character.isDigit(c)) // index start
-            {
-                index = readIndex(message);
-            }
-            else if (name == null) // name start
-            {
-                name = readName(message);
-            }
-            else // start arguments
-            {
-                args = readArguments(message);
-            }
-        }
-        if (!ended)
-        {
-            throw new IllegalMacroException("macro");
-        }
-        if (name == null)
-        {
-            if (index == null)
-            {
-                return DEFAULT_MACRO;
-            }
-            return new IndexedDefaultMacro(index);
-        }
-        if (index == null)
-        {
-            return new NamedMacro(name, args);
-        }
-        return new CompleteMacro(index, name, args);
-    }
-
-    private static int readIndex(final RawMessage message)
-    {
-        StringBuilder sb = new StringBuilder().append(message.current());
-        boolean ended = false;
-        char c;
-        while (message.hasNext()) // read the index
-        {
-            c = message.next();
-            if (Character.isDigit(c)) // more digits
-            {
-                sb.append(c);
-            }
-            else if (c == MACRO_SEPARATOR || c == MACRO_END) // end of index
-            {
-                if (c == MACRO_END) // end of macro
-                {
-                    message.prev();
-                }
-                ended = true;
-                break;
-            }
-            else // NaN invalid index
-            {
-                throw new IllegalMacroException("index");
-            }
-        }
-        if (!ended) // index did not end
-        {
-            throw new IllegalMacroException("index");
-        }
-        return parseInt(sb.toString());
-    }
-
-    private static String readName(final RawMessage message)
-    {
-        StringBuilder sb = new StringBuilder().append(message.current());
-        boolean ended = false;
-        boolean comment = false;
-        char c;
-        while (message.hasNext()) // read the name
-        {
-            c = message.next();
-            if (c == MACRO_SEPARATOR || c == MACRO_END) // end of name
-            {
-                if (c == MACRO_END) // end of macro
-                {
-                    message.prev();
-                }
-                ended = true;
-                break;
-            }
-
-            if (comment && c == MACRO_ESCAPE)
-            {
-                message.next();
-            }
-            else if (c == MACRO_LABEL) // start of comment
-            {
-                comment = true;
-            }
-            else if (!comment) // if not comment add to name
-            {
-                sb.append(c);
-            }
-        }
-        if (!ended)
-        {
-            throw new IllegalMacroException("name");
-        }
-        return sb.toString();
-    }
-
-    private static List<Argument> readArguments(RawMessage message)
-    {
-        boolean ended = false;
-        List<Argument> list = new ArrayList<Argument>();
-        list.add(readArgument(message)); // read first argument
-        char c;
-        while (message.hasNext())
-        {
-            c = message.next();
-            if (c == MACRO_END) // end of name
-            {
-                message.prev();
-                ended = true;
-                break;
-            }
-            list.add(readArgument(message)); // read argument
-        }
-        if (!ended)
-        {
-            throw new IllegalMacroException("arguments");
-        }
-        return list;
-    }
-
-    private static Argument readArgument(RawMessage message)
-    {
-        StringBuilder sb = new StringBuilder().append(message.current());
-        String argumentValue = null;
-        boolean ended = false;
-        char c;
-        while (message.hasNext()) // read the argument
-        {
-            c = message.next();
-            if (c == MACRO_SEPARATOR || c == MACRO_END) // end of argument
-            {
-                if (c == MACRO_END) // end of macro
-                {
-                    message.prev();
-                }
-                ended = true;
-                break;
-            }
-            if (c == ARGUMENT_VALUE) // start of argument-value
-            {
-                argumentValue = readArgumentValue(message);
-            }
-            else if (c == MACRO_ESCAPE)
-            {
-                sb.append(message.next());
+                components.add(DEFAULT_MACRO);
             }
             else
             {
-                sb.append(c);
+                //label = matcher.group(4);
+                params = matcher.group(5);
+
+                if (noIndex)
+                {
+                    if (params == null && INTEGER.matcher(name).matches())
+                    {
+                        components.add(new IndexedDefaultMacro(parseInt(name)));
+                    }
+                    else
+                    {
+                        components.add(new NamedMacro(name, parseArguments(params)));
+                    }
+                }
+                else
+                {
+                    components.add(new CompleteMacro(parseInt(index), name, parseArguments(params)));
+                }
             }
+
+            suffix = matcher.group(6);
+            if (suffix != null)
+            {
+                components.add(new IllegalMacro(stripBackslashes(suffix, "\\{"), "Encountered macro start, but no valid macro followed."));
+            }
+
         }
-        if (!ended)
-        {
-            throw new IllegalMacroException("argument");
-        }
-        if (argumentValue == null)
-        {
-            return new Flag(sb.toString());
-        }
-        return new Parameter(sb.toString(), argumentValue);
+
+        return new Message(components);
     }
 
-    private static String readArgumentValue(RawMessage message)
+    private static List<Argument> parseArguments(String params)
     {
-        StringBuilder sb = new StringBuilder();
-        boolean ended = false;
-        char c;
-        while (message.hasNext()) // read argument-value
+        if (params == null || params.isEmpty())
         {
-            c = message.next();
-            if (c == MACRO_SEPARATOR || c == MACRO_END) // end of argument
+            return Collections.emptyList();
+        }
+        List<Argument> args = new ArrayList<Argument>();
+
+        Matcher matcher = ARGUMENT.matcher(params);
+        String name;
+        String value;
+        while (matcher.find())
+        {
+            name = matcher.group(1);
+            value = matcher.group(2);
+            if (value == null)
             {
-                message.prev();
-                ended = true;
-                break;
-            }
-            if (c == MACRO_ESCAPE)
-            {
-                sb.append(message.next());
+                args.add(new Flag(name));
             }
             else
             {
-                sb.append(c);
+                args.add(new Parameter(name, stripBackslashes(value, ":}")));
             }
         }
-        if (!ended)
-        {
-            throw new IllegalMacroException("argument-value");
-        }
-        return sb.toString();
+
+        return args;
     }
 
-    /**
-     * Show the original text of an invalid macro.
-     * Gets added to the Message when an {@link IllegalMacroException} was thrown during parsing.
-     */
-    private static class IllegalMacro extends Text implements ErrorComponent
+    private static String stripBackslashes(String input, String charset)
     {
-        private String error;
-
-        public IllegalMacro(String string, String error)
+        if (input.length() <= 1)
         {
-            super(string);
-            this.error = error;
+            return input;
         }
-
-        @Override
-        public String getError()
+        else if (input.indexOf('\\') == -1)
         {
-            return error;
+            return input;
+        }
+        else
+        {
+            StringBuilder stripped = new StringBuilder();
+            char c;
+            int i;
+            for (i = 0; i < input.length() - 1; ++i)
+            {
+                c = input.charAt(i);
+                if (c != '\\' || charset.indexOf(input.charAt(i + 1)) == -1) {
+                    stripped.append(c);
+                }
+            }
+            return stripped.append(i).toString();
         }
     }
+
 }
