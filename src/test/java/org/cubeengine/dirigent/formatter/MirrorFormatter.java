@@ -27,7 +27,7 @@ import java.util.Set;
 import org.cubeengine.dirigent.Component;
 import org.cubeengine.dirigent.parser.component.Text;
 import org.cubeengine.dirigent.parser.component.macro.argument.Argument;
-import org.cubeengine.dirigent.parser.component.macro.argument.Flag;
+import org.cubeengine.dirigent.parser.component.macro.argument.Value;
 import org.cubeengine.dirigent.parser.component.macro.argument.Parameter;
 
 /**
@@ -52,9 +52,9 @@ public class MirrorFormatter extends ConstantFormatter
         for (final Argument argument : context.getArgumentList())
         {
             builder.append(':');
-            if (argument instanceof Flag)
+            if (argument instanceof Value)
             {
-                builder.append(((Flag)argument).getValue());
+                builder.append(((Value)argument).getValue());
             }
             else if (argument instanceof Parameter)
             {

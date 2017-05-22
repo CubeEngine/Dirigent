@@ -25,11 +25,11 @@ package org.cubeengine.dirigent.parser.component.macro.argument;
 /**
  * A simple Value Argument
  */
-public class Flag implements Argument
+public class Value implements Argument
 {
     private final String value;
 
-    public Flag(String value)
+    public Value(String value)
     {
         this.value = value;
     }
@@ -46,14 +46,14 @@ public class Flag implements Argument
         {
             return true;
         }
-        if (!(o instanceof Flag))
+        if (!(o instanceof Value))
         {
             return false;
         }
 
-        final Flag flag = (Flag)o;
+        final Value value = (Value)o;
 
-        return getValue().equals(flag.getValue());
+        return getValue().equals(value.getValue());
     }
 
     @Override
@@ -65,6 +65,6 @@ public class Flag implements Argument
     @Override
     public String toString()
     {
-        return "Flag{" + "value='" + value + '\'' + '}';
+        return "Value{" + "value='" + value + '\'' + '}';
     }
 }

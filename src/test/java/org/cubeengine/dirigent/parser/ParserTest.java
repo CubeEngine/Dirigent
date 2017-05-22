@@ -32,7 +32,7 @@ import org.cubeengine.dirigent.parser.component.macro.IllegalMacro;
 import org.cubeengine.dirigent.parser.component.macro.IndexedDefaultMacro;
 import org.cubeengine.dirigent.parser.component.macro.NamedMacro;
 import org.cubeengine.dirigent.parser.component.macro.argument.Argument;
-import org.cubeengine.dirigent.parser.component.macro.argument.Flag;
+import org.cubeengine.dirigent.parser.component.macro.argument.Value;
 import org.cubeengine.dirigent.parser.component.macro.argument.Parameter;
 import org.junit.Test;
 
@@ -75,7 +75,7 @@ public class ParserTest
 
     public static Argument arg(String name)
     {
-        return new Flag(name);
+        return new Value(name);
     }
 
     public static Argument arg(String name, String val)

@@ -25,7 +25,7 @@ package org.cubeengine.dirigent.formatter;
 import java.util.List;
 import java.util.Locale;
 import org.cubeengine.dirigent.parser.component.macro.argument.Argument;
-import org.cubeengine.dirigent.parser.component.macro.argument.Flag;
+import org.cubeengine.dirigent.parser.component.macro.argument.Value;
 import org.cubeengine.dirigent.parser.component.macro.argument.Parameter;
 
 /**
@@ -100,9 +100,9 @@ public class Context
         if (argumentList.size() >= i + 1)
         {
             Argument argument = argumentList.get(i);
-            if (argument instanceof Flag)
+            if (argument instanceof Value)
             {
-                return ((Flag)argument).getValue();
+                return ((Value)argument).getValue();
             }
         }
         return null;
@@ -117,7 +117,7 @@ public class Context
     {
         for (Argument argument : argumentList)
         {
-            if (argument instanceof Flag && ((Flag)argument).getValue().equals(flag))
+            if (argument instanceof Value && ((Value)argument).getValue().equals(flag))
             {
                 return true;
             }

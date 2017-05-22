@@ -35,7 +35,7 @@ import org.cubeengine.dirigent.parser.component.macro.IllegalMacro;
 import org.cubeengine.dirigent.parser.component.macro.IndexedDefaultMacro;
 import org.cubeengine.dirigent.parser.component.macro.NamedMacro;
 import org.cubeengine.dirigent.parser.component.macro.argument.Argument;
-import org.cubeengine.dirigent.parser.component.macro.argument.Flag;
+import org.cubeengine.dirigent.parser.component.macro.argument.Value;
 import org.cubeengine.dirigent.parser.component.macro.argument.Parameter;
 
 import static java.lang.Integer.parseInt;
@@ -49,9 +49,9 @@ public class Parser
 {
     // DON'T LOOK AT THIS!                                    |  some text          |            | index     |   | name  || label   | |  the parameters                      |         | broken macro            |
     private static final Pattern TEXT_AND_MACRO = compile(
-        "\\G((?:\\\\[{\\\\]|[^{])*)(?:(\\{(?:(?:(0|[1-9]\\d*):)?([^:#}]+)(?:#[^:}]+)?((?::[^=:}]+(?:=(?:\\\\[:}\\\\]|[^:}])+)?)+)?)?})|(\\{(?:\\\\[{\\\\]|[^{])*))?");
+        "\\G((?:\\\\[{\\\\]|[^{])*)(?:(\\{(?:(?:(0|[1-9]\\d*):)?([^:#}]+)(?:#(?:\\\\[:}\\\\]|[^:}])+)?((?::(?:\\\\[=:}\\\\]|[^=:}])+(?:=(?:\\\\[:}\\\\]|[^:}])+)?)+)?)?})|(\\{(?:\\\\[{\\\\]|[^{])*))?");
     private static final Pattern INTEGER = compile("(?:0|[1-9]\\d*)");
-    private static final Pattern ARGUMENT = compile("\\G:([^=:]+)(?:=((?:\\\\[:}\\\\]|[^:}])+))?");
+    private static final Pattern ARGUMENT = compile("\\G:((?:\\\\[=:}\\\\]|[^=:}])+)(?:=((?:\\\\[:}\\\\]|[^:}])+))?");
 
     private static final int GROUP_TEXT_PREFIX = 1;
     private static final int GROUP_WHOLE_MACRO = 2;
@@ -148,15 +148,17 @@ public class Parser
         String value;
         while (matcher.find())
         {
-            name = matcher.group(GROUP_PARAM_NAME);
+            name = stripBackslashes(matcher.group(GROUP_PARAM_NAME), "=:}\\");
             value = matcher.group(GROUP_PARAM_VALUE);
             if (value == null)
             {
-                args.add(new Flag(name));
+                args.add(new Value(name));
+                System.out.println("Value: " + name);
             }
             else
             {
                 args.add(new Parameter(name, stripBackslashes(value, ":}")));
+                System.out.println("Parameter: name='" + name + "', value='" + value + "'");
             }
         }
 
@@ -186,7 +188,7 @@ public class Parser
                     stripped.append(c);
                 }
             }
-            return stripped.append(i).toString();
+            return stripped.append(input.charAt(i)).toString();
         }
     }
 }
