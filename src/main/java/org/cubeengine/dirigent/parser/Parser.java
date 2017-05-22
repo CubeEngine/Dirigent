@@ -38,7 +38,6 @@ import org.cubeengine.dirigent.parser.component.macro.argument.Argument;
 import org.cubeengine.dirigent.parser.component.macro.argument.Value;
 import org.cubeengine.dirigent.parser.component.macro.argument.Parameter;
 
-import static java.lang.Integer.parseInt;
 import static java.util.regex.Pattern.compile;
 import static org.cubeengine.dirigent.parser.component.macro.DefaultMacro.DEFAULT_MACRO;
 
@@ -50,7 +49,6 @@ public class Parser
     private static final Pattern TEXT_AND_MACRO = compile(
         //  |  some text          |             | index     |   | name  || label                    | |  the parameters                                        |         | broken macro            |
         "\\G((?:\\\\[{\\\\]|[^{])*)(?:(\\{(?:(?:(0|[1-9]\\d*):)?([^:#}]+)(?:#(?:\\\\[:}\\\\]|[^:}])+)?((?::(?:\\\\[=:}\\\\]|[^=:}])+(?:=(?:\\\\[:}\\\\]|[^:}])+)?)+)?)?})|(\\{(?:\\\\[{\\\\]|[^{])*))?");
-    private static final Pattern INTEGER = compile("(?:0|[1-9]\\d*)");
     private static final Pattern ARGUMENT = compile("\\G:((?:\\\\[=:}\\\\]|[^=:}])+)(?:=((?:\\\\[:}\\\\]|[^:}])+))?");
 
     private static final int GROUP_TEXT_PREFIX = 1;
@@ -69,32 +67,40 @@ public class Parser
 
     public static Message parseMessage(final String message)
     {
+        if (message == null)
+        {
+            throw new IllegalArgumentException("message may not be null!");
+        }
+        if (message.isEmpty())
+        {
+            return Message.EMPTY;
+        }
         if (message.indexOf('{') == -1)
         {
             return new Message(new Text(message));
         }
 
-        Matcher matcher = TEXT_AND_MACRO.matcher(message);
+        Matcher textMatcher = TEXT_AND_MACRO.matcher(message);
+        Matcher argMatcher = ARGUMENT.matcher("");
 
         List<Component> components = new ArrayList<Component>();
         String prefix;
         String index;
         String name;
-        String params;
         String brokenMacroRest;
-        while (matcher.find())
+        while (textMatcher.find())
         {
-            prefix = matcher.group(GROUP_TEXT_PREFIX);
+            prefix = textMatcher.group(GROUP_TEXT_PREFIX);
             if (prefix.length() > 0)
             {
                 components.add(new Text(stripBackslashes(prefix, "\\{")));
             }
 
-            if (matcher.group(GROUP_WHOLE_MACRO) != null)
+            if (textMatcher.start(GROUP_WHOLE_MACRO) != -1)
             {
 
-                index = matcher.group(GROUP_INDEX);
-                name = matcher.group(GROUP_NAME);
+                index = textMatcher.group(GROUP_INDEX);
+                name = textMatcher.group(GROUP_NAME);
                 boolean noIndex = index == null;
                 boolean noName = name == null;
                 if (noIndex && noName)
@@ -103,47 +109,103 @@ public class Parser
                 }
                 else
                 {
-                    params = matcher.group(GROUP_PARAMS);
-
                     if (noIndex)
                     {
-                        if (params == null && INTEGER.matcher(name).matches())
+                        if (textMatcher.start(GROUP_PARAMS) == -1 && isInt(name))
                         {
-                            components.add(new IndexedDefaultMacro(parseInt(name)));
+                            components.add(new IndexedDefaultMacro(toInt(name)));
                         }
                         else
                         {
-                            components.add(new NamedMacro(name, parseArguments(params)));
+                            components.add(new NamedMacro(name, parseArguments(textMatcher.group(GROUP_PARAMS), argMatcher)));
                         }
                     }
                     else
                     {
-                        components.add(new CompleteMacro(parseInt(index), name, parseArguments(params)));
+                        components.add(new CompleteMacro(toInt(index), name, parseArguments(textMatcher.group(GROUP_PARAMS), argMatcher)));
                     }
                 }
 
             }
 
-            brokenMacroRest = matcher.group(GROUP_BROKEN_MACRO);
+            brokenMacroRest = textMatcher.group(GROUP_BROKEN_MACRO);
             if (brokenMacroRest != null)
             {
                 components.add(new IllegalMacro(stripBackslashes(brokenMacroRest, "\\{"),
                                                 "Encountered macro start, but no valid macro followed."));
+            }
+            if (textMatcher.hitEnd())
+            {
+                break;
             }
         }
 
         return new Message(components);
     }
 
-    private static List<Argument> parseArguments(String params)
+    private static int toInt(String s)
+    {
+        int len = s.length();
+        if (len == 1)
+        {
+            return s.charAt(0) - '0';
+        }
+
+        int out = 0;
+        for (int i = len - 1, factor = 1; i >= 0; --i, factor *= 10)
+        {
+            out += (s.charAt(i) - '0') * factor;
+        }
+        return out;
+    }
+
+    private static boolean isInt(String s)
+    {
+        int len = s.length();
+        if (len == 0)
+        {
+            return false;
+        }
+        if (len == 1)
+        {
+            return isDigit(s.charAt(0));
+        }
+        else
+        {
+            if (!isNonNullDigit(s.charAt(0)))
+            {
+                return false;
+            }
+            for (int i = 1; i < len; ++i)
+            {
+                if (!isDigit(s.charAt(i)))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+    }
+
+    private static boolean isNonNullDigit(char c)
+    {
+        return c >= '1' && c <= '9';
+    }
+
+    private static boolean isDigit(char c)
+    {
+        return c >= '0' && c <= '9';
+    }
+
+    private static List<Argument> parseArguments(String params, Matcher matcher)
     {
         if (params == null || params.isEmpty())
         {
             return Collections.emptyList();
         }
-        List<Argument> args = new ArrayList<Argument>();
+        List<Argument> args = new ArrayList<Argument>(1);
 
-        Matcher matcher = ARGUMENT.matcher(params);
+        matcher.reset(params);
         String name;
         String value;
         while (matcher.find())
@@ -165,11 +227,7 @@ public class Parser
 
     private static String stripBackslashes(String input, String charset)
     {
-        if (input.length() <= 1)
-        {
-            return input;
-        }
-        else if (input.indexOf('\\') == -1)
+        if (input.indexOf('\\') == -1 || input.length() <= 1)
         {
             return input;
         }

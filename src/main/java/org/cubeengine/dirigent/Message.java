@@ -22,6 +22,7 @@
  */
 package org.cubeengine.dirigent;
 
+import java.util.Collections;
 import java.util.List;
 
 import static java.util.Collections.singletonList;
@@ -32,6 +33,8 @@ import static java.util.Collections.unmodifiableList;
  */
 public class Message
 {
+    public static Message EMPTY = new Message(Collections.<Component>emptyList());
+
     private final List<Component> components;
 
     public Message(List<Component> components)
