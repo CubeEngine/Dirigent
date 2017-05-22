@@ -22,13 +22,12 @@
  */
 package org.cubeengine.dirigent.parser.component.macro;
 
-import org.cubeengine.dirigent.parser.IllegalMacroException;
 import org.cubeengine.dirigent.parser.component.ErrorComponent;
 import org.cubeengine.dirigent.parser.component.Text;
 
 /**
  * Show the original text of an invalid macro.
- * Gets added to the Message when an {@link IllegalMacroException} was thrown during parsing.
+ * Gets added to the Message when an invalid macro is encountered.
  */
 public class IllegalMacro extends Text implements ErrorComponent
 {
