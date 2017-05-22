@@ -59,7 +59,7 @@ public class DecimalFormatter extends ReflectedFormatter
 
     protected Component formatNumber(Number number, Context context)
     {
-        String arg = context.getFlag(0);
+        String arg = context.get(0);
         NumberFormat decimalFormat = getInstance(context.getLocale());
         if (arg == null)
         {
