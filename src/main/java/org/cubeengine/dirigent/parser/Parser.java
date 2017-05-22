@@ -53,7 +53,6 @@ public class Parser
     private static final Pattern INTEGER = compile("(?:0|[1-9]\\d*)");
     private static final Pattern ARGUMENT = compile("\\G:([^=:]+)(?:=((?:\\\\[:}\\\\]|[^:}])+))?");
 
-    private static final int GROUP_WHOLE_MATCH = 0;
     private static final int GROUP_TEXT_PREFIX = 1;
     private static final int GROUP_WHOLE_MACRO = 2;
     private static final int GROUP_INDEX = 3;
@@ -81,7 +80,6 @@ public class Parser
         String prefix;
         String index;
         String name;
-        //String label;
         String params;
         String brokenMacroRest;
         while (matcher.find())
