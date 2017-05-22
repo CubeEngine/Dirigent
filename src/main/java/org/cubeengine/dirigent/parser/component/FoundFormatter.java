@@ -61,4 +61,43 @@ public class FoundFormatter implements Component
     {
         return context.with(arguments);
     }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (!(o instanceof FoundFormatter))
+        {
+            return false;
+        }
+
+        final FoundFormatter that = (FoundFormatter)o;
+
+        if (!getFound().equals(that.getFound()))
+        {
+            return false;
+        }
+        if (!getArg().equals(that.getArg()))
+        {
+            return false;
+        }
+        if (!arguments.equals(that.arguments))
+        {
+            return false;
+        }
+        return getContext().equals(that.getContext());
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int result = getFound().hashCode();
+        result = 31 * result + getArg().hashCode();
+        result = 31 * result + arguments.hashCode();
+        result = 31 * result + getContext().hashCode();
+        return result;
+    }
 }

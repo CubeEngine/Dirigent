@@ -52,4 +52,27 @@ public class Message
     {
         return components;
     }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (!(o instanceof Message))
+        {
+            return false;
+        }
+
+        final Message message = (Message)o;
+
+        return getComponents().equals(message.getComponents());
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return getComponents().hashCode();
+    }
 }

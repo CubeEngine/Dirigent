@@ -39,4 +39,27 @@ public class IndexedDefaultMacro extends DefaultMacro implements Indexed
     {
         return index;
     }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (!(o instanceof IndexedDefaultMacro))
+        {
+            return false;
+        }
+
+        final IndexedDefaultMacro that = (IndexedDefaultMacro)o;
+
+        return getIndex() == that.getIndex();
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return getIndex();
+    }
 }

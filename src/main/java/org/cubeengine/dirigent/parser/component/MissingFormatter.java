@@ -53,4 +53,33 @@ public class MissingFormatter implements ErrorComponent
     {
         return "Formatter not found";
     }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (!(o instanceof MissingFormatter))
+        {
+            return false;
+        }
+
+        final MissingFormatter that = (MissingFormatter)o;
+
+        if (!getMissing().equals(that.getMissing()))
+        {
+            return false;
+        }
+        return getArg().equals(that.getArg());
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int result = getMissing().hashCode();
+        result = 31 * result + getArg().hashCode();
+        return result;
+    }
 }

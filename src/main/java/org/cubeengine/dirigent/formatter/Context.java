@@ -124,4 +124,33 @@ public class Context
         }
         return false;
     }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (!(o instanceof Context))
+        {
+            return false;
+        }
+
+        final Context context = (Context)o;
+
+        if (!getLocale().equals(context.getLocale()))
+        {
+            return false;
+        }
+        return getArgumentList().equals(context.getArgumentList());
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int result = getLocale().hashCode();
+        result = 31 * result + getArgumentList().hashCode();
+        return result;
+    }
 }

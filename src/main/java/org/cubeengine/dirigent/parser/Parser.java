@@ -40,6 +40,7 @@ import org.cubeengine.dirigent.parser.component.macro.argument.Flag;
 import org.cubeengine.dirigent.parser.component.macro.argument.Parameter;
 
 import static java.lang.Integer.parseInt;
+import static java.util.regex.Pattern.compile;
 import static org.cubeengine.dirigent.parser.component.macro.DefaultMacro.DEFAULT_MACRO;
 
 /**
@@ -47,10 +48,10 @@ import static org.cubeengine.dirigent.parser.component.macro.DefaultMacro.DEFAUL
  */
 public class Parser
 {
-    // DON'T LOOK AT THIS!                                          |  some text          |      |  the index        | |the type|  |the label| |  the parameters                      |  some more text            |
-    private static final Pattern TEXT_AND_MACRO = Pattern.compile("^((?:\\\\[{\\\\]|[^{])*)(?:\\{(?:(?:(0|[1-9]\\d*):)?([^:#}]+)(?:#([^:}]+))?(:[^=:}]+(?:=(?:\\\\[:}\\\\]|[^:}])+)?)*)?}|(\\{(?:\\\\[{\\\\]|[^{])*))?");
-    private static final Pattern INTEGER = Pattern.compile("^(?:0|[1-9]\\d*)$");
-    private static final Pattern ARGUMENT = Pattern.compile("^:([^=:]+)(?:=((?:\\\\[:}\\\\]|[^:}])+))?");
+    // DON'T LOOK AT THIS!                                  |  some text          |      |  the index        | |the type|  |the label| |  the parameters                      |  some more text            |
+    private static final Pattern TEXT_AND_MACRO = compile("^((?:\\\\[{\\\\]|[^{])*)(?:\\{(?:(?:(0|[1-9]\\d*):)?([^:#}]+)(?:#([^:}]+))?(:[^=:}]+(?:=(?:\\\\[:}\\\\]|[^:}])+)?)*)?}|(\\{(?:\\\\[{\\\\]|[^{])*))?");
+    private static final Pattern INTEGER        = compile("^(?:0|[1-9]\\d*)$");
+    private static final Pattern ARGUMENT       = compile("^:([^=:]+)(?:=((?:\\\\[:}\\\\]|[^:}])+))?");
 
     private Parser()
     {
@@ -72,8 +73,11 @@ public class Parser
         //String label;
         String params;
         String suffix;
+        int offset = 0;
         while (matcher.find())
         {
+            offset = matcher.end();
+            System.out.println("Offset: " + offset);
             prefix = matcher.group(1);
             if (prefix.length() > 0)
             {

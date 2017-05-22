@@ -47,4 +47,27 @@ public class ChainedComponent implements Component
     {
         return chained;
     }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (!(o instanceof ChainedComponent))
+        {
+            return false;
+        }
+
+        final ChainedComponent that = (ChainedComponent)o;
+
+        return getChained().equals(that.getChained());
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return getChained().hashCode();
+    }
 }

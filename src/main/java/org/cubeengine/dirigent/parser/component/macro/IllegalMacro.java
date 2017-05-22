@@ -45,4 +45,33 @@ public class IllegalMacro extends Text implements ErrorComponent
     {
         return error;
     }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (!(o instanceof IllegalMacro))
+        {
+            return false;
+        }
+        if (!super.equals(o))
+        {
+            return false;
+        }
+
+        final IllegalMacro that = (IllegalMacro)o;
+
+        return getError().equals(that.getError());
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int result = super.hashCode();
+        result = 31 * result + getError().hashCode();
+        return result;
+    }
 }

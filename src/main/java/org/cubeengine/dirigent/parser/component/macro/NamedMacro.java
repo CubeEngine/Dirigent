@@ -52,4 +52,33 @@ public class NamedMacro implements Macro
     {
         return args;
     }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (!(o instanceof NamedMacro))
+        {
+            return false;
+        }
+
+        final NamedMacro that = (NamedMacro)o;
+
+        if (!getName().equals(that.getName()))
+        {
+            return false;
+        }
+        return getArgs().equals(that.getArgs());
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int result = getName().hashCode();
+        result = 31 * result + getArgs().hashCode();
+        return result;
+    }
 }

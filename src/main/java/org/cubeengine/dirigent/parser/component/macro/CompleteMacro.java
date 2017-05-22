@@ -43,4 +43,33 @@ public class CompleteMacro extends NamedMacro implements Indexed
     {
         return index;
     }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (!(o instanceof CompleteMacro))
+        {
+            return false;
+        }
+        if (!super.equals(o))
+        {
+            return false;
+        }
+
+        final CompleteMacro that = (CompleteMacro)o;
+
+        return getIndex() == that.getIndex();
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int result = super.hashCode();
+        result = 31 * result + getIndex();
+        return result;
+    }
 }

@@ -40,4 +40,27 @@ public class Text implements Component
     {
         return string;
     }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (!(o instanceof Text))
+        {
+            return false;
+        }
+
+        final Text text = (Text)o;
+
+        return getString().equals(text.getString());
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return getString().hashCode();
+    }
 }
