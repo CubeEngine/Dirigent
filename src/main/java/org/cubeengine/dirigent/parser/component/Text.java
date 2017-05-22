@@ -63,4 +63,10 @@ public class Text implements Component
     {
         return getString().hashCode();
     }
+
+    @Override
+    public String toString()
+    {
+        return "Text{" + "string='" + string + '\'' + '}';
+    }
 }

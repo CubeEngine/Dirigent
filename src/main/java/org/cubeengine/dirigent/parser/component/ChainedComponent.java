@@ -70,4 +70,10 @@ public class ChainedComponent implements Component
     {
         return getChained().hashCode();
     }
+
+    @Override
+    public String toString()
+    {
+        return "ChainedComponent{" + "chained=" + chained + '}';
+    }
 }

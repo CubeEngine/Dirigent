@@ -82,4 +82,10 @@ public class MissingFormatter implements ErrorComponent
         result = 31 * result + getArg().hashCode();
         return result;
     }
+
+    @Override
+    public String toString()
+    {
+        return "MissingFormatter{" + "missing=" + missing + ", arg=" + arg + '}';
+    }
 }

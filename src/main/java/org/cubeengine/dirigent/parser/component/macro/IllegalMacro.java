@@ -74,4 +74,10 @@ public class IllegalMacro extends Text implements ErrorComponent
         result = 31 * result + getError().hashCode();
         return result;
     }
+
+    @Override
+    public String toString()
+    {
+        return "IllegalMacro{" + "error='" + error + '\'' + ", string='" + getString() + '\'' + '}';
+    }
 }

@@ -38,4 +38,33 @@ public class Flag implements Argument
     {
         return value;
     }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (!(o instanceof Flag))
+        {
+            return false;
+        }
+
+        final Flag flag = (Flag)o;
+
+        return getValue().equals(flag.getValue());
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return getValue().hashCode();
+    }
+
+    @Override
+    public String toString()
+    {
+        return "Flag{" + "value='" + value + '\'' + '}';
+    }
 }

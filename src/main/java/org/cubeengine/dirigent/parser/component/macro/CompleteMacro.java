@@ -72,4 +72,10 @@ public class CompleteMacro extends NamedMacro implements Indexed
         result = 31 * result + getIndex();
         return result;
     }
+
+    @Override
+    public String toString()
+    {
+        return "CompleteMacro{" + "index=" + index + ", name='" + getName() + '\'' + ", args=" + getArgs() + "}";
+    }
 }

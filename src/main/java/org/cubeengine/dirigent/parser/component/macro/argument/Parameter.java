@@ -45,4 +45,39 @@ public class Parameter implements Argument
     {
         return value;
     }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (!(o instanceof Parameter))
+        {
+            return false;
+        }
+
+        final Parameter parameter = (Parameter)o;
+
+        if (!getName().equals(parameter.getName()))
+        {
+            return false;
+        }
+        return getValue().equals(parameter.getValue());
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int result = getName().hashCode();
+        result = 31 * result + getValue().hashCode();
+        return result;
+    }
+
+    @Override
+    public String toString()
+    {
+        return "Parameter{" + "name='" + name + '\'' + ", value='" + value + '\'' + '}';
+    }
 }

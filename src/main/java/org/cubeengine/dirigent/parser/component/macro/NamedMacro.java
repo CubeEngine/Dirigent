@@ -81,4 +81,10 @@ public class NamedMacro implements Macro
         result = 31 * result + getArgs().hashCode();
         return result;
     }
+
+    @Override
+    public String toString()
+    {
+        return "NamedMacro{" + "name='" + name + '\'' + ", args=" + args + '}';
+    }
 }

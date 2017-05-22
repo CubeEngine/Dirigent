@@ -100,4 +100,11 @@ public class FoundFormatter implements Component
         result = 31 * result + getContext().hashCode();
         return result;
     }
+
+    @Override
+    public String toString()
+    {
+        return "FoundFormatter{" + "found=" + found + ", arg=" + arg + ", arguments=" + arguments + ", context="
+            + context + '}';
+    }
 }

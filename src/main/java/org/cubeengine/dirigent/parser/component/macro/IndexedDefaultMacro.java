@@ -62,4 +62,10 @@ public class IndexedDefaultMacro extends DefaultMacro implements Indexed
     {
         return getIndex();
     }
+
+    @Override
+    public String toString()
+    {
+        return "IndexedDefaultMacro{" + "index=" + index + "}";
+    }
 }

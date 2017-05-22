@@ -32,4 +32,10 @@ public class DefaultMacro implements Macro
     DefaultMacro()
     {
     }
+
+    @Override
+    public String toString()
+    {
+        return "DefaultMacro";
+    }
 }

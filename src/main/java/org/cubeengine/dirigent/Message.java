@@ -75,4 +75,10 @@ public class Message
     {
         return getComponents().hashCode();
     }
+
+    @Override
+    public String toString()
+    {
+        return "Message{" + "components=" + components + '}';
+    }
 }
