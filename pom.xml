@@ -10,7 +10,7 @@
 
     <groupId>org.cubeengine</groupId>
     <artifactId>dirigent</artifactId>
-    <version>4.0.0-SNAPSHOT</version>
+    <version>4.0.0</version>
 
     <name>Dirigent</name>
     <description>A readable and compact message composing library</description>
@@ -28,7 +28,7 @@
         <url>https://github.com/CubeEngine/Dirigent</url>
         <connection>scm:git:https://github.com/CubeEngine/Dirigent</connection>
         <developerConnection>scm:git:git@github.com:CubeEngine/Dirigent</developerConnection>
-        <tag>HEAD</tag>
+        <tag>dirigent-4.0.0</tag>
     </scm>
 
     <distributionManagement>
