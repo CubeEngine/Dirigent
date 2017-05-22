@@ -1,6 +1,6 @@
-/**
+/*
  * The MIT License
- * Copyright (c) 2013 Cube Island
+ * Copyright © 2013 Cube Island
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -83,9 +83,9 @@ public class ParserTest
         return new Parameter(name, val);
     }
 
-    public static Component err(String s, String err)
+    public static Component err(String s)
     {
-        return new IllegalMacro(s, err);
+        return new IllegalMacro(s, "Encountered macro start, but no valid macro followed.");
     }
 
     @Test
@@ -122,11 +122,11 @@ public class ParserTest
             parseMessage("text and a macro {1:name#with index and comment:and parameter=with value:multiple:and one=more} more text"));
 
         assertEquals(
-            msg(txt("illegal macro "), err("{starts but wont end", "Encountered macro start, but no valid macro followed.")),
+            msg(txt("illegal macro "), err("{starts but wont end")),
             parseMessage("illegal macro {starts but wont end"));
 
         assertEquals(
-            msg(txt("illegal macro "), err("{starts:has arguments but wont end", "Encountered macro start, but no valid macro followed.")),
+            msg(txt("illegal macro "), err("{starts:has arguments but wont end")),
             parseMessage("illegal macro {starts:has arguments but wont end"));
     }
 }

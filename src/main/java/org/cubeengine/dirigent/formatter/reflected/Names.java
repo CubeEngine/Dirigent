@@ -1,6 +1,6 @@
-/**
+/*
  * The MIT License
- * Copyright (c) 2013 Cube Island
+ * Copyright © 2013 Cube Island
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,11 +27,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
 /**
  * This Annotation is used for ReflectedFormatter to declare the names of the formatter
  */
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
 public @interface Names
 {
     /**

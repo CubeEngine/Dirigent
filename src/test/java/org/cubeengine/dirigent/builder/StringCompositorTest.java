@@ -1,6 +1,6 @@
-/**
+/*
  * The MIT License
- * Copyright (c) 2013 Cube Island
+ * Copyright © 2013 Cube Island
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -108,7 +108,7 @@ public class StringCompositorTest
     public void testTime()
     {
         Calendar date = Calendar.getInstance();
-        date.set(2017, 5, 22, 18, 37, 28);
+        date.set(2017, Calendar.JUNE, 22, 18, 37, 28);
         assertEquals("It is 18:37:28!", compose("It is {time:kk\\:mm\\:ss}!", date.getTime()));
     }
 
