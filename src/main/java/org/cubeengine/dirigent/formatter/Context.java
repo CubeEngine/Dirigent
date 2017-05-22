@@ -91,11 +91,25 @@ public class Context
     }
 
     /**
-     * Gets the Value of an Argument at a position
+     * Gets the Value of an Argument at a position.
+     *
+     * @param i the position
+     * @return the Argument value
+     * @deprecated use {@link #get(int)} instead.
+     */
+    @Deprecated
+    public String getFlag(int i)
+    {
+        return get(i);
+    }
+
+    /**
+     * Gets the Value of an Argument at a position.
+     *
      * @param i the position
      * @return the Argument value
      */
-    public String getFlag(int i)
+    public String get(int i)
     {
         if (argumentList.size() >= i + 1)
         {

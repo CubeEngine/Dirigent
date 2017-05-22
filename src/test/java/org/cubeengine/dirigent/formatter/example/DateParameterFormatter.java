@@ -35,9 +35,9 @@ import static java.text.DateFormat.*;
 /**
  * Formats a {@link Date} allowing multiple formats
  */
-public class DateFormatter extends AbstractFormatter<Date>
+public class DateParameterFormatter extends AbstractFormatter<Date>
 {
-    public DateFormatter()
+    public DateParameterFormatter()
     {
         super(Date.class, "date");
     }

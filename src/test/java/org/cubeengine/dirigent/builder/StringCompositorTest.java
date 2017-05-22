@@ -30,9 +30,10 @@ import org.cubeengine.dirigent.Component;
 import org.cubeengine.dirigent.formatter.Context;
 import org.cubeengine.dirigent.formatter.MirrorFormatter;
 import org.cubeengine.dirigent.formatter.PostProcessor;
-import org.cubeengine.dirigent.formatter.example.DateFormatter;
+import org.cubeengine.dirigent.formatter.example.DateParameterFormatter;
 import org.cubeengine.dirigent.formatter.example.DecimalFormatter;
 import org.cubeengine.dirigent.formatter.example.IntegerFormatter;
+import org.cubeengine.dirigent.formatter.example.DateFormatter;
 import org.cubeengine.dirigent.parser.component.Text;
 import org.junit.Before;
 import org.junit.Test;
@@ -48,6 +49,7 @@ public class StringCompositorTest
     {
         compositor = new StringBuilderDirigent();
 
+        compositor.registerFormatter(new DateParameterFormatter());
         compositor.registerFormatter(new DateFormatter());
         compositor.registerFormatter(new IntegerFormatter());
         compositor.registerFormatter(new DecimalFormatter());
@@ -100,6 +102,14 @@ public class StringCompositorTest
         assertEquals("Decimal: 04,321", compose("Decimal: {decimal:2\\:3}", 4.321));
         assertEquals("Decimal: 4.423,321", compose("Decimal: {decimal:2\\:3}", 4423.321));
         assertEquals("Decimal: 4,321 9,88 5,43210", compose("Decimal: {decimal} {2:decimal:2} {decimal:5}", 4.321f, 5.4321f, BigDecimal.valueOf(9.87654321)));
+    }
+
+    @Test
+    public void testTime()
+    {
+        Calendar date = Calendar.getInstance();
+        date.set(2017, 5, 22, 18, 37, 28);
+        assertEquals("It is 18:37:28!", compose("It is {time:kk\\:mm\\:ss}!", date.getTime()));
     }
 
     @Test(expected = IllegalArgumentException.class)
