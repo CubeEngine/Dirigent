@@ -153,12 +153,10 @@ public class Parser
             if (value == null)
             {
                 args.add(new Value(name));
-                System.out.println("Value: " + name);
             }
             else
             {
                 args.add(new Parameter(name, stripBackslashes(value, ":}")));
-                System.out.println("Parameter: name='" + name + "', value='" + value + "'");
             }
         }
 
