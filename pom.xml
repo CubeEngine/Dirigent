@@ -75,6 +75,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jdkVersion>1.6</jdkVersion>
+        <releaseProfile>release</releaseProfile>
     </properties>
 
     <dependencies>
@@ -97,8 +98,9 @@
                 <configuration>
                     <autoVersionSubmodules>true</autoVersionSubmodules>
                     <useReleaseProfile>false</useReleaseProfile>
-                    <releaseProfiles>release</releaseProfiles>
+                    <releaseProfiles>${releaseProfile}</releaseProfiles>
                     <goals>deploy</goals>
+                    <arguments>-P${releaseProfile}</arguments>
                 </configuration>
             </plugin>
             <plugin>
