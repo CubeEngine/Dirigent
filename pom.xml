@@ -128,7 +128,6 @@
                 <configuration>
                     <strictCheck>true</strictCheck>
                     <header>com/mycila/maven/plugin/license/templates/MIT.txt</header>
-                    <strictCheck>true</strictCheck>
                     <includes>
                         <include>**/*.java</include>
                     </includes>
