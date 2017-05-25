@@ -32,7 +32,7 @@ public class IntegerFormatter extends NumberFormatter
      */
     public IntegerFormatter()
     {
-        this("integer", "long", "amount", "count");
+        this("integer", "long", "short", "amount", "count");
     }
 
     /**
