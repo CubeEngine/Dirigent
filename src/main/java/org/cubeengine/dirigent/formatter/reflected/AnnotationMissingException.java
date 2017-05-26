@@ -25,12 +25,12 @@ package org.cubeengine.dirigent.formatter.reflected;
 import java.lang.annotation.Annotation;
 
 /**
- * This Exception is thrown whenever a ReflectedFormatter is missing the @Names Annotation or has no valid @Format annotated method
+ * This Exception is thrown whenever a ReflectedFormatter is missing the @Names annotation or has no valid @Format annotated method
  */
 public class AnnotationMissingException extends RuntimeException
 {
     public AnnotationMissingException(Class<? extends Annotation> clazz)
     {
-        super("This formatter is missing a @" + clazz.getName() + " Annotation!");
+        super("This formatter is missing a @" + clazz.getName() + " annotation!");
     }
 }

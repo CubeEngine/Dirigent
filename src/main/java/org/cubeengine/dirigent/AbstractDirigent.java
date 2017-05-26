@@ -121,7 +121,7 @@ public abstract class AbstractDirigent<MessageT> implements Dirigent<MessageT>
     }
 
     /**
-     * Finds Formatter for the messages components and runs the global PostProcessors.
+     * Finds Formatter for the messages components and runs global PostProcessors.
      *
      * @param locale the locale
      * @param message the parsed message
