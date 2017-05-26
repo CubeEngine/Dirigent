@@ -48,6 +48,11 @@ public class NumberFormatterTest
         checkFormat("12%", 0.12, Locale.GERMANY, NumberFormatter.FORMAT_PARAM_NAME, "##%");
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void testFormatWithWrongFormat() {
+        checkFormat("", 123, Locale.GERMANY, NumberFormatter.FORMAT_PARAM_NAME, ".,.,");
+    }
+
     @Test
     public void testFormatInteger()
     {
