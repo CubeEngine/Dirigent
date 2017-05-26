@@ -34,8 +34,6 @@ import org.junit.Test;
 
 /**
  * Tests the {@link NumberFormatter}.
- *
- * @author stefan.wolf
  */
 public class NumberFormatterTest
 {

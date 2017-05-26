@@ -27,9 +27,7 @@ import java.util.Locale;
 import org.junit.Test;
 
 /**
- * DESC
- *
- * @author stefan.wolf
+ * Tests the {@link DateTimeFormatter}.
  */
 public class DateTimeFormatterTest extends AbstractDateTimeFormatterTest
 {
