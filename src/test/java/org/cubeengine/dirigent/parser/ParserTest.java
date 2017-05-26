@@ -38,6 +38,7 @@ import org.junit.Test;
 
 import static java.util.Arrays.asList;
 import static org.cubeengine.dirigent.parser.Parser.parseMessage;
+import static org.cubeengine.dirigent.parser.Parser.stripBackslashes;
 import static org.cubeengine.dirigent.parser.component.macro.DefaultMacro.DEFAULT_MACRO;
 import static org.junit.Assert.assertEquals;
 
@@ -89,7 +90,7 @@ public class ParserTest
     }
 
     @Test
-    public void testReadMessage() throws Exception
+    public void testReadMessage()
     {
         assertEquals(msg(txt("only text")), parseMessage("only text"));
         assertEquals(msg(DEFAULT_MACRO), parseMessage("{}"));
@@ -128,6 +129,11 @@ public class ParserTest
         assertEquals(
             msg(txt("illegal macro "), err("{starts:has arguments but wont end")),
             parseMessage("illegal macro {starts:has arguments but wont end"));
+    }
+
+    @Test
+    public void testReadMessageWithEscaping()
+    {
 
         assertEquals(
             msg(txt("some escape test {} or {name#label:mdmmd}")),
@@ -135,8 +141,18 @@ public class ParserTest
 
         assertEquals(
             msg(txt("some text with "),
-                named("text", arg("static \\\\\\\\ tex:t\\"), arg("moep")),
+                named("text", arg("static \\\\ tex:t\\"), arg("moep")),
                 txt("!")),
             parseMessage("some text with {text:static \\\\\\\\ tex\\:t\\\\:moep}!"));
+    }
+
+    @Test
+    public void testStripBackslashes()
+    {
+        assertEquals("\\", stripBackslashes("\\", "=:}\\"));
+        assertEquals("sta:tic", stripBackslashes("sta\\:tic", "=:}\\"));
+        assertEquals("static", stripBackslashes("static", "=:}\\"));
+        assertEquals("static \\\\ tex:t\\", stripBackslashes("static \\\\\\\\ tex\\:t\\\\", "=:}\\"));
+        assertEquals("static \\\\ tex\\:t\\", stripBackslashes("static \\\\\\\\ tex\\:t\\\\", "=}\\"));
     }
 }

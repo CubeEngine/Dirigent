@@ -225,7 +225,7 @@ public class Parser
         return args;
     }
 
-    private static String stripBackslashes(String input, String charset)
+    static String stripBackslashes(String input, String charset)
     {
         if (input.indexOf('\\') == -1 || input.length() <= 1)
         {
@@ -234,17 +234,34 @@ public class Parser
         else
         {
             StringBuilder stripped = new StringBuilder();
-            char c;
+            char c, n;
             int i;
             for (i = 0; i < input.length() - 1; ++i)
             {
                 c = input.charAt(i);
-                if (c != '\\' || charset.indexOf(input.charAt(i + 1)) == -1)
+                if (c == '\\')
+                {
+                    n = input.charAt(i + 1);
+                    if (charset.indexOf(n) == -1)
+                    {
+                        stripped.append(c);
+                    }
+                    else
+                    {
+                        stripped.append(n);
+                        ++i;
+                    }
+                }
+                else
                 {
                     stripped.append(c);
                 }
             }
-            return stripped.append(input.charAt(i)).toString();
+            if (i < input.length())
+            {
+                stripped.append(input.charAt(i));
+            }
+            return stripped.toString();
         }
     }
 }
