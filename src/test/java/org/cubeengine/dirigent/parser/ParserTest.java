@@ -134,7 +134,6 @@ public class ParserTest
     @Test
     public void testReadMessageWithEscaping()
     {
-
         assertEquals(
             msg(txt("some escape test {} or {name#label:mdmmd}")),
             parseMessage("some escape test \\{} or \\{name#label:mdmmd}"));
@@ -144,6 +143,10 @@ public class ParserTest
                 named("text", arg("static \\\\ tex:t\\"), arg("moep")),
                 txt("!")),
             parseMessage("some text with {text:static \\\\\\\\ tex\\:t\\\\:moep}!"));
+
+        assertEquals(
+            msg(txt("escaping "), named("in", arg("arg"))),
+            parseMessage("escaping {in#la\\:b\\el:arg}"));
     }
 
     @Test

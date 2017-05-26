@@ -20,26 +20,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.cubeengine.dirigent.formatter.example;
+package org.cubeengine.dirigent.builder;
 
 import org.cubeengine.dirigent.Component;
-import org.cubeengine.dirigent.parser.component.Text;
-import org.cubeengine.dirigent.formatter.AbstractFormatter;
 import org.cubeengine.dirigent.formatter.Context;
+import org.cubeengine.dirigent.formatter.reflected.Format;
+import org.cubeengine.dirigent.formatter.reflected.Names;
+import org.cubeengine.dirigent.formatter.reflected.ReflectedFormatter;
+import org.cubeengine.dirigent.parser.component.Text;
 
 /**
- * Formats an {@link Integer}
+ * A sample for a reflected formatter wich is used for the tests.
  */
-public class IntegerFormatter extends AbstractFormatter<Integer>
+@Names({"sample", "reflected"})
+public class SampleReflectedFormatter extends ReflectedFormatter
 {
-    public IntegerFormatter()
+    @Format
+    public Component format(String string, Context context)
     {
-        super(Integer.class, "number");
+        return new Text("[" + string + "]");
     }
 
-    @Override
-    protected Component format(Integer arg, Context context)
+    @Format
+    public Component format(Integer integer, Context context)
     {
-        return new Text(String.valueOf(arg));
+        return new Text("<" + String.valueOf(integer) + ">");
     }
 }

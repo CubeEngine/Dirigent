@@ -22,23 +22,27 @@
  */
 package org.cubeengine.dirigent.builder;
 
-import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Locale;
 import org.cubeengine.dirigent.Component;
 import org.cubeengine.dirigent.formatter.Context;
-import org.cubeengine.dirigent.formatter.MirrorFormatter;
+import org.cubeengine.dirigent.formatter.CurrencyFormatter;
+import org.cubeengine.dirigent.formatter.DateFormatter;
+import org.cubeengine.dirigent.formatter.DateTimeFormatter;
+import org.cubeengine.dirigent.formatter.IntegerFormatter;
+import org.cubeengine.dirigent.formatter.NumberFormatter;
+import org.cubeengine.dirigent.formatter.PercentFormatter;
 import org.cubeengine.dirigent.formatter.PostProcessor;
-import org.cubeengine.dirigent.formatter.example.DateParameterFormatter;
-import org.cubeengine.dirigent.formatter.example.DecimalFormatter;
-import org.cubeengine.dirigent.formatter.example.IntegerFormatter;
-import org.cubeengine.dirigent.formatter.example.DateFormatter;
+import org.cubeengine.dirigent.formatter.StaticTextFormatter;
+import org.cubeengine.dirigent.formatter.StringFormatter;
+import org.cubeengine.dirigent.formatter.TimeFormatter;
 import org.cubeengine.dirigent.parser.component.Text;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class StringCompositorTest
 {
@@ -49,94 +53,96 @@ public class StringCompositorTest
     {
         compositor = new StringBuilderDirigent();
 
-        compositor.registerFormatter(new DateParameterFormatter());
+        compositor.registerFormatter(new CurrencyFormatter());
         compositor.registerFormatter(new DateFormatter());
+        compositor.registerFormatter(new DateTimeFormatter());
         compositor.registerFormatter(new IntegerFormatter());
-        compositor.registerFormatter(new DecimalFormatter());
-        compositor.registerFormatter(new MirrorFormatter("mirror"));
+        compositor.registerFormatter(new NumberFormatter());
+        compositor.registerFormatter(new PercentFormatter());
+        compositor.registerFormatter(new StaticTextFormatter());
+        compositor.registerFormatter(new StringFormatter());
+        compositor.registerFormatter(new TimeFormatter());
+
+        compositor.registerFormatter(new SampleReflectedFormatter());
     }
 
     private String compose(String raw, Object... args)
     {
-        return compositor.compose(Locale.GERMAN, raw, args);
+        return compositor.compose(Locale.GERMANY, raw, args);
     }
 
     @Test
-    public void testString() throws Exception
+    public void testPlainText() throws Exception
     {
         String msg = "This is a pure String message";
         assertEquals(msg, compose(msg));
 
         msg = "Another pure String \\with escape character";
         assertEquals(msg, compose(msg));
-
-        msg = "Another pure String \\with escape character\\";
-        assertEquals(msg, compose(msg));
-
-        msg = "This is a {} String message";
-        assertEquals(msg, compose(msg, "{}"));
-
-        msg = "This is a \\{} String message";
-        assertEquals(msg.replaceAll("\\\\\\{", "{"), compose(msg));
-
-        msg = "This \\is a \\{} String \\message";
-        assertEquals(msg.replaceAll("\\\\\\{", "{"), compose(msg));
-
-        msg = "This is a {1}{} String message";
-        assertEquals(msg, compose(msg, "{}", "{1}"));
-
-        assertEquals("This is a cool String message", compose("This is a {} String message", "cool"));
     }
 
     @Test
-    public void testLabelEscaping() {
-        assertEquals("This is a 42.0 message.", this.compositor.compose(Locale.US, "This is a {decimal#test\\:2:1} message.", 42d));
+    public void testDefaultFormatterWithPositioning() throws Exception
+    {
+        final String msg = "message with default formatter";
+        assertEquals(msg, compose("message with {} formatter", "default"));
+
+        assertEquals(msg, compose("message with {} {}", "default", "formatter"));
+
+        assertEquals(msg, compose("message with {1} {0}", "formatter", "default"));
+
+        assertEquals(msg, compose("message {} {2} {}", "with", "formatter", "default"));
     }
 
     @Test
-    public void testNumbers()
+    public void testFormatterIntegration() throws Exception
     {
-        assertEquals("This is a 42 message", compose("This is a {number} message", 42));
-        assertEquals("Numbers: 1 2 3", compose("Numbers: {number} {2:number} {number}", 1, 3, 2));
-        assertEquals("Decimal: 4,321 9,88 5,43210", compose("Decimal: {decimal} {2:decimal:2} {decimal:5}", 4.321, 5.4321, 9.87654321));
-        assertEquals("Decimal: 04,321", compose("Decimal: {decimal:2\\:3}", 4.321));
-        assertEquals("Decimal: 4.423,321", compose("Decimal: {decimal:2\\:3}", 4423.321));
-        assertEquals("Decimal: 4,321 9,88 5,43210", compose("Decimal: {decimal} {2:decimal:2} {decimal:5}", 4.321f, 5.4321f, BigDecimal.valueOf(9.87654321)));
+        assertEquals("msg: 42,00 €", compose("msg: {currency}", 42));
+        assertEquals("msg: 42", compose("msg: {integer}", 42.38));
+        assertEquals("msg: 42%", compose("msg: {percent}", 0.42));
+        assertEquals("msg: 42,4", compose("msg: {number:format=#.0}", 42.356321));
+
+        final Calendar calendar = GregorianCalendar.getInstance();
+        calendar.set(2017, Calendar.JANUARY, 3, 21, 18, 0);
+        final Date date = calendar.getTime();
+        assertEquals("msg: Dienstag, 3. Januar 2017", compose("msg: {date:full}", date));
+        assertEquals("msg: 21:18", compose("msg: {time:short}", date));
+        assertEquals("msg: Dienstag, 3. Januar 2017 21:18", compose("msg: {datetime:full:time=short}", date));
+        assertEquals("msg: 03.01.2017 21:18:00", compose("msg: {datetime}", date));
+        assertEquals("msg: 2017.01.03 21:18", compose("msg: {date:format=YYYY.MM.dd HH\\:mm}", date));
+
+        assertEquals("msg: A STRING", compose("msg: {string:uppercase}", "a string"));
+        assertEquals("msg: 42", compose("msg: {string}", 42));
+
+        assertEquals("msg: static text", compose("msg: {text:static text}"));
     }
 
     @Test
-    public void testTime()
+    public void testReflectedFormatterIntegration() throws Exception
     {
-        Calendar date = Calendar.getInstance();
-        date.set(2017, Calendar.JUNE, 22, 18, 37, 28);
-        assertEquals("It is 18:37:28!", compose("It is {time:kk\\:mm\\:ss}!", date.getTime()));
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testDecimalFail() throws Exception
-    {
-        compose("Decimal: {decimal:r}", 4.5);
+        assertEquals("msg: [string]", compose("msg: {sample}", "string"));
+        assertEquals("msg: <42>", compose("msg: {reflected}", 42));
     }
 
     @Test
-    public void testDates()
+    public void testFormatterWithWrongParameter() throws Exception
     {
-        Calendar instance = Calendar.getInstance();
-        instance.set(2014, Calendar.AUGUST, 1, 1, 0, 0);
-        Date date = new Date(instance.getTimeInMillis());
-        assertEquals("Year: 2014", compose("Year: {date:format=yyyy}", date));
-        assertEquals("Date is: 2014-08-01", compose("Date is: {date:format=yyyy-MM-dd}", date));
-        assertEquals("Date is: 2014-08-01 01:00:00", compose("Date is: {date:format=yyyy-MM-dd HH\\:mm\\:ss}", date));
-        assertEquals("No Args: 01.08.14 01:00", compose("No Args: {date#will use default short conversion}", date));
+        // TODO here I would expect something else
+        assertEquals("msg: Formatter not found", compose("msg: {number}", "string"));
     }
 
     @Test
-    public void testConstantFormatter() throws Exception
+    public void testUnavailableFormatterName() throws Exception
     {
-        final String msg = "Use of a mirror {mirror:flag:param=test:par2=42:t}";
-        assertEquals(msg, compose(msg));
+        // TODO here I would expect something else
+        assertEquals("msg: Formatter not found", compose("msg: {blub}", "string"));
+    }
 
-        assertEquals("Test: 1 and {mirror:4} with 2", compose("Test: {number} and {mirror:4} with {number}", 1, 2));
+    @Test
+    public void testConstantFormatterPositioning() throws Exception
+    {
+        assertEquals("Test: 1 and static text with 2",
+                     compose("Test: {number} and {text:static text} with {number}", 1, 2));
     }
 
     @Test
@@ -154,8 +160,8 @@ public class StringCompositorTest
             }
         });
 
-        assertEquals("Postprocessor will add an exclamationpoint!", compose(
-            "Postprocessor will add an exclamationpoint{}", ""));
+        assertEquals("Postprocessor will add an exclamationpoint!",
+                     compose("Postprocessor will add an exclamationpoint{}", ""));
 
         compositor.addPostProcessor(new PostProcessor()
         {
