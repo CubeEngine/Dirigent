@@ -128,5 +128,15 @@ public class ParserTest
         assertEquals(
             msg(txt("illegal macro "), err("{starts:has arguments but wont end")),
             parseMessage("illegal macro {starts:has arguments but wont end"));
+
+        assertEquals(
+            msg(txt("some escape test {} or {name#label:mdmmd}")),
+            parseMessage("some escape test \\{} or \\{name#label:mdmmd}"));
+
+        assertEquals(
+            msg(txt("some text with "),
+                named("text", arg("static \\\\\\\\ tex:t\\"), arg("moep")),
+                txt("!")),
+            parseMessage("some text with {text:static \\\\\\\\ tex\\:t\\\\:moep}!"));
     }
 }
