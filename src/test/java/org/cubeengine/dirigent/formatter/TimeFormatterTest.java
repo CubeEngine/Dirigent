@@ -44,11 +44,11 @@ public class TimeFormatterTest extends AbstractDateTimeFormatterTest
         checkFormat("15:13:21", date, Locale.GERMANY, null);
         checkFormat("3:13:21 PM", date, Locale.US, null);
 
-        checkFormat("15:13 Uhr MESZ", date, Locale.GERMANY, TimeFormatter.FULL_STYLE);
-        checkFormat("3:13:21 PM CEST", date, Locale.US, TimeFormatter.FULL_STYLE);
+        checkFormat("15:13 Uhr UTC", date, Locale.GERMANY, TimeFormatter.FULL_STYLE);
+        checkFormat("3:13:21 PM UTC", date, Locale.US, TimeFormatter.FULL_STYLE);
 
-        checkFormat("15:13:21 MESZ", date, Locale.GERMANY, TimeFormatter.LONG_STYLE);
-        checkFormat("3:13:21 PM CEST", date, Locale.US, TimeFormatter.LONG_STYLE);
+        checkFormat("15:13:21 UTC", date, Locale.GERMANY, TimeFormatter.LONG_STYLE);
+        checkFormat("3:13:21 PM UTC", date, Locale.US, TimeFormatter.LONG_STYLE);
 
         checkFormat("15:13:21", date, Locale.GERMANY, TimeFormatter.MEDIUM_STYLE);
         checkFormat("3:13:21 PM", date, Locale.US, TimeFormatter.MEDIUM_STYLE);

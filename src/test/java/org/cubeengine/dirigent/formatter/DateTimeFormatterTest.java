@@ -44,11 +44,11 @@ public class DateTimeFormatterTest extends AbstractDateTimeFormatterTest
         checkFormat("25.05.2017 15:13:21", date, Locale.GERMANY, null);
         checkFormat("May 25, 2017 3:13:21 PM", date, Locale.US, null);
 
-        checkFormat("Donnerstag, 25. Mai 2017 15:13 Uhr MESZ", date, Locale.GERMANY, DateTimeFormatter.FULL_STYLE);
-        checkFormat("Thursday, May 25, 2017 3:13:21 PM CEST", date, Locale.US, DateTimeFormatter.FULL_STYLE);
+        checkFormat("Donnerstag, 25. Mai 2017 15:13 Uhr UTC", date, Locale.GERMANY, DateTimeFormatter.FULL_STYLE);
+        checkFormat("Thursday, May 25, 2017 3:13:21 PM UTC", date, Locale.US, DateTimeFormatter.FULL_STYLE);
 
-        checkFormat("25. Mai 2017 15:13:21 MESZ", date, Locale.GERMANY, DateTimeFormatter.LONG_STYLE);
-        checkFormat("May 25, 2017 3:13:21 PM CEST", date, Locale.US, DateTimeFormatter.LONG_STYLE);
+        checkFormat("25. Mai 2017 15:13:21 UTC", date, Locale.GERMANY, DateTimeFormatter.LONG_STYLE);
+        checkFormat("May 25, 2017 3:13:21 PM UTC", date, Locale.US, DateTimeFormatter.LONG_STYLE);
 
         checkFormat("25.05.2017 15:13:21", date, Locale.GERMANY, DateTimeFormatter.MEDIUM_STYLE);
         checkFormat("May 25, 2017 3:13:21 PM", date, Locale.US, DateTimeFormatter.MEDIUM_STYLE);
@@ -66,7 +66,7 @@ public class DateTimeFormatterTest extends AbstractDateTimeFormatterTest
                     DateTimeFormatter.SHORT_STYLE, DateTimeFormatter.MEDIUM_STYLE);
         checkFormat("Donnerstag, 25. Mai 2017 15:13", date, Locale.GERMANY, DateTimeFormatter.SHORT_STYLE,
                     DateTimeFormatter.FULL_STYLE, null);
-        checkFormat("25.05.17 15:13 Uhr MESZ", date, Locale.GERMANY, DateTimeFormatter.SHORT_STYLE, null,
+        checkFormat("25.05.17 15:13 Uhr UTC", date, Locale.GERMANY, DateTimeFormatter.SHORT_STYLE, null,
                     DateTimeFormatter.FULL_STYLE);
     }
 

@@ -28,6 +28,8 @@ import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 import org.cubeengine.dirigent.Component;
 import org.cubeengine.dirigent.parser.component.Text;
 import org.cubeengine.dirigent.parser.component.macro.argument.Argument;
@@ -48,7 +50,8 @@ public abstract class AbstractDateTimeFormatterTest
     }
 
     protected Date createDate() {
-        final Calendar calendar = GregorianCalendar.getInstance();
+        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+        final Calendar calendar = GregorianCalendar.getInstance(Locale.US);
         calendar.set(2017, Calendar.MAY, 25, 15, 13, 21);
         return calendar.getTime();
     }
