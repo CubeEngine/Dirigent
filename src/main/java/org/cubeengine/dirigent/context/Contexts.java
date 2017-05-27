@@ -1,3 +1,25 @@
+/*
+ * The MIT License
+ * Copyright © 2013 Cube Island
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 package org.cubeengine.dirigent.context;
 
 import java.util.Arrays;
@@ -8,7 +30,6 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
-import org.cubeengine.dirigent.formatter.Formatter;
 
 /**
  * Useful helpers to work with contexts.
@@ -21,20 +42,17 @@ public class Contexts
     public static final Context EMPTY = new Context(Collections.<ContextProperty<?>, Object>emptyMap());
 
     /**
-     * Identification context property for a {@link Locale} which must be considered within the {@link Formatter}
-     * implementations.
+     * This property identifies a {@link Locale} instance in a context.
      */
     public static final ContextProperty<Locale> LOCALE = new ContextProperty<Locale>();
 
     /**
-     * Identification context property for a {@link Locale} which must be considered within the {@link Formatter}
-     * implementations.
+     * This property identifies a {@link TimeZone} instance in a context.
      */
     public static final ContextProperty<TimeZone> TIMEZONE = new ContextProperty<TimeZone>();
 
     /**
-     * Identification context property for a {@link Locale} which must be considered within the {@link Formatter}
-     * implementations.
+     * This property identifies a {@link Currency} instance in a context.
      */
     public static final ContextProperty<Currency> CURRENCY = new ContextProperty<Currency>();
 
@@ -74,17 +92,24 @@ public class Contexts
     }
 
     /**
-     * Creates a new context with the specified properties.
+     * Creates a new context with the given property mappings.
      *
-     * @param mappings The property mappings of the context.
+     * @param mappings The property mappings for the context
      *
-     * @return the context.
+     * @return the context
      */
     public static Context createContext(PropertyMapping<?>... mappings)
     {
         return createContext(Arrays.asList(mappings));
     }
 
+    /**
+     * Creates a new context with the given property mappings.
+     *
+     * @param mappings The property mappings for the context
+     *
+     * @return the context
+     */
     public static Context createContext(Collection<PropertyMapping<?>> mappings)
     {
         Map<ContextProperty<?>, Object> properties = new HashMap<ContextProperty<?>, Object>(mappings.size());
