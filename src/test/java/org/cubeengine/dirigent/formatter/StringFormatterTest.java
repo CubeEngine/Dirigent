@@ -24,12 +24,13 @@ package org.cubeengine.dirigent.formatter;
 
 import java.util.Locale;
 import org.cubeengine.dirigent.Component;
-import org.cubeengine.dirigent.context.Context;
 import org.cubeengine.dirigent.formatter.argument.Arguments;
 import org.cubeengine.dirigent.parser.Text;
 import org.cubeengine.dirigent.formatter.argument.Value;
 import org.junit.Assert;
 import org.junit.Test;
+
+import static org.cubeengine.dirigent.context.Contexts.createContext;
 
 /**
  * Tests the {@link StringFormatter}.
@@ -59,7 +60,7 @@ public class StringFormatterTest
             arguments = Arguments.create(new Value(flag));
         }
 
-        final Component component = stringFormatter.format(object, Context.create(locale), arguments);
+        final Component component = stringFormatter.format(object, createContext(locale), arguments);
 
         Assert.assertTrue(component instanceof Text);
         Assert.assertEquals(expected, ((Text)component).getText());

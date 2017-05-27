@@ -22,13 +22,9 @@
  */
 package org.cubeengine.dirigent.context;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import org.cubeengine.dirigent.formatter.Formatter;
 
 /**
  * This class specifies the context of a compose process which is triggered by the
@@ -37,17 +33,6 @@ import org.cubeengine.dirigent.formatter.Formatter;
  */
 public class Context
 {
-    /**
-     * A reference of a simple empty context.
-     */
-    public static final Context EMPTY = new Context(Collections.<ContextProperty<?>, Object>emptyMap());
-
-    /**
-     * Identification context property for a {@link Locale} which must be considered within the {@link Formatter}
-     * implementations.
-     */
-    public static final ContextProperty<Locale> LOCALE = new ContextProperty<Locale>();
-
     /**
      * A map holding all properties of the context.
      */
@@ -58,19 +43,9 @@ public class Context
      *
      * @param properties The properties of this context.
      */
-    private Context(Map<ContextProperty<?>, Object> properties)
+    protected Context(Map<ContextProperty<?>, Object> properties)
     {
         this.properties = Collections.unmodifiableMap(properties);
-    }
-
-    /**
-     * Returns the Locale which must be considered from the {@link Formatter} implementations.
-     *
-     * @return the locale or the default locale if the property doesn't exist.
-     */
-    public Locale getLocale()
-    {
-        return getOrElse(LOCALE, Locale.getDefault());
     }
 
     /**
@@ -131,49 +106,5 @@ public class Context
     public int hashCode()
     {
         return properties.hashCode();
-    }
-
-    /**
-     * Creates a new empty context.
-     *
-     * @return an empty context.
-     */
-    public static Context create()
-    {
-        return EMPTY;
-    }
-
-    /**
-     * Creates a new context holding the specified {@link Locale}.
-     *
-     * @param locale The locale of this context.
-     *
-     * @return the context.
-     */
-    public static Context create(Locale locale)
-    {
-        return create(LOCALE.with(locale));
-    }
-
-    /**
-     * Creates a new context with the specified properties.
-     *
-     * @param mappings The property mappings of the context.
-     *
-     * @return the context.
-     */
-    public static Context create(PropertyMapping<?>... mappings)
-    {
-        return create(Arrays.asList(mappings));
-    }
-
-    public static Context create(Collection<PropertyMapping<?>> mappings)
-    {
-        Map<ContextProperty<?>, Object> properties = new HashMap<ContextProperty<?>, Object>(mappings.size());
-        for (final PropertyMapping<?> mapping : mappings)
-        {
-            properties.put(mapping.property, mapping.value);
-        }
-        return new Context(properties);
     }
 }

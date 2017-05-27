@@ -30,6 +30,8 @@ import org.cubeengine.dirigent.parser.Text;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.cubeengine.dirigent.context.Contexts.createContext;
+
 /**
  * Tests the {@link CurrencyFormatter}.
  */
@@ -47,7 +49,7 @@ public class CurrencyFormatterTest
 
     private void checkFormat(final String expected, final Number number, final Locale locale)
     {
-        final Component component = currencyFormatter.format(number, Context.create(locale), Arguments.NONE);
+        final Component component = currencyFormatter.format(number, createContext(locale), Arguments.NONE);
 
         Assert.assertTrue(component instanceof Text);
         Assert.assertEquals(expected, ((Text)component).getText());

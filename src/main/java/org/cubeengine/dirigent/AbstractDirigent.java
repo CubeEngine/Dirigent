@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.cubeengine.dirigent.context.Contexts;
 import org.cubeengine.dirigent.formatter.argument.Arguments;
 import org.cubeengine.dirigent.parser.MacroResolutionResult;
 import org.cubeengine.dirigent.parser.MacroResolutionState;
@@ -68,7 +69,7 @@ public abstract class AbstractDirigent<MessageT> implements Dirigent<MessageT>
     @Override
     public MessageT compose(String source, Object... args)
     {
-        return this.compose(Context.create(), source, args);
+        return this.compose(Contexts.createContext(), source, args);
     }
 
     @Override
@@ -125,11 +126,6 @@ public abstract class AbstractDirigent<MessageT> implements Dirigent<MessageT>
             list.add(formatter);
         }
         return this;
-    }
-
-    protected Component erroneousMacro(Macro macro, Object input, MacroResolutionState state)
-    {
-        return new UnresolvableMacro(macro, input, state);
     }
 
     /**
@@ -195,7 +191,7 @@ public abstract class AbstractDirigent<MessageT> implements Dirigent<MessageT>
                 }
                 else
                 {
-                    out = erroneousMacro(macro, input, res.getState());
+                    out = new UnresolvableMacro(macro, input, res.getState());
                 }
 
                 if (!explicitIndex && !isConstant)

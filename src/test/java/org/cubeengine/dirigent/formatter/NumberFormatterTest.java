@@ -32,6 +32,8 @@ import org.cubeengine.dirigent.formatter.argument.Value;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.cubeengine.dirigent.context.Contexts.createContext;
+
 /**
  * Tests the {@link NumberFormatter}.
  */
@@ -85,7 +87,7 @@ public class NumberFormatterTest
     private void checkFormat(final String expected, final Number number, final Locale locale, final String mode,
                              final String value)
     {
-        final Context context = Context.create(locale);
+        final Context context = createContext(locale);
         final Arguments args = args(mode, value);
         final Component component = numberFormatter.format(number, context, args);
 

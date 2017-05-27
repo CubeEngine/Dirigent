@@ -31,6 +31,8 @@ import org.cubeengine.dirigent.formatter.argument.Value;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.cubeengine.dirigent.context.Contexts.createContext;
+
 /**
  * Tests the {@link StaticTextFormatter}.
  */
@@ -57,7 +59,7 @@ public class StaticTextFormatterTest
             arguments = Arguments.create(new Value(argument));
         }
 
-        final Component component = staticTextFormatter.format(Context.create(locale), arguments);
+        final Component component = staticTextFormatter.format(createContext(locale), arguments);
 
         Assert.assertTrue(component instanceof Text);
         Assert.assertEquals(expected, ((Text)component).getText());

@@ -70,7 +70,7 @@ public class Arguments
     }
 
     /**
-     * Returns the Arguments value for given name or null if not found
+     * Returns the argument value for given name or null if not found.
      *
      * @param name the name
      *
@@ -82,7 +82,25 @@ public class Arguments
     }
 
     /**
-     * Gets the Value of an Argument at a position.
+     * Returns the argument value for given name or the given default if not found.
+     *
+     * @param name the name
+     * @param def the default value
+     *
+     * @return the value of the Argument by name
+     */
+    public String getOrElse(String name, String def)
+    {
+        String val = get(name);
+        if (val == null)
+        {
+            return def;
+        }
+        return val;
+    }
+
+    /**
+     * Returns the unnamed value at a position or null if the position is not within bounds.
      *
      * @param i the position
      *
@@ -95,6 +113,24 @@ public class Arguments
             return values.get(i);
         }
         return null;
+    }
+
+    /**
+     * Returns the unnamed value at a position or the default if the position is not within bounds.
+     *
+     * @param i the position
+     * @param def the default value
+     *
+     * @return the value of the Argument by name
+     */
+    public String getOrElse(int i, String def)
+    {
+        String val = get(i);
+        if (val == null)
+        {
+            return def;
+        }
+        return val;
     }
 
     /**

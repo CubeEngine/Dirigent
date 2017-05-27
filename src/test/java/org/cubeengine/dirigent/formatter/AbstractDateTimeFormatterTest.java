@@ -38,6 +38,8 @@ import org.cubeengine.dirigent.formatter.argument.Parameter;
 import org.cubeengine.dirigent.formatter.argument.Value;
 import org.junit.Assert;
 
+import static org.cubeengine.dirigent.context.Contexts.createContext;
+
 /**
  * Abstract methods for tests of the {@link DateTimeFormatter}.
  */
@@ -76,7 +78,7 @@ public abstract class AbstractDateTimeFormatterTest
     private void checkFormat(final String expected, final Date date, final Locale locale, final String defaultStyle,
                              final String dateStyle, final String timeStyle, final String format)
     {
-        final Context context = Context.create(locale);
+        final Context context = createContext(locale);
         final Arguments args = createArguments(defaultStyle, dateStyle, timeStyle, format);
 
         final Component component = formatter.format(date, context, args);

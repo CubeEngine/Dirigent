@@ -28,7 +28,7 @@ import org.cubeengine.dirigent.context.Context;
 import org.cubeengine.dirigent.formatter.argument.Arguments;
 import org.cubeengine.dirigent.parser.Text;
 
-import static org.cubeengine.dirigent.context.Context.LOCALE;
+import static org.cubeengine.dirigent.context.Contexts.LOCALE;
 
 /**
  * The string formatter formats an {@link Object} with {@link String#valueOf(Object)}. It is possible to control this

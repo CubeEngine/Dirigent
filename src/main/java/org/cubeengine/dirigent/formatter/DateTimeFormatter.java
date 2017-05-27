@@ -31,7 +31,7 @@ import org.cubeengine.dirigent.context.Context;
 import org.cubeengine.dirigent.formatter.argument.Arguments;
 import org.cubeengine.dirigent.parser.Text;
 
-import static org.cubeengine.dirigent.context.Context.LOCALE;
+import static org.cubeengine.dirigent.context.Contexts.LOCALE;
 
 /**
  * <p>
@@ -137,16 +137,15 @@ public class DateTimeFormatter extends AbstractFormatter<Date>
     private DateFormat parseFormatter(Context context, Arguments args)
     {
         final String format = args.get(FORMAT_PARAM_NAME);
+        final Locale locale = context.get(LOCALE);
         if (format != null)
         {
-            return new SimpleDateFormat(format, context.getLocale());
+            return new SimpleDateFormat(format, locale);
         }
 
         final int defaultFormatStyle = parseDateFormatStyle(args);
         final int dateFormatStyle = parseDateFormatStyle(args.get(DATE_PARAM_NAME), defaultFormatStyle);
         final int timeFormatStyle = parseDateFormatStyle(args.get(TIME_PARAM_NAME), defaultFormatStyle);
-
-        final Locale locale = context.get(LOCALE);
 
         if (Mode.DATE_TIME.equals(mode))
         {

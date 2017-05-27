@@ -43,6 +43,7 @@ import org.cubeengine.dirigent.parser.Text;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.cubeengine.dirigent.context.Contexts.createContext;
 import static org.junit.Assert.assertEquals;
 
 public class StringCompositorTest
@@ -69,7 +70,7 @@ public class StringCompositorTest
 
     private String compose(String raw, Object... args)
     {
-        return compositor.compose(Context.create(Locale.GERMANY), raw, args);
+        return compositor.compose(createContext(Locale.GERMANY), raw, args);
     }
 
     @Test
