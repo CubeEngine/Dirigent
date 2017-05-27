@@ -23,6 +23,7 @@
 package org.cubeengine.dirigent.context;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
@@ -59,6 +60,37 @@ public class Context
     public <K> K get(ContextProperty<K> key)
     {
         return getOrElse(key, key.getDefaultProvider());
+    }
+
+    /**
+     * Sets a new property and returns a new immutable context.
+     *
+     * @param key the key
+     * @param value the value
+     * @param <K> the key type
+     * @return the new context instance
+     */
+    public <K> Context set(ContextProperty<K> key, K value)
+    {
+        Map<ContextProperty<?>, Object> values = new HashMap<ContextProperty<?>, Object>(this.properties);
+        values.put(key, value);
+        return new Context(values);
+    }
+
+    /**
+     * Sets new properties and returns a new immutable context.
+     *
+     * @param mappings the new mappings
+     * @return the new context instance
+     */
+    public Context set(PropertyMapping<?>... mappings)
+    {
+        Map<ContextProperty<?>, Object> values = new HashMap<ContextProperty<?>, Object>(this.properties);
+        for (final PropertyMapping<?> mapping : mappings)
+        {
+            values.put(mapping.property, mapping.value);
+        }
+        return new Context(values);
     }
 
     /**
