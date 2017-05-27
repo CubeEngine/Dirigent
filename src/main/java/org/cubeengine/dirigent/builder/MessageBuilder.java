@@ -23,9 +23,10 @@
 package org.cubeengine.dirigent.builder;
 
 import org.cubeengine.dirigent.Component;
+import org.cubeengine.dirigent.context.Context;
+import org.cubeengine.dirigent.parser.Text;
 import org.cubeengine.dirigent.parser.component.ComponentGroup;
 import org.cubeengine.dirigent.parser.component.ResolvedMacro;
-import org.cubeengine.dirigent.parser.Text;
 import org.cubeengine.dirigent.parser.component.TextComponent;
 import org.cubeengine.dirigent.parser.component.UnresolvableMacro;
 
@@ -48,38 +49,40 @@ public abstract class MessageBuilder<MessageT, BuilderT>
      * Returns the built message
      *
      * @param builderT the builder
+     * @param context  the context
      *
      * @return the built message
      */
-    public abstract MessageT finalize(BuilderT builderT);
+    public abstract MessageT finalize(BuilderT builderT, Context context);
 
     /**
      * Appends a Component to the builder
      *
      * @param component the component
      * @param builder   the builder
+     * @param context   the context
      */
-    public final void buildAny(Component component, BuilderT builder)
+    public final void buildAny(Component component, BuilderT builder, Context context)
     {
         if (component instanceof ResolvedMacro)
         {
-            buildFormatted((ResolvedMacro)component, builder);
+            buildResolved((ResolvedMacro)component, builder, context);
         }
         else if (component instanceof UnresolvableMacro)
         {
-            build((UnresolvableMacro)component, builder);
+            buildUnresolvable((UnresolvableMacro)component, builder, context);
         }
         else if (component instanceof TextComponent)
         {
-            build((TextComponent)component, builder);
+            buildText((TextComponent)component, builder, context);
         }
         else if (component instanceof ComponentGroup)
         {
-            buildGroup((ComponentGroup)component, builder);
+            buildGroup((ComponentGroup)component, builder, context);
         }
         else
         {
-            buildOther(component, builder);
+            buildOther(component, builder, context);
         }
     }
 
@@ -88,20 +91,21 @@ public abstract class MessageBuilder<MessageT, BuilderT>
      *
      * @param component the text
      * @param builder   the builder
+     * @param context   the context
      */
-    public abstract void build(TextComponent component, BuilderT builder);
+    public abstract void buildText(TextComponent component, BuilderT builder, Context context);
 
     /**
      * Appends a {@link ResolvedMacro} Component to the builder
      *
      * @param c       the found formatter
      * @param builder the builder
+     * @param context the context
      */
-    public final void buildFormatted(ResolvedMacro c, BuilderT builder)
+    public final void buildResolved(ResolvedMacro c, BuilderT builder, Context context)
     {
-        @SuppressWarnings("unchecked") Component processed = c.getFound().process(c.getInput(), c.getContext(),
-                                                                                  c.getArguments());
-        buildAny(processed, builder);
+        Component processed = c.getFormatter().process(c.getInput(), c.getContext(), c.getArguments());
+        buildAny(processed, builder, context);
     }
 
     /**
@@ -109,20 +113,22 @@ public abstract class MessageBuilder<MessageT, BuilderT>
      *
      * @param component the component
      * @param builder   the builder
+     * @param context   the context
      */
-    public abstract void build(UnresolvableMacro component, BuilderT builder);
+    public abstract void buildUnresolvable(UnresolvableMacro component, BuilderT builder, Context context);
 
     /**
      * Appends a chain of Components to the builder
      *
-     * @param chained the chained Components
+     * @param group   the chained Components
      * @param builder the builder
+     * @param context the context
      */
-    public void buildGroup(ComponentGroup chained, BuilderT builder)
+    public void buildGroup(ComponentGroup group, BuilderT builder, Context context)
     {
-        for (Component component : chained.getComponents())
+        for (Component component : group.getComponents())
         {
-            buildAny(component, builder);
+            buildAny(component, builder, context);
         }
     }
 
@@ -132,6 +138,7 @@ public abstract class MessageBuilder<MessageT, BuilderT>
      *
      * @param component the component
      * @param builder   the builder
+     * @param context   the context
      */
-    public abstract void buildOther(Component component, BuilderT builder);
+    public abstract void buildOther(Component component, BuilderT builder, Context context);
 }

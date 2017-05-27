@@ -23,6 +23,7 @@
 package org.cubeengine.dirigent.builder;
 
 import org.cubeengine.dirigent.Component;
+import org.cubeengine.dirigent.context.Context;
 import org.cubeengine.dirigent.parser.component.TextComponent;
 import org.cubeengine.dirigent.parser.component.UnresolvableMacro;
 import org.cubeengine.dirigent.parser.token.Macro;
@@ -34,7 +35,7 @@ import org.cubeengine.dirigent.parser.token.NamedMacro;
 public class StringMessageBuilder extends MessageBuilder<String, StringBuilder>
 {
     @Override
-    public void build(TextComponent component, StringBuilder builder)
+    public void buildText(TextComponent component, StringBuilder builder, Context context)
     {
         builder.append(component.getText());
     }
@@ -46,13 +47,13 @@ public class StringMessageBuilder extends MessageBuilder<String, StringBuilder>
     }
 
     @Override
-    public String finalize(StringBuilder stringBuilder)
+    public String finalize(StringBuilder stringBuilder, Context context)
     {
         return stringBuilder.toString();
     }
 
     @Override
-    public void build(UnresolvableMacro component, StringBuilder builder)
+    public void buildUnresolvable(UnresolvableMacro component, StringBuilder builder, Context context)
     {
         Macro macro = component.getMacro();
         if (macro instanceof NamedMacro)
@@ -66,7 +67,7 @@ public class StringMessageBuilder extends MessageBuilder<String, StringBuilder>
     }
 
     @Override
-    public void buildOther(Component component, StringBuilder builder)
+    public void buildOther(Component component, StringBuilder builder, Context context)
     {
         throw new IllegalStateException("Custom components not supported"); // No custom Components
     }

@@ -29,7 +29,7 @@ import java.util.Map;
 /**
  * This class specifies the context of a compose process which is triggered by the
  * {@link org.cubeengine.dirigent.Dirigent#compose(Context, String, Object...)} method. This might include a
- * {@link Locale} or other information which can be used by the formatters to build proper messages.
+ * {@link Locale} or other information which can be used by the formatters to buildText proper messages.
  */
 public class Context
 {

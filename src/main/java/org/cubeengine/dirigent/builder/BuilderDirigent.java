@@ -23,6 +23,7 @@
 package org.cubeengine.dirigent.builder;
 
 import org.cubeengine.dirigent.AbstractDirigent;
+import org.cubeengine.dirigent.context.Context;
 import org.cubeengine.dirigent.parser.component.ComponentGroup;
 
 /**
@@ -41,10 +42,10 @@ public class BuilderDirigent<MessageT, BuilderT> extends AbstractDirigent<Messag
     }
 
     @Override
-    protected MessageT compose(ComponentGroup message)
+    protected MessageT compose(ComponentGroup group, Context context)
     {
         BuilderT builder = mBuilder.newBuilder();
-        mBuilder.buildGroup(new ComponentGroup(message.getComponents()), builder);
-        return mBuilder.finalize(builder);
+        mBuilder.buildGroup(group, builder, context);
+        return mBuilder.finalize(builder, context);
     }
 }

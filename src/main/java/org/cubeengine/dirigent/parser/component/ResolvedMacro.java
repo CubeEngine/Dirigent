@@ -32,23 +32,23 @@ import org.cubeengine.dirigent.formatter.Formatter;
  */
 public class ResolvedMacro implements Component
 {
-    private final Formatter found;
+    private final Formatter<Object> formatter;
     private final Object input;
     private final Arguments arguments;
     private final Context context;
 
-    public ResolvedMacro(Formatter found, Object input, Context context, Arguments arguments)
+    public ResolvedMacro(Formatter<Object> formatter, Object input, Context context, Arguments arguments)
     {
 
-        this.found = found;
+        this.formatter = formatter;
         this.input = input;
         this.arguments = arguments;
         this.context = context;
     }
 
-    public Formatter getFound()
+    public Formatter<Object> getFormatter()
     {
-        return found;
+        return formatter;
     }
 
     public Object getInput()
@@ -80,7 +80,7 @@ public class ResolvedMacro implements Component
 
         final ResolvedMacro that = (ResolvedMacro)o;
 
-        if (!getFound().equals(that.getFound()))
+        if (!getFormatter().equals(that.getFormatter()))
         {
             return false;
         }
@@ -98,7 +98,7 @@ public class ResolvedMacro implements Component
     @Override
     public int hashCode()
     {
-        int result = getFound().hashCode();
+        int result = getFormatter().hashCode();
         result = 31 * result + getInput().hashCode();
         result = 31 * result + getArguments().hashCode();
         result = 31 * result + getContext().hashCode();
@@ -108,7 +108,7 @@ public class ResolvedMacro implements Component
     @Override
     public String toString()
     {
-        return "ResolvedMacro{" + "found=" + found + ", input=" + input + ", arguments=" + arguments + ", context="
+        return "ResolvedMacro{" + "formatter=" + formatter + ", input=" + input + ", arguments=" + arguments + ", context="
             + context + '}';
     }
 }

@@ -26,23 +26,23 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.cubeengine.dirigent.context.Context;
 import org.cubeengine.dirigent.context.Contexts;
+import org.cubeengine.dirigent.formatter.ConstantFormatter;
+import org.cubeengine.dirigent.formatter.DefaultFormatter;
+import org.cubeengine.dirigent.formatter.Formatter;
+import org.cubeengine.dirigent.formatter.PostProcessor;
 import org.cubeengine.dirigent.formatter.argument.Arguments;
 import org.cubeengine.dirigent.parser.MacroResolutionResult;
 import org.cubeengine.dirigent.parser.MacroResolutionState;
+import org.cubeengine.dirigent.parser.Text;
 import org.cubeengine.dirigent.parser.Tokenizer;
 import org.cubeengine.dirigent.parser.component.ComponentGroup;
 import org.cubeengine.dirigent.parser.component.ResolvedMacro;
 import org.cubeengine.dirigent.parser.component.UnresolvableMacro;
-import org.cubeengine.dirigent.parser.Text;
 import org.cubeengine.dirigent.parser.token.Indexed;
 import org.cubeengine.dirigent.parser.token.Macro;
 import org.cubeengine.dirigent.parser.token.NamedMacro;
-import org.cubeengine.dirigent.formatter.ConstantFormatter;
-import org.cubeengine.dirigent.context.Context;
-import org.cubeengine.dirigent.formatter.DefaultFormatter;
-import org.cubeengine.dirigent.formatter.Formatter;
-import org.cubeengine.dirigent.formatter.PostProcessor;
 import org.cubeengine.dirigent.parser.token.Token;
 
 /**
@@ -77,15 +77,18 @@ public abstract class AbstractDirigent<MessageT> implements Dirigent<MessageT>
     {
         List<Token> tokens = Tokenizer.tokenize(source);
         ComponentGroup message = resolve(tokens, context, args);
-        return compose(message);
+        return compose(message, context);
     }
 
     /**
      * Composes the parsed Message into the final form
+     *
      * @param message the parsed message
+     * @param context the context
+     *
      * @return the composed Message
      */
-    protected abstract MessageT compose(ComponentGroup message);
+    protected abstract MessageT compose(ComponentGroup message, Context context);
 
     @Override
     public MacroResolutionResult findFormatter(String name, Object arg)
@@ -131,11 +134,13 @@ public abstract class AbstractDirigent<MessageT> implements Dirigent<MessageT>
     /**
      * Finds Formatter for the messages components and runs global PostProcessors.
      *
-     * @param tokens the parsed components
-     * @param context the locale
-     * @param inputs the message arguments
+     * @param tokens  the parsed components
+     * @param context the context
+     * @param inputs  the message arguments
+     *
      * @return the modified Message ready to be composed
      */
+    @SuppressWarnings("unchecked")
     private ComponentGroup resolve(List<Token> tokens, Context context, Object[] inputs)
     {
         if (tokens.isEmpty())
@@ -180,14 +185,15 @@ public abstract class AbstractDirigent<MessageT> implements Dirigent<MessageT>
                     arguments = named.getArgs();
                 }
 
-                Object input = argIndex < inputs.length ? inputs[argIndex] : null; // may be null because it might be a constant macro
+                // may be null because it might be a constant macro
+                Object input = argIndex < inputs.length ? inputs[argIndex] : null;
                 MacroResolutionResult res = this.findFormatter(name, input);
-                Formatter<?> formatter = res.getFormatter();
+                Formatter formatter = res.getFormatter();
                 boolean isConstant = formatter instanceof ConstantFormatter;
 
                 if (res.isOK())
                 {
-                    out = new ResolvedMacro(formatter, isConstant ? null : input, context, arguments);
+                    out = new ResolvedMacro((Formatter<Object>)formatter, isConstant ? null : input, context, arguments);
                 }
                 else
                 {
@@ -198,11 +204,11 @@ public abstract class AbstractDirigent<MessageT> implements Dirigent<MessageT>
                 {
                     implicitArgCounter++;
                 }
-
             }
             else
             {
-                throw new IllegalStateException("The message contains Components that are not Text or Macro: " + token.getClass().getName());
+                throw new IllegalStateException(
+                    "The message contains Components that are not Text or Macro: " + token.getClass().getName());
             }
 
             list.add(applyPostProcessors(out, context, arguments));
