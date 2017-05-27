@@ -26,9 +26,21 @@ import org.cubeengine.dirigent.Component;
 import org.cubeengine.dirigent.formatter.argument.Arguments;
 
 /**
- * Processes a Component afterwards
+ * A post processor can be added to a specific {@link Formatter} or the whole {@link org.cubeengine.dirigent.Dirigent}
+ * object. The provided method is called after a component was created by the specific formatter or in general. It can
+ * be used to manipulate the result and do some magic with it, like adding global style options, for example making
+ * macro components bold or colorized.
  */
 public interface PostProcessor
 {
+    /**
+     * Processes a component afterwards.
+     *
+     * @param component The component.
+     * @param context   The compose context.
+     * @param arguments The arguments of the occurred macro.
+     *
+     * @return The manipulated component.
+     */
     Component process(Component component, Context context, Arguments arguments);
 }

@@ -29,40 +29,56 @@ import org.cubeengine.dirigent.Component;
 import org.cubeengine.dirigent.formatter.argument.Arguments;
 
 /**
- * A Formatter for T.
- * PostProcessors can be added to run after formatting
-  *
- * @param <T> the ObjectType to format
+ * Formatters are used to format message parameters. In general a specific formatter can be used for a specific object
+ * type which is the generic type of this class.
+ * <p>
+ * A {@link PostProcessor} can be added to a Formatter to run after the formatting process and manipulate the created
+ * {@link Component}.
+ *
+ * @param <T> the object type to format
  */
 public abstract class Formatter<T>
 {
+    /**
+     * The attached {@link PostProcessor}s.
+     */
     private List<PostProcessor> postProcessors = new ArrayList<PostProcessor>();
 
     /**
-     * Returns true if given argument can be formatted with this Formatter
-     * @param arg the argument
-     * @return whether the argument can be formatted
+     * Returns true if given parameter can be formatted with this Formatter
+     *
+     * @param param The parameter to format.
+     *
+     * @return whether the parameter can be formatted
      */
-    public abstract boolean isApplicable(Object arg);
+    public abstract boolean isApplicable(Object param);
 
     /**
-     * Formats the argument into a Component for given Context
-     * @param arg the argument
-     * @param context the Context
-     * @param args
+     * Formats the parameter into a {@link Component} for given compose {@link Context} with the help of the specified
+     * {@link Arguments} object.
+     *
+     * @param param   The parameter to format.
+     * @param context The compose context.
+     * @param args    The arguments of the macro.
+     *
      * @return the resulting Component
      */
-    protected abstract Component format(T arg, Context context, Arguments args);
+    protected abstract Component format(T param, Context context, Arguments args);
 
     /**
-     * Formats the argument into a Component for given Context. Then runs all PostProcessors.
-     * @param arg the argument
-     * @param context the Context
+     * Formats the parameter into a {@link Component} for given compose {@link Context} with the help of the specified
+     * {@link Arguments} object. Therefore it calls the {@link #format(Object, Context, Arguments)} method which must
+     * be implemented by sub classes. Afterwards all attached {@link PostProcessor}s are executed.
+     *
+     * @param param   the parameter to format.
+     * @param context the compose context.
+     * @param args    The arguments of the macro.
+     *
      * @return the resulting processed Component
      */
-    public final Component process(T arg, Context context, Arguments args)
+    public final Component process(T param, Context context, Arguments args)
     {
-        Component result = format(arg, context, args);
+        Component result = format(param, context, args);
         for (PostProcessor processor : postProcessors)
         {
             result = processor.process(result, context, args);
@@ -72,6 +88,7 @@ public abstract class Formatter<T>
 
     /**
      * Adds a PostProcessor to this Formatter
+     *
      * @param pp the PostProcessor to add
      */
     public final void addPostProcessor(PostProcessor pp)
@@ -81,6 +98,7 @@ public abstract class Formatter<T>
 
     /**
      * Returns the names of this formatter
+     *
      * @return the names
      */
     public abstract Set<String> names();

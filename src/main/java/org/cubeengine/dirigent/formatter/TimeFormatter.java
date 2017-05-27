@@ -23,7 +23,8 @@
 package org.cubeengine.dirigent.formatter;
 
 /**
- * Uses the {@link DateTimeFormatter} to format times with the {@link org.cubeengine.dirigent.formatter.DateTimeFormatter.Mode#TIME}.
+ * Uses the {@link DateTimeFormatter} to format times with the
+ * {@link org.cubeengine.dirigent.formatter.DateTimeFormatter.Mode#TIME}.
  */
 public class TimeFormatter extends DateTimeFormatter
 {

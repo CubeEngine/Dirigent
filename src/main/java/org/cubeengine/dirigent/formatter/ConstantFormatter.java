@@ -26,26 +26,29 @@ import org.cubeengine.dirigent.Component;
 import org.cubeengine.dirigent.formatter.argument.Arguments;
 
 /**
- * A Formatter for Constant Expressions. This Formatter does not consume arguments.
+ * Indicates a specific Formatter which doesn't need any message parameters. Instead it's used for constant expressions
+ * which don't consume any parameters.
  */
 public abstract class ConstantFormatter extends Formatter<Void>
 {
     @Override
-    public boolean isApplicable(Object arg)
+    public boolean isApplicable(Object param)
     {
         return true;
     }
 
     @Override
-    public final Component format(Void arg, Context context, Arguments args)
+    public final Component format(Void param, Context context, Arguments args)
     {
         return format(context, args);
     }
 
     /**
      * Formats the Constant expression
-     * @param context the context
-     * @param args the arguments
+     *
+     * @param context The compose context
+     * @param args    The arguments of the macro.
+     *
      * @return the resulting Component
      */
     public abstract Component format(Context context, Arguments args);

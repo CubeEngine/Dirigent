@@ -63,9 +63,9 @@ public class StringFormatter extends AbstractFormatter<Object>
     }
 
     @Override
-    protected Component format(Object arg, Context context, Arguments args)
+    protected Component format(Object param, Context context, Arguments args)
     {
-        return new Text(parseObjectToString(arg, context.get(LOCALE), args));
+        return new Text(parseObjectToString(param, context.get(LOCALE), args));
     }
 
     /**

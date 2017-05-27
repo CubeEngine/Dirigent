@@ -27,35 +27,73 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * The Context of a Macro including Locale and the arguments of the Macro if any
+ * This class specifies the context of a compose process which is triggered by the
+ * {@link org.cubeengine.dirigent.Dirigent#compose(Context, String, Object...)} method. This might include a
+ * {@link Locale} or other information which can be used by the formatters to build proper messages.
  */
 public class Context
 {
+    /**
+     * A reference of a simple empty context.
+     */
     public static final Context EMPTY = new Context(Collections.<ContextProperty<?>, Object>emptyMap());
 
-    private final Map<ContextProperty<?>, Object> properties;
-
+    /**
+     * Identification context property for a {@link Locale} which must be considered within the {@link Formatter}
+     * implementations.
+     */
     public static final ContextProperty<Locale> LOCALE = new ContextProperty<Locale>();
 
+    /**
+     * A map holding all properties of the context.
+     */
+    private final Map<ContextProperty<?>, Object> properties;
+
+    /**
+     * Constructor.
+     *
+     * @param properties The properties of this context.
+     */
     private Context(Map<ContextProperty<?>, Object> properties)
     {
         this.properties = Collections.unmodifiableMap(properties);
     }
 
     /**
-     * Returns the Locale
-     * @return the locale
+     * Returns the Locale which must be considered from the {@link Formatter} implementations.
+     *
+     * @return the locale or the default locale if the property doesn't exist.
      */
     public Locale getLocale()
     {
         return getOrElse(LOCALE, Locale.getDefault());
     }
 
+    /**
+     * Returns the value of a context property which is identified with the specified {@link ContextProperty} object.
+     *
+     * @param key The context property.
+     * @param <K> The type which is identified by the property.
+     * @param <V> The actual value type.
+     *
+     * @return the value of the context property.
+     */
     public <K, V extends K> V get(ContextProperty<K> key)
     {
         return key.get(properties);
     }
 
+    /**
+     * Returns the value of a context property which is identified with the specified {@link ContextProperty} object.
+     * If the value isn't specified the provided default value will be returned.
+     *
+     * @param key The context property.
+     * @param def The default value.
+     * @param <K> The type which is identified by the property.
+     * @param <V> The actual value type.
+     *
+     * @return the value of the context property or the default value if it's not specified.
+     */
     public <K, V extends K> V getOrElse(ContextProperty<K> key, V def)
     {
         return key.getOrElse(properties, def);
@@ -85,25 +123,34 @@ public class Context
     }
 
     /**
-     * Replaces the list of arguments allowing to reuse the context
-     * @param list the list to replace with
-     * @return fluent interface
+     * Creates a new empty context.
+     *
+     * @return an empty context.
      */
-    public Context with(Map<ContextProperty<?>, Object> properties)
-    {
-        return create(properties);
-    }
-
     public static Context create()
     {
         return EMPTY;
     }
 
+    /**
+     * Creates a new context holding the specified {@link Locale}.
+     *
+     * @param locale The locale of this context.
+     *
+     * @return the context.
+     */
     public static Context create(Locale locale)
     {
         return create(LOCALE.to(locale));
     }
 
+    /**
+     * Creates a new context with the specified properties.
+     *
+     * @param properties The properties of the context.
+     *
+     * @return the context.
+     */
     public static Context create(Map<ContextProperty<?>, Object> properties)
     {
         if (properties.isEmpty())

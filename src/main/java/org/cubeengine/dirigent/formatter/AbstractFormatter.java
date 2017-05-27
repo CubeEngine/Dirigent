@@ -31,54 +31,91 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableSet;
 
 /**
- * A Formatter for one specific class
+ * The abstract formatter provides a default implementation for formatters of one specific class.
+ *
  * @param <T> the class to format
  */
 public abstract class AbstractFormatter<T> extends Formatter<T>
 {
+    /**
+     * The class which is supported by the implementation.
+     */
     private final Class<T> clazz;
+    /**
+     * The macro names triggering this formatter.
+     */
     private Set<String> names;
 
+    /**
+     * Constructor.
+     *
+     * @param clazz The class of the parameter types which can be formatted.
+     * @param names The macro names triggering this formatter.
+     */
     public AbstractFormatter(Class<T> clazz, String... names)
     {
         this(clazz, new HashSet<String>(asList(names)));
     }
 
+    /**
+     * Constructor.
+     *
+     * @param clazz The class of the parameter types which can be formatted.
+     * @param names The macro names triggering this formatter.
+     */
     public AbstractFormatter(Class<T> clazz, Set<String> names)
     {
         this.clazz = clazz;
         this.names = unmodifiableSet(names);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param names The macro names triggering this formatter.
+     */
     public AbstractFormatter(String... names)
     {
         this(new HashSet<String>(asList(names)));
     }
 
+    /**
+     * Constructor.
+     *
+     * @param names The macro names triggering this formatter.
+     */
     public AbstractFormatter(Set<String> names)
     {
         this.clazz = getClazz(getClass());
         this.names = names;
     }
 
+    /**
+     * Loads the class information from the generic type of the specified class.
+     *
+     * @param thisClass The class.
+     * @param <T>       The parameter object type.
+     *
+     * @return the class informaiton.
+     */
     @SuppressWarnings("unchecked")
     private static <T> Class<T> getClazz(Class<?> thisClass)
     {
         Type genericSuperclass = thisClass.getGenericSuperclass();
         if (genericSuperclass instanceof ParameterizedType)
         {
-            return  (Class<T>)((ParameterizedType)genericSuperclass).getActualTypeArguments()[0];
+            return (Class<T>)((ParameterizedType)genericSuperclass).getActualTypeArguments()[0];
         }
         else
         {
-            return  (Class<T>)Object.class;
+            return (Class<T>)Object.class;
         }
     }
 
     @Override
-    public boolean isApplicable(Object arg)
+    public boolean isApplicable(Object param)
     {
-        return arg != null && clazz.isAssignableFrom(arg.getClass());
+        return param != null && clazz.isAssignableFrom(param.getClass());
     }
 
     @Override

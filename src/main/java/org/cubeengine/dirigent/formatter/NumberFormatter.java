@@ -93,9 +93,9 @@ public class NumberFormatter extends AbstractFormatter<Number>
     }
 
     @Override
-    protected Component format(Number arg, Context context, Arguments args)
+    protected Component format(Number param, Context context, Arguments args)
     {
-        return new Text(parseNumberToString(arg, context, args));
+        return new Text(parseNumberToString(param, context, args));
     }
 
     /**
@@ -103,8 +103,8 @@ public class NumberFormatter extends AbstractFormatter<Number>
      *
      * @param number  The number to parse.
      * @param context The context to use.
+     * @param args    The arguments of the macro.
      *
-     * @param args
      * @return The number as a string.
      */
     protected String parseNumberToString(Number number, Context context, Arguments args)
@@ -117,8 +117,8 @@ public class NumberFormatter extends AbstractFormatter<Number>
      * Parses the {@link NumberFormat} to use from the context arguments.
      *
      * @param context The context.
+     * @param args    The arguments of the macro.
      *
-     * @param args
      * @return the {@link NumberFormat}.
      */
     private NumberFormat parseFormatter(Context context, Arguments args)
@@ -167,7 +167,7 @@ public class NumberFormatter extends AbstractFormatter<Number>
         /**
          * Loads the mode from the formatter context or returns the default mode if the context doesn't specify one.
          *
-         * @param args     The context.
+         * @param args        The arguments of the macro.
          * @param defaultMode The default mode.
          *
          * @return the loaded mode.

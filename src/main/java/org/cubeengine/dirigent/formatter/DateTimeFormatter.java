@@ -102,9 +102,9 @@ public class DateTimeFormatter extends AbstractFormatter<Date>
     }
 
     @Override
-    protected Component format(Date arg, Context context, Arguments args)
+    protected Component format(Date param, Context context, Arguments args)
     {
-        return new Text(parseDateToString(arg, context, args));
+        return new Text(parseDateToString(param, context, args));
     }
 
     /**
@@ -112,8 +112,8 @@ public class DateTimeFormatter extends AbstractFormatter<Date>
      *
      * @param date    The date to parse.
      * @param context The context to use.
+     * @param args    The arguments of the macro.
      *
-     * @param args
      * @return The number as a string.
      */
     protected String parseDateToString(Date date, Context context, Arguments args)
@@ -126,8 +126,8 @@ public class DateTimeFormatter extends AbstractFormatter<Date>
      * Parses the {@link DateFormat} to use from the context arguments.
      *
      * @param context The context.
+     * @param args    The arguments of the macro.
      *
-     * @param args
      * @return the {@link DateFormat}.
      */
     private DateFormat parseFormatter(Context context, Arguments args)
@@ -196,7 +196,8 @@ public class DateTimeFormatter extends AbstractFormatter<Date>
     /**
      * Parses the default style of the {@link DateFormat} from context labels.
      *
-     * @param args
+     * @param args The arguments of the macro.
+     *
      * @return The id of the style.
      */
     private int parseDateFormatStyle(Arguments args)

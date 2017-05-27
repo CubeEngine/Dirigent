@@ -30,20 +30,21 @@ import org.cubeengine.dirigent.parser.component.Text;
 import static java.util.Collections.singleton;
 
 /**
- * The default Formatter using {@link String#valueOf} to convert it into {@link Text}
+ * The default Formatter using {@link String#valueOf} to convert it into {@link Text}. If this formatter is specified,
+ * it will be used if a macro doesn't have a name.
  */
 public class DefaultFormatter extends Formatter<Object>
 {
     @Override
-    public boolean isApplicable(Object arg)
+    public boolean isApplicable(Object param)
     {
         return true;
     }
 
     @Override
-    protected Component format(Object arg, Context context, Arguments args)
+    protected Component format(Object param, Context context, Arguments args)
     {
-        return new Text(String.valueOf(arg));
+        return new Text(String.valueOf(param));
     }
 
     @Override

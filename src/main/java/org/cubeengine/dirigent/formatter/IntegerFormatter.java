@@ -23,7 +23,8 @@
 package org.cubeengine.dirigent.formatter;
 
 /**
- * Uses the {@link NumberFormatter} to format integer values with the {@link org.cubeengine.dirigent.formatter.NumberFormatter.Mode#INTEGER}.
+ * Uses the {@link NumberFormatter} to format integer values with the
+ * {@link org.cubeengine.dirigent.formatter.NumberFormatter.Mode#INTEGER}.
  */
 public class IntegerFormatter extends NumberFormatter
 {

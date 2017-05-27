@@ -23,7 +23,8 @@
 package org.cubeengine.dirigent.formatter;
 
 /**
- * Uses the {@link NumberFormatter} to format currency values with the {@link org.cubeengine.dirigent.formatter.NumberFormatter.Mode#CURRENCY}.
+ * Uses the {@link NumberFormatter} to format currency values with the
+ * {@link org.cubeengine.dirigent.formatter.NumberFormatter.Mode#CURRENCY}.
  */
 public class CurrencyFormatter extends NumberFormatter
 {

@@ -23,7 +23,8 @@
 package org.cubeengine.dirigent.formatter;
 
 /**
- * Uses the {@link NumberFormatter} to format percent values with the {@link org.cubeengine.dirigent.formatter.NumberFormatter.Mode#PERCENT}.
+ * Uses the {@link NumberFormatter} to format percent values with the
+ * {@link org.cubeengine.dirigent.formatter.NumberFormatter.Mode#PERCENT}.
  */
 public class PercentFormatter extends NumberFormatter
 {
