@@ -44,17 +44,38 @@ public class Contexts
     /**
      * This property identifies a {@link Locale} instance in a context.
      */
-    public static final ContextProperty<Locale> LOCALE = new ContextProperty<Locale>();
+    public static final ContextProperty<Locale> LOCALE = new ContextProperty<Locale>(new DefaultProvider<Locale>()
+    {
+        @Override
+        public Locale defaultValue()
+        {
+            return Locale.getDefault();
+        }
+    });
 
     /**
      * This property identifies a {@link TimeZone} instance in a context.
      */
-    public static final ContextProperty<TimeZone> TIMEZONE = new ContextProperty<TimeZone>();
+    public static final ContextProperty<TimeZone> TIMEZONE = new ContextProperty<TimeZone>(new DefaultProvider<TimeZone>()
+    {
+        @Override
+        public TimeZone defaultValue()
+        {
+            return TimeZone.getDefault();
+        }
+    });
 
     /**
      * This property identifies a {@link Currency} instance in a context.
      */
-    public static final ContextProperty<Currency> CURRENCY = new ContextProperty<Currency>();
+    public static final ContextProperty<Currency> CURRENCY = new ContextProperty<Currency>(new DefaultProvider<Currency>()
+    {
+        @Override
+        public Currency defaultValue()
+        {
+            return Currency.getInstance(Locale.getDefault());
+        }
+    });
 
     /**
      * Creates a new empty context.

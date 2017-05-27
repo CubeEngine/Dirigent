@@ -51,36 +51,34 @@ public class Context
     /**
      * Returns the value of a context property which is identified with the specified {@link ContextProperty} object.
      *
-     * @param key The context property.
-     * @param <K> The type which is identified by the property.
-     * @param <V> The actual value type.
+     * @param key the context property
+     * @param <K> the type which is identified by the property
      *
      * @return the value of the context property.
      */
-    public <K, V extends K> V get(ContextProperty<K> key)
+    public <K> K get(ContextProperty<K> key)
     {
-        return getOrElse(key, null);
+        return getOrElse(key, key.getDefaultProvider());
     }
 
     /**
      * Returns the value of a context property which is identified with the specified {@link ContextProperty} object.
      * If the value isn't specified the provided default value will be returned.
      *
-     * @param key The context property.
-     * @param def The default value.
-     * @param <K> The type which is identified by the property.
-     * @param <V> The actual value type.
+     * @param key The context property
+     * @param defaultProvider the default value provider
+     * @param <K> The type which is identified by the property
      *
      * @return the value of the context property or the default value if it's not specified.
      */
-    public <K, V extends K> V getOrElse(ContextProperty<K> key, V def)
+    public <K> K getOrElse(ContextProperty<K> key, DefaultProvider<K> defaultProvider)
     {
 
         @SuppressWarnings("unchecked")
-        V val = (V)properties.get(key);
+        K val = (K)properties.get(key);
         if (val == null)
         {
-            return def;
+            return defaultProvider.defaultValue();
         }
         return val;
     }
