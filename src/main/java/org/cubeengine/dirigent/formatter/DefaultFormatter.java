@@ -24,8 +24,9 @@ package org.cubeengine.dirigent.formatter;
 
 import java.util.Set;
 import org.cubeengine.dirigent.Component;
+import org.cubeengine.dirigent.context.Context;
 import org.cubeengine.dirigent.formatter.argument.Arguments;
-import org.cubeengine.dirigent.parser.component.Text;
+import org.cubeengine.dirigent.parser.Text;
 
 import static java.util.Collections.singleton;
 
@@ -36,7 +37,7 @@ import static java.util.Collections.singleton;
 public class DefaultFormatter extends Formatter<Object>
 {
     @Override
-    public boolean isApplicable(Object param)
+    public boolean isApplicable(Object input)
     {
         return true;
     }

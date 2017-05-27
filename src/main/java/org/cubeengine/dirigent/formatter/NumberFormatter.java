@@ -27,17 +27,20 @@ import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.util.Locale;
 import org.cubeengine.dirigent.Component;
+import org.cubeengine.dirigent.context.Context;
 import org.cubeengine.dirigent.formatter.argument.Arguments;
-import org.cubeengine.dirigent.parser.component.Text;
+import org.cubeengine.dirigent.parser.Text;
 
-import static org.cubeengine.dirigent.formatter.Context.LOCALE;
+import static org.cubeengine.dirigent.context.Context.LOCALE;
 
 /**
+ * <p>
  * The number formatter formats a {@link Number} object with a {@link NumberFormat}. The class has a {@link Mode} which
  * can be passed as a constructor parameter. This mode specifies which kind of {@link NumberFormat} shall be used by
  * default. It is possible to overwrite this default behaviour using a flag on the message macro. If the mode isn't
  * specified this formatter works similar to the {@link java.text.MessageFormat#format(Object)} method with the macro
  * {@code number}.
+ * </p>
  * <p>
  * In a message it's possible to control the format with two types of options. The first possibility is specifying a
  * "format" parameter. This parameter creates a {@link DecimalFormat} object with the specified format. Furthermore it's
@@ -46,6 +49,7 @@ import static org.cubeengine.dirigent.formatter.Context.LOCALE;
  * {@link NumberFormat#getPercentInstance()}. It is the same functionality as handled by the {@link Mode}. The default
  * behaviour loads the format with the {@link NumberFormat#getInstance()} method. Furthermore the locale is respected
  * at this point and passed to the format.
+ * </p>
  */
 public class NumberFormatter extends AbstractFormatter<Number>
 {

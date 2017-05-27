@@ -24,10 +24,11 @@ package org.cubeengine.dirigent.formatter;
 
 import java.util.Locale;
 import org.cubeengine.dirigent.Component;
+import org.cubeengine.dirigent.context.Context;
 import org.cubeengine.dirigent.formatter.argument.Arguments;
-import org.cubeengine.dirigent.parser.component.Text;
+import org.cubeengine.dirigent.parser.Text;
 
-import static org.cubeengine.dirigent.formatter.Context.LOCALE;
+import static org.cubeengine.dirigent.context.Context.LOCALE;
 
 /**
  * The string formatter formats an {@link Object} with {@link String#valueOf(Object)}. It is possible to control this
@@ -45,7 +46,7 @@ public class StringFormatter extends AbstractFormatter<Object>
     static final String UPPERCASE_FLAG = "uppercase";
 
     /**
-     * Constructor. Initializes this formatter with a few default names.
+     * Constructs this formatter with a few default names.
      */
     public StringFormatter()
     {
@@ -53,7 +54,7 @@ public class StringFormatter extends AbstractFormatter<Object>
     }
 
     /**
-     * Constructor.
+     * Constructs this formatter with the given names.
      *
      * @param names The names triggering this formatter.
      */

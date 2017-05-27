@@ -23,7 +23,7 @@
 package org.cubeengine.dirigent.parser.token;
 
 /**
- * An empty Macro
+ * An empty (no name, no index) macro.
  */
 public class DefaultMacro implements Macro
 {

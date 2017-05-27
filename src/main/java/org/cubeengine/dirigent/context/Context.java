@@ -20,11 +20,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.cubeengine.dirigent.formatter;
+package org.cubeengine.dirigent.context;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import org.cubeengine.dirigent.formatter.Formatter;
 
 /**
  * This class specifies the context of a compose process which is triggered by the
@@ -80,7 +84,7 @@ public class Context
      */
     public <K, V extends K> V get(ContextProperty<K> key)
     {
-        return key.get(properties);
+        return getOrElse(key, null);
     }
 
     /**
@@ -96,7 +100,14 @@ public class Context
      */
     public <K, V extends K> V getOrElse(ContextProperty<K> key, V def)
     {
-        return key.getOrElse(properties, def);
+
+        @SuppressWarnings("unchecked")
+        V val = (V)properties.get(key);
+        if (val == null)
+        {
+            return def;
+        }
+        return val;
     }
 
     @Override
@@ -141,21 +152,27 @@ public class Context
      */
     public static Context create(Locale locale)
     {
-        return create(LOCALE.to(locale));
+        return create(LOCALE.with(locale));
     }
 
     /**
      * Creates a new context with the specified properties.
      *
-     * @param properties The properties of the context.
+     * @param mappings The property mappings of the context.
      *
      * @return the context.
      */
-    public static Context create(Map<ContextProperty<?>, Object> properties)
+    public static Context create(PropertyMapping<?>... mappings)
     {
-        if (properties.isEmpty())
+        return create(Arrays.asList(mappings));
+    }
+
+    public static Context create(Collection<PropertyMapping<?>> mappings)
+    {
+        Map<ContextProperty<?>, Object> properties = new HashMap<ContextProperty<?>, Object>(mappings.size());
+        for (final PropertyMapping<?> mapping : mappings)
         {
-            return EMPTY;
+            properties.put(mapping.property, mapping.value);
         }
         return new Context(properties);
     }

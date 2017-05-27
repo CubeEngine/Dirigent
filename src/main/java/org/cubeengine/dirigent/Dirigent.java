@@ -23,9 +23,10 @@
 package org.cubeengine.dirigent;
 
 import java.util.Locale;
-import org.cubeengine.dirigent.formatter.Context;
+import org.cubeengine.dirigent.context.Context;
 import org.cubeengine.dirigent.formatter.Formatter;
 import org.cubeengine.dirigent.formatter.PostProcessor;
+import org.cubeengine.dirigent.parser.MacroResolutionResult;
 
 /**
  * The main interface of this API.
@@ -37,77 +38,50 @@ public interface Dirigent<MessageT>
 {
     /**
      * Composes a message using the {@link Locale#getDefault()} Locale.
+     *
      * @param source the source message
-     * @param args the message arguments
+     * @param args   the message arguments
+     *
      * @return the composed Message
      */
     MessageT compose(String source, Object... args);
 
     /**
      * Composes a message
-     * @param locale the locale
-     * @param source the source message
-     * @param args the message arguments
+     *
+     * @param context the context
+     * @param source  the source message
+     * @param args    the message arguments
+     *
      * @return the composed message
      */
     MessageT compose(Context context, String source, Object... args);
 
     /**
      * Adds a new Formatter to use when composing the messages
+     *
      * @param formatter the formatter to add
+     *
      * @return fluent interface
      */
     Dirigent registerFormatter(Formatter<?> formatter);
 
     /**
      * Adds a new PostProcessor to run over all MessageComponents
+     *
      * @param postProcessor the PostProcessor to add
+     *
      * @return fluent interface
      */
     Dirigent addPostProcessor(PostProcessor postProcessor);
 
     /**
      * Finds a Formatter for given name and argument
+     *
      * @param name the name of the formatter
-     * @param arg the argument to pass to the formatter
+     * @param arg  the argument to pass to the formatter
+     *
      * @return the formatter or null if not found
      */
-    LookupResult findFormatter(String name, Object arg);
-
-    final class LookupResult
-    {
-        public static final LookupResult UNKNOWN_NAME = new LookupResult(LookupState.UNKNOWN_NAME, null);
-        public static final LookupResult NONE_APPLICABLE = new LookupResult(LookupState.NONE_APPLICABLE, null);
-
-        private final LookupState state;
-        private final Formatter<?> formatter;
-
-        public LookupResult(LookupState state, Formatter<?> formatter)
-        {
-            this.state = state;
-            this.formatter = formatter;
-        }
-
-        public boolean isOK()
-        {
-            return getState() == LookupState.OK;
-        }
-
-        public LookupState getState()
-        {
-            return state;
-        }
-
-        public Formatter<?> getFormatter()
-        {
-            return formatter;
-        }
-    }
-
-    enum LookupState
-    {
-        OK,
-        UNKNOWN_NAME,
-        NONE_APPLICABLE
-    }
+    MacroResolutionResult findFormatter(String name, Object arg);
 }

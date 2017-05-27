@@ -23,7 +23,7 @@
 package org.cubeengine.dirigent.parser.token;
 
 /**
- * A Macro that has a position
+ * A macro that has a position.
  */
 public interface Indexed extends Macro
 {

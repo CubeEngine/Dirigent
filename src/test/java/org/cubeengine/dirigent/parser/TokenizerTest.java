@@ -24,9 +24,7 @@ package org.cubeengine.dirigent.parser;
 
 import java.util.Arrays;
 import java.util.List;
-import org.cubeengine.dirigent.parser.component.Text;
 import org.cubeengine.dirigent.parser.token.CompleteMacro;
-import org.cubeengine.dirigent.parser.token.IllegalMacro;
 import org.cubeengine.dirigent.parser.token.IndexedDefaultMacro;
 import org.cubeengine.dirigent.parser.token.NamedMacro;
 import org.cubeengine.dirigent.formatter.argument.Argument;
@@ -36,18 +34,13 @@ import org.cubeengine.dirigent.parser.token.Token;
 import org.junit.Test;
 
 import static java.util.Arrays.asList;
-import static org.cubeengine.dirigent.parser.Parser.parseMessage;
-import static org.cubeengine.dirigent.parser.Parser.stripBackslashes;
+import static org.cubeengine.dirigent.parser.Tokenizer.tokenize;
+import static org.cubeengine.dirigent.parser.Tokenizer.unescape;
 import static org.cubeengine.dirigent.parser.token.DefaultMacro.DEFAULT_MACRO;
 import static org.junit.Assert.assertEquals;
 
-public class ParserTest
+public class TokenizerTest
 {
-    public static List<Token> msg(Token... components)
-    {
-        return tokens(components);
-    }
-
     public static List<Token> tokens(Token... components)
     {
         return Arrays.asList(components);
@@ -85,76 +78,76 @@ public class ParserTest
 
     public static Token err(String s)
     {
-        return new IllegalMacro(s, "Encountered macro start, but no valid macro followed.");
+        return new InvalidMacro(s);
     }
 
     @Test
     public void testReadMessage()
     {
-        assertEquals(msg(txt("only text")), parseMessage("only text"));
-        assertEquals(msg(DEFAULT_MACRO), parseMessage("{}"));
-        assertEquals(msg(named("name")), parseMessage("{name}"));
-        assertEquals(msg(indexed(0)), parseMessage("{0}"));
-        assertEquals(msg(complete(1, "name")), parseMessage("{1:name#with index and comment}"));
+        assertEquals(tokens(txt("only text")), tokenize("only text"));
+        assertEquals(tokens(DEFAULT_MACRO), tokenize("{}"));
+        assertEquals(tokens(named("name")), tokenize("{name}"));
+        assertEquals(tokens(indexed(0)), tokenize("{0}"));
+        assertEquals(tokens(complete(1, "name")), tokenize("{1:name#with index and comment}"));
 
         assertEquals(
-            msg(complete(1, "name", arg("and parameter"))),
-            parseMessage("{1:name#with index and comment:and parameter}"));
+            tokens(complete(1, "name", arg("and parameter"))),
+            tokenize("{1:name#with index and comment:and parameter}"));
 
         assertEquals(
-            msg(complete(1, "name", arg("#parameterwithhash"))),
-            parseMessage("{1:name#with index and comment:#parameterwithhash}"));
+            tokens(complete(1, "name", arg("#parameterwithhash"))),
+            tokenize("{1:name#with index and comment:#parameterwithhash}"));
 
         assertEquals(
-            msg(complete(1, "name", arg("and parameter", "with value"))),
-            parseMessage("{1:name#with index and comment:and parameter=with value}"));
+            tokens(complete(1, "name", arg("and parameter", "with value"))),
+            tokenize("{1:name#with index and comment:and parameter=with value}"));
 
         assertEquals(
-            msg(complete(1, "name", arg("and parameter", "with value"), arg("multiple"))),
-            parseMessage("{1:name#with index and comment:and parameter=with value:multiple}"));
+            tokens(complete(1, "name", arg("and parameter", "with value"), arg("multiple"))),
+            tokenize("{1:name#with index and comment:and parameter=with value:multiple}"));
 
         assertEquals(
-            msg(complete(1, "name", arg("and parameter", "with value"), arg("multiple"), arg("and one", "more"))),
-            parseMessage("{1:name#with index and comment:and parameter=with value:multiple:and one=more}"));
+            tokens(complete(1, "name", arg("and parameter", "with value"), arg("multiple"), arg("and one", "more"))),
+            tokenize("{1:name#with index and comment:and parameter=with value:multiple:and one=more}"));
 
         assertEquals(
-            msg(txt("text and a macro "), complete(1, "name", arg("and parameter", "with value"), arg("multiple"), arg("and one", "more")), txt(" more text")),
-            parseMessage("text and a macro {1:name#with index and comment:and parameter=with value:multiple:and one=more} more text"));
+            tokens(txt("text and a macro "), complete(1, "name", arg("and parameter", "with value"), arg("multiple"), arg("and one", "more")), txt(" more text")),
+            tokenize("text and a macro {1:name#with index and comment:and parameter=with value:multiple:and one=more} more text"));
 
         assertEquals(
-            msg(txt("illegal macro "), err("{starts but wont end")),
-            parseMessage("illegal macro {starts but wont end"));
+            tokens(txt("illegal macro "), err("{starts but wont end")),
+            tokenize("illegal macro {starts but wont end"));
 
         assertEquals(
-            msg(txt("illegal macro "), err("{starts:has arguments but wont end")),
-            parseMessage("illegal macro {starts:has arguments but wont end"));
+            tokens(txt("illegal macro "), err("{starts:has arguments but wont end")),
+            tokenize("illegal macro {starts:has arguments but wont end"));
     }
 
     @Test
     public void testReadMessageWithEscaping()
     {
         assertEquals(
-            msg(txt("some escape test {} or {name#label:mdmmd}")),
-            parseMessage("some escape test \\{} or \\{name#label:mdmmd}"));
+            tokens(txt("some escape test {} or {name#label:mdmmd}")),
+            tokenize("some escape test \\{} or \\{name#label:mdmmd}"));
 
         assertEquals(
-            msg(txt("some text with "),
+            tokens(txt("some text with "),
                 named("text", arg("static \\\\ tex:t\\"), arg("moep")),
                 txt("!")),
-            parseMessage("some text with {text:static \\\\\\\\ tex\\:t\\\\:moep}!"));
+            tokenize("some text with {text:static \\\\\\\\ tex\\:t\\\\:moep}!"));
 
         assertEquals(
-            msg(txt("escaping "), named("in", arg("arg"))),
-            parseMessage("escaping {in#la\\:b\\el:arg}"));
+            tokens(txt("escaping "), named("in", arg("arg"))),
+            tokenize("escaping {in#la\\:b\\el:arg}"));
     }
 
     @Test
     public void testStripBackslashes()
     {
-        assertEquals("\\", stripBackslashes("\\", "=:}\\"));
-        assertEquals("sta:tic", stripBackslashes("sta\\:tic", "=:}\\"));
-        assertEquals("static", stripBackslashes("static", "=:}\\"));
-        assertEquals("static \\\\ tex:t\\", stripBackslashes("static \\\\\\\\ tex\\:t\\\\", "=:}\\"));
-        assertEquals("static \\\\ tex\\:t\\", stripBackslashes("static \\\\\\\\ tex\\:t\\\\", "=}\\"));
+        assertEquals("\\", unescape("\\", "=:}\\"));
+        assertEquals("sta:tic", unescape("sta\\:tic", "=:}\\"));
+        assertEquals("static", unescape("static", "=:}\\"));
+        assertEquals("static \\\\ tex:t\\", unescape("static \\\\\\\\ tex\\:t\\\\", "=:}\\"));
+        assertEquals("static \\\\ tex\\:t\\", unescape("static \\\\\\\\ tex\\:t\\\\", "=}\\"));
     }
 }

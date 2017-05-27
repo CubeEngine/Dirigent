@@ -20,40 +20,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.cubeengine.dirigent;
+package org.cubeengine.dirigent.parser;
 
-import java.util.Collections;
-import java.util.List;
-
-import static java.util.Collections.singletonList;
-import static java.util.Collections.unmodifiableList;
+import org.cubeengine.dirigent.parser.component.TextComponent;
+import org.cubeengine.dirigent.parser.token.Token;
 
 /**
- * A parsed Message
+ * A simple component for static strings.
  */
-public class Message
+public class Text implements Token, TextComponent
 {
-    public static Message EMPTY = new Message(Collections.<Component>emptyList());
+    private String string;
 
-    private final List<Component> components;
-
-    public Message(List<Component> components)
+    public Text(String string)
     {
-        this.components = unmodifiableList(components);
+        this.string = String.valueOf(string);
     }
 
-    public Message(Component component)
+    public String getText()
     {
-        this.components = singletonList(component);
-    }
-
-    /**
-     * Returns the components of the parsed message
-     * @return the components
-     */
-    public List<Component> getComponents()
-    {
-        return components;
+        return string;
     }
 
     @Override
@@ -63,25 +49,25 @@ public class Message
         {
             return true;
         }
-        if (!(o instanceof Message))
+        if (!(o instanceof Text))
         {
             return false;
         }
 
-        final Message message = (Message)o;
+        final Text text = (Text)o;
 
-        return getComponents().equals(message.getComponents());
+        return getText().equals(text.getText());
     }
 
     @Override
     public int hashCode()
     {
-        return getComponents().hashCode();
+        return getText().hashCode();
     }
 
     @Override
     public String toString()
     {
-        return "Message{" + "components=" + components + '}';
+        return "Text{" + "string='" + string + '\'' + '}';
     }
 }

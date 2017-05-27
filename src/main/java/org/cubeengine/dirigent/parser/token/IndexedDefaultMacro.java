@@ -23,7 +23,7 @@
 package org.cubeengine.dirigent.parser.token;
 
 /**
- * A Macro with position and no name
+ * A macro with position, but no name.
  */
 public class IndexedDefaultMacro extends DefaultMacro implements Indexed
 {

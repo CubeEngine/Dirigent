@@ -24,8 +24,9 @@ package org.cubeengine.dirigent.formatter;
 
 import java.util.Locale;
 import org.cubeengine.dirigent.Component;
+import org.cubeengine.dirigent.context.Context;
 import org.cubeengine.dirigent.formatter.argument.Arguments;
-import org.cubeengine.dirigent.parser.component.Text;
+import org.cubeengine.dirigent.parser.Text;
 import org.cubeengine.dirigent.formatter.argument.Parameter;
 import org.cubeengine.dirigent.formatter.argument.Value;
 import org.junit.Assert;
@@ -89,7 +90,7 @@ public class NumberFormatterTest
         final Component component = numberFormatter.format(number, context, args);
 
         Assert.assertTrue(component instanceof Text);
-        Assert.assertEquals(expected, ((Text)component).getString());
+        Assert.assertEquals(expected, ((Text)component).getText());
     }
 
     private Arguments args(final String paramName, final String paramValue)

@@ -23,9 +23,8 @@
 package org.cubeengine.dirigent.formatter.argument;
 
 /**
- * A Macro Argument
+ * A macro argument.
+ * This is the common interface of parameters and values.
  */
 public interface Argument
-{
-
-}
+{}

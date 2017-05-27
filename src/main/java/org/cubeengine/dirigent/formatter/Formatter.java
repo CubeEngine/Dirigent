@@ -26,14 +26,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import org.cubeengine.dirigent.Component;
+import org.cubeengine.dirigent.context.Context;
 import org.cubeengine.dirigent.formatter.argument.Arguments;
 
 /**
+ * <p>
  * Formatters are used to format message parameters. In general a specific formatter can be used for a specific object
  * type which is the generic type of this class.
+ * </p>
  * <p>
  * A {@link PostProcessor} can be added to a Formatter to run after the formatting process and manipulate the created
  * {@link Component}.
+ * </p>
  *
  * @param <T> the object type to format
  */
@@ -47,11 +51,11 @@ public abstract class Formatter<T>
     /**
      * Returns true if given parameter can be formatted with this Formatter
      *
-     * @param param The parameter to format.
+     * @param input The input value to format.
      *
      * @return whether the parameter can be formatted
      */
-    public abstract boolean isApplicable(Object param);
+    public abstract boolean isApplicable(Object input);
 
     /**
      * Formats the parameter into a {@link Component} for given compose {@link Context} with the help of the specified

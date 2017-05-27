@@ -27,15 +27,18 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import org.cubeengine.dirigent.Component;
+import org.cubeengine.dirigent.context.Context;
 import org.cubeengine.dirigent.formatter.argument.Arguments;
-import org.cubeengine.dirigent.parser.component.Text;
+import org.cubeengine.dirigent.parser.Text;
 
-import static org.cubeengine.dirigent.formatter.Context.LOCALE;
+import static org.cubeengine.dirigent.context.Context.LOCALE;
 
 /**
+ * <p>
  * The date time formatter formats a {@link Date} object with a {@link DateFormat}. The class has a {@link Mode} which
  * can be passed as a constructor parameter. This mode specifies whether the instance formats a {@link Date} object to a
  * date, a time or a date time representation by default. The default constructors uses the data time representation.
+ * </p>
  * <p>
  * In a message it's possible to control the format with two types of options. The first possibility is specifying a
  * "format" parameter. This parameter creates a {@link SimpleDateFormat} with the specified format. Furthermore it's
@@ -43,6 +46,7 @@ import static org.cubeengine.dirigent.formatter.Context.LOCALE;
  * {@link DateFormat} instance. Specified as a flag this style is used for date and time. With one of the parameters
  * "date" and "time" it's possible to control both styles independently. Furthermore the {@link java.util.Locale} is
  * respected and passed to the format.
+ * </p>
  */
 public class DateTimeFormatter extends AbstractFormatter<Date>
 {

@@ -23,9 +23,8 @@
 package org.cubeengine.dirigent;
 
 /**
- * Marker interface for a Component of a {@link Message}
+ * Marker interface for a component
  */
 public interface Component
 {
-
 }

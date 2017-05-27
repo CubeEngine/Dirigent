@@ -29,7 +29,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This Annotation is used for ReflectedFormatter to declare the format methods
+ * This annotation is used for {@link ReflectedFormatter} to declare the format methods.
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

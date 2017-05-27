@@ -23,7 +23,7 @@
 package org.cubeengine.dirigent.builder;
 
 /**
- * A Dirigent implementation creating String compositions by using a StringBuilder.
+ * A {@link org.cubeengine.dirigent.Dirigent} implementation creating String compositions by using a {@link StringBuilder}.
  */
 public class StringBuilderDirigent extends BuilderDirigent<String, StringBuilder>
 {

@@ -27,15 +27,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.cubeengine.dirigent.formatter.argument.Arguments;
-import org.cubeengine.dirigent.parser.Parser;
+import org.cubeengine.dirigent.parser.MacroResolutionResult;
+import org.cubeengine.dirigent.parser.MacroResolutionState;
+import org.cubeengine.dirigent.parser.Tokenizer;
+import org.cubeengine.dirigent.parser.component.ComponentGroup;
 import org.cubeengine.dirigent.parser.component.ResolvedMacro;
-import org.cubeengine.dirigent.parser.component.MissingFormatter;
-import org.cubeengine.dirigent.parser.component.Text;
+import org.cubeengine.dirigent.parser.component.UnresolvableMacro;
+import org.cubeengine.dirigent.parser.Text;
 import org.cubeengine.dirigent.parser.token.Indexed;
 import org.cubeengine.dirigent.parser.token.Macro;
 import org.cubeengine.dirigent.parser.token.NamedMacro;
 import org.cubeengine.dirigent.formatter.ConstantFormatter;
-import org.cubeengine.dirigent.formatter.Context;
+import org.cubeengine.dirigent.context.Context;
 import org.cubeengine.dirigent.formatter.DefaultFormatter;
 import org.cubeengine.dirigent.formatter.Formatter;
 import org.cubeengine.dirigent.formatter.PostProcessor;
@@ -71,8 +74,8 @@ public abstract class AbstractDirigent<MessageT> implements Dirigent<MessageT>
     @Override
     public MessageT compose(Context context, String source, Object... args)
     {
-        List<Token> tokens = Parser.parseMessage(source);
-        Message message = resolve(tokens, context, args);
+        List<Token> tokens = Tokenizer.tokenize(source);
+        ComponentGroup message = resolve(tokens, context, args);
         return compose(message);
     }
 
@@ -81,24 +84,24 @@ public abstract class AbstractDirigent<MessageT> implements Dirigent<MessageT>
      * @param message the parsed message
      * @return the composed Message
      */
-    protected abstract MessageT compose(Message message);
+    protected abstract MessageT compose(ComponentGroup message);
 
     @Override
-    public LookupResult findFormatter(String name, Object arg)
+    public MacroResolutionResult findFormatter(String name, Object arg)
     {
         List<Formatter<?>> list = this.formatters.get(name);
         if (list == null)
         {
-            return LookupResult.UNKNOWN_NAME;
+            return MacroResolutionResult.UNKNOWN_NAME;
         }
         for (Formatter<?> formatter : list)
         {
             if (formatter.isApplicable(arg))
             {
-                return new LookupResult(LookupState.OK, formatter);
+                return new MacroResolutionResult(MacroResolutionState.OK, formatter);
             }
         }
-        return LookupResult.NONE_APPLICABLE;
+        return MacroResolutionResult.NONE_APPLICABLE;
     }
 
     @Override
@@ -124,9 +127,9 @@ public abstract class AbstractDirigent<MessageT> implements Dirigent<MessageT>
         return this;
     }
 
-    protected Component erroneousMacro(Macro macro, Object input, LookupState state)
+    protected Component erroneousMacro(Macro macro, Object input, MacroResolutionState state)
     {
-        return new MissingFormatter(macro, input, state);
+        return new UnresolvableMacro(macro, input, state);
     }
 
     /**
@@ -137,11 +140,11 @@ public abstract class AbstractDirigent<MessageT> implements Dirigent<MessageT>
      * @param inputs the message arguments
      * @return the modified Message ready to be composed
      */
-    private Message resolve(List<Token> tokens, Context context, Object[] inputs)
+    private ComponentGroup resolve(List<Token> tokens, Context context, Object[] inputs)
     {
         if (tokens.isEmpty())
         {
-            return Message.EMPTY;
+            return ComponentGroup.EMPTY;
         }
 
         List<Component> list = new ArrayList<Component>();
@@ -182,7 +185,7 @@ public abstract class AbstractDirigent<MessageT> implements Dirigent<MessageT>
                 }
 
                 Object input = argIndex < inputs.length ? inputs[argIndex] : null; // may be null because it might be a constant macro
-                LookupResult res = this.findFormatter(name, input);
+                MacroResolutionResult res = this.findFormatter(name, input);
                 Formatter<?> formatter = res.getFormatter();
                 boolean isConstant = formatter instanceof ConstantFormatter;
 
@@ -209,7 +212,7 @@ public abstract class AbstractDirigent<MessageT> implements Dirigent<MessageT>
             list.add(applyPostProcessors(out, context, arguments));
         }
 
-        return new Message(list);
+        return new ComponentGroup(list);
     }
 
     private Component applyPostProcessors(Component in, Context context, Arguments args)

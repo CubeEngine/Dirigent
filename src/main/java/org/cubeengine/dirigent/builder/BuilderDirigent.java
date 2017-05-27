@@ -23,11 +23,11 @@
 package org.cubeengine.dirigent.builder;
 
 import org.cubeengine.dirigent.AbstractDirigent;
-import org.cubeengine.dirigent.Message;
-import org.cubeengine.dirigent.parser.component.ChainedComponent;
+import org.cubeengine.dirigent.parser.component.ComponentGroup;
 
 /**
  * A Dirigent implementation using Builders
+ *
  * @param <MessageT> the resulting MessageType
  * @param <BuilderT> the Builder Type
  */
@@ -41,10 +41,10 @@ public class BuilderDirigent<MessageT, BuilderT> extends AbstractDirigent<Messag
     }
 
     @Override
-    protected MessageT compose(Message message)
+    protected MessageT compose(ComponentGroup message)
     {
         BuilderT builder = mBuilder.newBuilder();
-        mBuilder.buildChain(new ChainedComponent(message.getComponents()), builder);
+        mBuilder.buildGroup(new ComponentGroup(message.getComponents()), builder);
         return mBuilder.finalize(builder);
     }
 }

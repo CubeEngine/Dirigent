@@ -47,7 +47,7 @@ public abstract class AbstractFormatter<T> extends Formatter<T>
     private Set<String> names;
 
     /**
-     * Constructor.
+     * Constructs the formatter with the given class and the string parameters as names.
      *
      * @param clazz The class of the parameter types which can be formatted.
      * @param names The macro names triggering this formatter.
@@ -58,7 +58,7 @@ public abstract class AbstractFormatter<T> extends Formatter<T>
     }
 
     /**
-     * Constructor.
+     * Constructs the formatter with the given class and set of names.
      *
      * @param clazz The class of the parameter types which can be formatted.
      * @param names The macro names triggering this formatter.
@@ -70,7 +70,7 @@ public abstract class AbstractFormatter<T> extends Formatter<T>
     }
 
     /**
-     * Constructor.
+     * Constructs the formatter with the string parameters as names and the implementation class.
      *
      * @param names The macro names triggering this formatter.
      */
@@ -80,13 +80,13 @@ public abstract class AbstractFormatter<T> extends Formatter<T>
     }
 
     /**
-     * Constructor.
+     * Constructs the formatter with a set of names and the implementation class.
      *
      * @param names The macro names triggering this formatter.
      */
     public AbstractFormatter(Set<String> names)
     {
-        this.clazz = getClazz(getClass());
+        this.clazz = getGenericType(getClass());
         this.names = names;
     }
 
@@ -96,10 +96,10 @@ public abstract class AbstractFormatter<T> extends Formatter<T>
      * @param thisClass The class.
      * @param <T>       The parameter object type.
      *
-     * @return the class informaiton.
+     * @return the class information.
      */
     @SuppressWarnings("unchecked")
-    private static <T> Class<T> getClazz(Class<?> thisClass)
+    private static <T> Class<T> getGenericType(Class<?> thisClass)
     {
         Type genericSuperclass = thisClass.getGenericSuperclass();
         if (genericSuperclass instanceof ParameterizedType)
@@ -113,9 +113,9 @@ public abstract class AbstractFormatter<T> extends Formatter<T>
     }
 
     @Override
-    public boolean isApplicable(Object param)
+    public boolean isApplicable(Object input)
     {
-        return param != null && clazz.isAssignableFrom(param.getClass());
+        return input != null && clazz.isAssignableFrom(input.getClass());
     }
 
     @Override

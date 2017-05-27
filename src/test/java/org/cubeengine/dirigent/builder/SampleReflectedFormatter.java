@@ -23,12 +23,12 @@
 package org.cubeengine.dirigent.builder;
 
 import org.cubeengine.dirigent.Component;
-import org.cubeengine.dirigent.formatter.Context;
+import org.cubeengine.dirigent.context.Context;
 import org.cubeengine.dirigent.formatter.argument.Arguments;
 import org.cubeengine.dirigent.formatter.reflected.Format;
 import org.cubeengine.dirigent.formatter.reflected.Names;
 import org.cubeengine.dirigent.formatter.reflected.ReflectedFormatter;
-import org.cubeengine.dirigent.parser.component.Text;
+import org.cubeengine.dirigent.parser.Text;
 
 /**
  * A sample for a reflected formatter wich is used for the tests.

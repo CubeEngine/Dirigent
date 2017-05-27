@@ -24,8 +24,9 @@ package org.cubeengine.dirigent.formatter;
 
 import java.util.Locale;
 import org.cubeengine.dirigent.Component;
+import org.cubeengine.dirigent.context.Context;
 import org.cubeengine.dirigent.formatter.argument.Arguments;
-import org.cubeengine.dirigent.parser.component.Text;
+import org.cubeengine.dirigent.parser.Text;
 import org.cubeengine.dirigent.formatter.argument.Value;
 import org.junit.Assert;
 import org.junit.Test;
@@ -61,6 +62,6 @@ public class StringFormatterTest
         final Component component = stringFormatter.format(object, Context.create(locale), arguments);
 
         Assert.assertTrue(component instanceof Text);
-        Assert.assertEquals(expected, ((Text)component).getString());
+        Assert.assertEquals(expected, ((Text)component).getText());
     }
 }

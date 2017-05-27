@@ -28,7 +28,7 @@ import org.cubeengine.dirigent.formatter.argument.Arguments;
 import org.cubeengine.dirigent.formatter.argument.Argument;
 
 /**
- * A Macro with a name and an optional list of Arguments
+ * A macro with a name and an optional list of Arguments
  */
 public class NamedMacro implements Macro
 {

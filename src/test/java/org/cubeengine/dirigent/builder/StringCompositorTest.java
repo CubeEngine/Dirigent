@@ -28,7 +28,7 @@ import java.util.GregorianCalendar;
 import java.util.Locale;
 import org.cubeengine.dirigent.Component;
 import org.cubeengine.dirigent.formatter.argument.Arguments;
-import org.cubeengine.dirigent.formatter.Context;
+import org.cubeengine.dirigent.context.Context;
 import org.cubeengine.dirigent.formatter.CurrencyFormatter;
 import org.cubeengine.dirigent.formatter.DateFormatter;
 import org.cubeengine.dirigent.formatter.DateTimeFormatter;
@@ -39,7 +39,7 @@ import org.cubeengine.dirigent.formatter.PostProcessor;
 import org.cubeengine.dirigent.formatter.StaticTextFormatter;
 import org.cubeengine.dirigent.formatter.StringFormatter;
 import org.cubeengine.dirigent.formatter.TimeFormatter;
-import org.cubeengine.dirigent.parser.component.Text;
+import org.cubeengine.dirigent.parser.Text;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -129,14 +129,14 @@ public class StringCompositorTest
     public void testFormatterWithWrongParameter() throws Exception
     {
         // TODO here I would expect something else
-        assertEquals("msg: Formatter not applicable to string!", compose("msg: {number}", "string"));
+        assertEquals("msg: {{unresolved: number}}", compose("msg: {number}", "string"));
     }
 
     @Test
     public void testUnavailableFormatterName() throws Exception
     {
         // TODO here I would expect something else
-        assertEquals("msg: Formatter not found: blub", compose("msg: {blub}", "string"));
+        assertEquals("msg: {{unresolved: blub}}", compose("msg: {blub}", "string"));
     }
 
     @Test
@@ -155,7 +155,7 @@ public class StringCompositorTest
             {
                 if (component instanceof Text)
                 {
-                    return new Text(((Text)component).getString() + "!");
+                    return new Text(((Text)component).getText() + "!");
                 }
                 return component;
             }
@@ -170,7 +170,7 @@ public class StringCompositorTest
             {
                 if (component instanceof Text)
                 {
-                    return new Text("#" + ((Text)component).getString() + "#");
+                    return new Text("#" + ((Text)component).getText() + "#");
                 }
                 return component;
             }

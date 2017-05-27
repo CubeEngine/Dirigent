@@ -27,11 +27,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.cubeengine.dirigent.Component;
-import org.cubeengine.dirigent.Message;
-import org.cubeengine.dirigent.parser.component.Text;
 import org.cubeengine.dirigent.parser.token.CompleteMacro;
-import org.cubeengine.dirigent.parser.token.IllegalMacro;
 import org.cubeengine.dirigent.parser.token.IndexedDefaultMacro;
 import org.cubeengine.dirigent.parser.token.NamedMacro;
 import org.cubeengine.dirigent.formatter.argument.Argument;
@@ -43,9 +39,9 @@ import static java.util.regex.Pattern.compile;
 import static org.cubeengine.dirigent.parser.token.DefaultMacro.DEFAULT_MACRO;
 
 /**
- * Parses a raw message to a {@link Message} consisting of {@link Component}s
+ * Processes a raw message to a {@link List} consisting of {@link Token}'s
  */
-public class Parser
+public class Tokenizer
 {
     private static final Pattern TEXT_AND_MACRO = compile(
         //  |  some text          |             | index     |   | name  || label                    | |  the parameters                                        |         | broken macro            |
@@ -62,11 +58,13 @@ public class Parser
     private static final int GROUP_PARAM_NAME = 1;
     private static final int GROUP_PARAM_VALUE = 2;
 
-    private Parser()
-    {
-    }
-
-    public static List<Token> parseMessage(final String message)
+    /**
+     * Takes a raw input messages and splits it into its lexical parts.
+     *
+     * @param message the raw input message
+     * @return a list of lexical tokens
+     */
+    public static List<Token> tokenize(final String message)
     {
         if (message == null)
         {
@@ -94,7 +92,7 @@ public class Parser
             prefix = textMatcher.group(GROUP_TEXT_PREFIX);
             if (prefix.length() > 0)
             {
-                components.add(new Text(stripBackslashes(prefix, "\\{")));
+                components.add(new Text(unescape(prefix, "\\{")));
             }
 
             if (textMatcher.start(GROUP_WHOLE_MACRO) != -1)
@@ -132,8 +130,7 @@ public class Parser
             brokenMacroRest = textMatcher.group(GROUP_BROKEN_MACRO);
             if (brokenMacroRest != null)
             {
-                components.add(new IllegalMacro(stripBackslashes(brokenMacroRest, "\\{"),
-                                                "Encountered macro start, but no valid macro followed."));
+                components.add(new InvalidMacro(unescape(brokenMacroRest, "\\{")));
             }
             if (textMatcher.hitEnd())
             {
@@ -144,6 +141,14 @@ public class Parser
         return components;
     }
 
+    /**
+     * Converts the given string into an integer using Horner's method.
+     * No validation is done on the input. This method will produce numbers, even if the input is not a valid decimal
+     * number.
+     *
+     * @param s an input string consisting of decimal digits
+     * @return the integer representation of the input string if possible
+     */
     private static int toInt(String s)
     {
         int len = s.length();
@@ -160,6 +165,12 @@ public class Parser
         return out;
     }
 
+    /**
+     * Checks the given string is a valid unsigned integer.
+     *
+     * @param s the input
+     * @return true if the input is a valid unsigned integer.
+     */
     private static boolean isInt(String s)
     {
         int len = s.length();
@@ -173,7 +184,7 @@ public class Parser
         }
         else
         {
-            if (!isNonNullDigit(s.charAt(0)))
+            if (!isNonZeroDigit(s.charAt(0)))
             {
                 return false;
             }
@@ -188,16 +199,35 @@ public class Parser
         }
     }
 
-    private static boolean isNonNullDigit(char c)
+    /**
+     * Checks if the given character is a non-zero decimal digit.
+     *
+     * @param c the character
+     * @return true if it is a non-zero digit
+     */
+    private static boolean isNonZeroDigit(char c)
     {
         return c >= '1' && c <= '9';
     }
 
+    /**
+     * Checks if the given character is a deciaml digit.
+     *
+     * @param c the character
+     * @return true if it is a decimal digit
+     */
     private static boolean isDigit(char c)
     {
         return c >= '0' && c <= '9';
     }
 
+    /**
+     * Decomposes the given arguments string to the separate arguments using the given {@link Matcher}.
+     *
+     * @param params the arguments string
+     * @param matcher the {@link Matcher} with the pattern to use
+     * @return the list og arguments
+     */
     private static List<Argument> parseArguments(String params, Matcher matcher)
     {
         if (params == null || params.isEmpty())
@@ -211,7 +241,7 @@ public class Parser
         String value;
         while (matcher.find())
         {
-            name = stripBackslashes(matcher.group(GROUP_PARAM_NAME), "=:}\\");
+            name = unescape(matcher.group(GROUP_PARAM_NAME), "=:}\\");
             value = matcher.group(GROUP_PARAM_VALUE);
             if (value == null)
             {
@@ -219,14 +249,21 @@ public class Parser
             }
             else
             {
-                args.add(new Parameter(name, stripBackslashes(value, ":}")));
+                args.add(new Parameter(name, unescape(value, ":}")));
             }
         }
 
         return args;
     }
 
-    static String stripBackslashes(String input, String charset)
+    /**
+     * Strips escaping backslashes from the given input string.
+     *
+     * @param input the input string with escaping backslashes
+     * @param charset the set of characters that need escaping
+     * @return the unescaped string
+     */
+    static String unescape(String input, String charset)
     {
         if (input.indexOf('\\') == -1 || input.length() <= 1)
         {

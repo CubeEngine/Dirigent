@@ -20,45 +20,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.cubeengine.dirigent.formatter;
+package org.cubeengine.dirigent.context;
 
-import java.util.HashMap;
-import java.util.Map;
-
-public class ContextProperty<K>
+public final class PropertyMapping<T>
 {
-    public Map<ContextProperty<?>, Object> to(K value)
-    {
-        Map<ContextProperty<?>, Object> map = new HashMap<ContextProperty<?>, Object>(1);
-        map.put(this, value);
-        return map;
-    }
+    public final ContextProperty<T> property;
+    public final T value;
 
-    public Map<ContextProperty<?>, Object> to(K value, Map<ContextProperty<?>, Object> properties)
+    public PropertyMapping(ContextProperty<T> property, T value)
     {
-        properties.put(this, value);
-        return properties;
+        this.property = property;
+        this.value = value;
     }
-
-    public <V extends K> V get(Map<ContextProperty<?>, Object> properties)
-    {
-        return getOrElse(properties, null);
-    }
-
-    public <V extends K> V getOrElse(Map<ContextProperty<?>, Object> properties, V def)
-    {
-        @SuppressWarnings("unchecked")
-        V val = (V)properties.get(this);
-        if (val == null)
-        {
-            return def;
-        }
-        return val;
-    }
-
-    public <V extends K> void set(V value, Map<ContextProperty<?>, Object> properties)
-    {
-        properties.put(this, value);
-    }
-
 }

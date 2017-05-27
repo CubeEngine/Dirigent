@@ -22,19 +22,21 @@
  */
 package org.cubeengine.dirigent.builder;
 
-import org.cubeengine.dirigent.parser.component.ErrorComponent;
 import org.cubeengine.dirigent.Component;
-import org.cubeengine.dirigent.parser.component.Text;
+import org.cubeengine.dirigent.parser.component.TextComponent;
+import org.cubeengine.dirigent.parser.component.UnresolvableMacro;
+import org.cubeengine.dirigent.parser.token.Macro;
+import org.cubeengine.dirigent.parser.token.NamedMacro;
 
 /**
- * Builds a String using a StringBuilder
+ * Builds a String using a {@link StringBuilder}
  */
 public class StringMessageBuilder extends MessageBuilder<String, StringBuilder>
 {
     @Override
-    public void build(Text component, StringBuilder builder)
+    public void build(TextComponent component, StringBuilder builder)
     {
-        builder.append(component.getString());
+        builder.append(component.getText());
     }
 
     @Override
@@ -50,13 +52,17 @@ public class StringMessageBuilder extends MessageBuilder<String, StringBuilder>
     }
 
     @Override
-    public void build(ErrorComponent component, StringBuilder builder)
+    public void build(UnresolvableMacro component, StringBuilder builder)
     {
-        if (component instanceof Text)
+        Macro macro = component.getMacro();
+        if (macro instanceof NamedMacro)
         {
-            builder.append(((Text)component).getString());
+            builder.append("{{unresolved: ").append(((NamedMacro)macro).getName()).append("}}");
         }
-        builder.append(component.getError());
+        else
+        {
+            builder.append("{{unresolved}}");
+        }
     }
 
     @Override

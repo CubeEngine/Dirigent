@@ -29,7 +29,7 @@ package org.cubeengine.dirigent.formatter;
 public class TimeFormatter extends DateTimeFormatter
 {
     /**
-     * Constructor. Initializes this formatter with a few default names.
+     * Constructs this formatter with a few default names.
      */
     public TimeFormatter()
     {
@@ -37,7 +37,7 @@ public class TimeFormatter extends DateTimeFormatter
     }
 
     /**
-     * Constructor.
+     * Constructs this formatter with the given names.
      *
      * @param names The names triggering this formatter.
      */

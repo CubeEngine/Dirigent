@@ -30,8 +30,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 import org.cubeengine.dirigent.Component;
+import org.cubeengine.dirigent.context.Context;
 import org.cubeengine.dirigent.formatter.argument.Arguments;
-import org.cubeengine.dirigent.parser.component.Text;
+import org.cubeengine.dirigent.parser.Text;
 import org.cubeengine.dirigent.formatter.argument.Argument;
 import org.cubeengine.dirigent.formatter.argument.Parameter;
 import org.cubeengine.dirigent.formatter.argument.Value;
@@ -81,7 +82,7 @@ public abstract class AbstractDateTimeFormatterTest
         final Component component = formatter.format(date, context, args);
 
         Assert.assertTrue(component instanceof Text);
-        Assert.assertEquals(expected, ((Text)component).getString());
+        Assert.assertEquals(expected, ((Text)component).getText());
     }
 
     private Arguments createArguments(final String defaultStyle, final String dateStyle, final String timeStyle,

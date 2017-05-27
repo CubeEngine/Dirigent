@@ -23,7 +23,7 @@
 package org.cubeengine.dirigent.parser.token;
 
 /**
- * A Macro that can be processed by a formatter
+ * A part of the input message. Implementations will add further meaning.
  */
 public interface Token
 {

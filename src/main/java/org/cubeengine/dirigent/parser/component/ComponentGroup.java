@@ -22,24 +22,33 @@
  */
 package org.cubeengine.dirigent.parser.component;
 
+import java.util.Collections;
+import java.util.List;
 import org.cubeengine.dirigent.Component;
-import org.cubeengine.dirigent.parser.token.Token;
 
 /**
- * A simple Component for Strings
+ * Multiple components grouped together to form a single logical unit.
+ * This can be used to implement nesting.
  */
-public class Text implements Token, Component
+public class ComponentGroup implements Component
 {
-    private String string;
+    public static final ComponentGroup EMPTY = new ComponentGroup(Collections.<Component>emptyList());
 
-    public Text(String string)
+    private List<Component> components;
+
+    public ComponentGroup(List<Component> components)
     {
-        this.string = String.valueOf(string);
+        this.components = Collections.unmodifiableList(components);
     }
 
-    public String getString()
+    /**
+     * Returns the components of this group.
+     *
+     * @return the components
+     */
+    public List<Component> getComponents()
     {
-        return string;
+        return components;
     }
 
     @Override
@@ -49,25 +58,25 @@ public class Text implements Token, Component
         {
             return true;
         }
-        if (!(o instanceof Text))
+        if (!(o instanceof ComponentGroup))
         {
             return false;
         }
 
-        final Text text = (Text)o;
+        final ComponentGroup that = (ComponentGroup)o;
 
-        return getString().equals(text.getString());
+        return getComponents().equals(that.getComponents());
     }
 
     @Override
     public int hashCode()
     {
-        return getString().hashCode();
+        return getComponents().hashCode();
     }
 
     @Override
     public String toString()
     {
-        return "Text{" + "string='" + string + '\'' + '}';
+        return "ComponentGroup{" + "components=" + components + '}';
     }
 }

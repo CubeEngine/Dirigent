@@ -22,6 +22,9 @@
  */
 package org.cubeengine.dirigent.parser.token;
 
+/**
+ * A token representing a macro that can be processed by a formatter
+ */
 public interface Macro extends Token
 {
 }

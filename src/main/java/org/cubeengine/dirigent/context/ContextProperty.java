@@ -20,60 +20,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.cubeengine.dirigent.parser.component;
+package org.cubeengine.dirigent.context;
 
-import java.util.Arrays;
-import java.util.List;
-import org.cubeengine.dirigent.Component;
-
-/**
- * Multiple Components chained one after the other
- */
-public class ChainedComponent implements Component
+public class ContextProperty<K>
 {
-    private List<Component> chained;
-
-    public ChainedComponent(Component... chained)
+    public <V extends K> PropertyMapping<K> with(V value)
     {
-        this.chained = Arrays.asList(chained);
-    }
-
-    public ChainedComponent(List<Component> components)
-    {
-        this.chained = components;
-    }
-
-    public List<Component> getChained()
-    {
-        return chained;
-    }
-
-    @Override
-    public boolean equals(Object o)
-    {
-        if (this == o)
-        {
-            return true;
-        }
-        if (!(o instanceof ChainedComponent))
-        {
-            return false;
-        }
-
-        final ChainedComponent that = (ChainedComponent)o;
-
-        return getChained().equals(that.getChained());
-    }
-
-    @Override
-    public int hashCode()
-    {
-        return getChained().hashCode();
-    }
-
-    @Override
-    public String toString()
-    {
-        return "ChainedComponent{" + "chained=" + chained + '}';
+        return new PropertyMapping<K>(this, value);
     }
 }

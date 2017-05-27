@@ -26,8 +26,9 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import org.cubeengine.dirigent.Component;
+import org.cubeengine.dirigent.context.Context;
 import org.cubeengine.dirigent.formatter.argument.Arguments;
-import org.cubeengine.dirigent.parser.component.Text;
+import org.cubeengine.dirigent.parser.Text;
 
 /**
  * This is a constant formatter handling static text. It could be used to indicate text parts of a message which must
@@ -41,7 +42,7 @@ public class StaticTextFormatter extends ConstantFormatter
     private final Set<String> names;
 
     /**
-     * Constructor. Initializes this formatter with a few default names.
+     * Constructs this formatter with a few default names.
      */
     public StaticTextFormatter()
     {
@@ -49,7 +50,7 @@ public class StaticTextFormatter extends ConstantFormatter
     }
 
     /**
-     * Constructor.
+     * Constructs this formatter with the given names.
      *
      * @param names The names triggering this formatter.
      */

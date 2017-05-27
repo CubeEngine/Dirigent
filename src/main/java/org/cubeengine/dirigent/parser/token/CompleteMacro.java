@@ -26,7 +26,7 @@ import java.util.List;
 import org.cubeengine.dirigent.formatter.argument.Argument;
 
 /**
- * A complete Macro with name, position and optional Arguments
+ * A complete macro with name, position and optional arguments.
  */
 public class CompleteMacro extends NamedMacro implements Indexed
 {

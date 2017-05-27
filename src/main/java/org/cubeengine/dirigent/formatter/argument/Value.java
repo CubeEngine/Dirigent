@@ -23,7 +23,7 @@
 package org.cubeengine.dirigent.formatter.argument;
 
 /**
- * A simple Value Argument
+ * A simple value argument
  */
 public class Value implements Argument
 {
@@ -34,7 +34,12 @@ public class Value implements Argument
         this.value = value;
     }
 
-    public String getValue()
+    /**
+     * Retrieves the actual value.
+     *
+     * @return the value
+     */
+    public String get()
     {
         return value;
     }
@@ -53,13 +58,13 @@ public class Value implements Argument
 
         final Value value = (Value)o;
 
-        return getValue().equals(value.getValue());
+        return get().equals(value.get());
     }
 
     @Override
     public int hashCode()
     {
-        return getValue().hashCode();
+        return get().hashCode();
     }
 
     @Override

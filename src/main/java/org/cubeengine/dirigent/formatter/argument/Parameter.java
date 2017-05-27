@@ -23,7 +23,7 @@
 package org.cubeengine.dirigent.formatter.argument;
 
 /**
- * A Key-Value Pair Argument
+ * A name-value argument
  */
 public class Parameter implements Argument
 {
@@ -36,11 +36,21 @@ public class Parameter implements Argument
         this.value = value;
     }
 
+    /**
+     * Retrieves the name of this pair.
+     *
+     * @return the name
+     */
     public String getName()
     {
         return name;
     }
 
+    /**
+     * Retrieves the value of this pair.
+     *
+     * @return the value
+     */
     public String getValue()
     {
         return value;

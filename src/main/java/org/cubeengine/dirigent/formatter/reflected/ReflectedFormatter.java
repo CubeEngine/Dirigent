@@ -31,7 +31,7 @@ import java.util.Set;
 import org.cubeengine.dirigent.formatter.argument.Arguments;
 import org.cubeengine.dirigent.formatter.Formatter;
 import org.cubeengine.dirigent.Component;
-import org.cubeengine.dirigent.formatter.Context;
+import org.cubeengine.dirigent.context.Context;
 
 import static java.util.Arrays.asList;
 
@@ -114,15 +114,15 @@ public abstract class ReflectedFormatter extends Formatter<Object>
     }
 
     @Override
-    public boolean isApplicable(Object param)
+    public boolean isApplicable(Object input)
     {
-        if (param == null)
+        if (input == null)
         {
             return false;
         }
         for (Class<?> tClass : formats.keySet())
         {
-            if (tClass.isAssignableFrom(param.getClass()))
+            if (tClass.isAssignableFrom(input.getClass()))
             {
                 return true;
             }

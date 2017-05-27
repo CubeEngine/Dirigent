@@ -20,29 +20,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.cubeengine.dirigent.parser.token;
+package org.cubeengine.dirigent.parser;
 
-import org.cubeengine.dirigent.parser.component.ErrorComponent;
-import org.cubeengine.dirigent.parser.component.Text;
+import org.cubeengine.dirigent.parser.component.TextComponent;
+import org.cubeengine.dirigent.parser.token.Token;
 
 /**
- * Show the original text of an invalid macro.
- * Gets added to the Message when an invalid macro is encountered.
+ * <p>
+ *     Show the original text of an invalid macro.
+ *     Gets added to the Message when an invalid macro is encountered.
+ * </p>
+ * <p>
+ *     An invalid macro is a text sequence that begins with an unescaped opening curly brace suggesting a macro,
+ *     but never sees a valid closing curly brace.
+ * </p>
  */
-public class IllegalMacro extends Text implements ErrorComponent
+public class InvalidMacro implements Token, TextComponent
 {
-    private String error;
+    private final String text;
 
-    public IllegalMacro(String string, String error)
+    public InvalidMacro(String text)
     {
-        super(string);
-        this.error = error;
+        this.text = text;
     }
 
     @Override
-    public String getError()
+    public String getText()
     {
-        return error;
+        return text;
     }
 
     @Override
@@ -52,31 +57,25 @@ public class IllegalMacro extends Text implements ErrorComponent
         {
             return true;
         }
-        if (!(o instanceof IllegalMacro))
-        {
-            return false;
-        }
-        if (!super.equals(o))
+        if (!(o instanceof InvalidMacro))
         {
             return false;
         }
 
-        final IllegalMacro that = (IllegalMacro)o;
+        final InvalidMacro that = (InvalidMacro)o;
 
-        return getError().equals(that.getError());
+        return text.equals(that.text);
     }
 
     @Override
     public int hashCode()
     {
-        int result = super.hashCode();
-        result = 31 * result + getError().hashCode();
-        return result;
+        return text.hashCode();
     }
 
     @Override
     public String toString()
     {
-        return "IllegalMacro{" + "error='" + error + '\'' + ", string='" + getString() + '\'' + '}';
+        return "InvalidMacro{" + "text='" + text + '\'' + '}';
     }
 }

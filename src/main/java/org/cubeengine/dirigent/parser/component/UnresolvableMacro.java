@@ -22,29 +22,29 @@
  */
 package org.cubeengine.dirigent.parser.component;
 
-import org.cubeengine.dirigent.Dirigent.LookupState;
+import org.cubeengine.dirigent.Component;
+import org.cubeengine.dirigent.parser.MacroResolutionState;
 import org.cubeengine.dirigent.parser.token.Macro;
-import org.cubeengine.dirigent.parser.token.NamedMacro;
 
 /**
  * A Component signaling a no Formatter could be found for a token
  */
-public class MissingFormatter implements ErrorComponent
+public class UnresolvableMacro implements Component
 {
-    private Macro missing;
+    private Macro macro;
     private Object arg;
-    private final LookupState state;
+    private final MacroResolutionState state;
 
-    public MissingFormatter(Macro missing, Object arg, LookupState state)
+    public UnresolvableMacro(Macro macro, Object arg, MacroResolutionState state)
     {
-        this.missing = missing;
+        this.macro = macro;
         this.arg = arg;
         this.state = state;
     }
 
-    public Macro getMissing()
+    public Macro getMacro()
     {
-        return missing;
+        return macro;
     }
 
     public Object getInput()
@@ -52,25 +52,9 @@ public class MissingFormatter implements ErrorComponent
         return arg;
     }
 
-    @Override
-    public String getError()
+    public MacroResolutionState getState()
     {
-        switch (state)
-        {
-            case NONE_APPLICABLE:
-                return "Formatter not applicable to " + arg + "!";
-            case UNKNOWN_NAME:
-                if (missing instanceof NamedMacro)
-                {
-                    return "Formatter not found: " + ((NamedMacro)missing).getName();
-                }
-                else
-                {
-                    return "Formatter not found";
-                }
-            default:
-                return "Formatter lookup failed!";
-        }
+        return state;
     }
 
     @Override
@@ -80,14 +64,14 @@ public class MissingFormatter implements ErrorComponent
         {
             return true;
         }
-        if (!(o instanceof MissingFormatter))
+        if (!(o instanceof UnresolvableMacro))
         {
             return false;
         }
 
-        final MissingFormatter that = (MissingFormatter)o;
+        final UnresolvableMacro that = (UnresolvableMacro)o;
 
-        if (!getMissing().equals(that.getMissing()))
+        if (!getMacro().equals(that.getMacro()))
         {
             return false;
         }
@@ -97,7 +81,7 @@ public class MissingFormatter implements ErrorComponent
     @Override
     public int hashCode()
     {
-        int result = getMissing().hashCode();
+        int result = getMacro().hashCode();
         result = 31 * result + getInput().hashCode();
         return result;
     }
@@ -105,6 +89,6 @@ public class MissingFormatter implements ErrorComponent
     @Override
     public String toString()
     {
-        return "MissingFormatter{" + "missing=" + missing + ", arg=" + arg + '}';
+        return "UnresolvableMacro{" + "macro=" + macro + ", arg=" + arg + '}';
     }
 }

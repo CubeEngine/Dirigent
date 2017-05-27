@@ -43,7 +43,7 @@ public class Arguments
         {
             if (arg instanceof Value)
             {
-                values.add(((Value)arg).getValue());
+                values.add(((Value)arg).get());
             }
             else if (arg instanceof Parameter)
             {
@@ -61,6 +61,7 @@ public class Arguments
 
     /**
      * Returns the list of arguments
+     *
      * @return the list of arguments
      */
     public List<String> getValues()
@@ -70,7 +71,9 @@ public class Arguments
 
     /**
      * Returns the Arguments value for given name or null if not found
+     *
      * @param name the name
+     *
      * @return the value of the Argument by name
      */
     public String get(String name)
@@ -82,6 +85,7 @@ public class Arguments
      * Gets the Value of an Argument at a position.
      *
      * @param i the position
+     *
      * @return the Argument value
      */
     public String get(int i)
@@ -95,7 +99,9 @@ public class Arguments
 
     /**
      * Returns whether the list of arguments contains given flag
+     *
      * @param value the flag to check for
+     *
      * @return whether the list of arguments contains given flag
      */
     public boolean has(String value)
