@@ -23,11 +23,12 @@
 package org.cubeengine.dirigent.formatter;
 
 import org.cubeengine.dirigent.Component;
+import org.cubeengine.dirigent.formatter.argument.Arguments;
 
 /**
  * Processes a Component afterwards
  */
 public interface PostProcessor
 {
-    Component process(Component component, Context context);
+    Component process(Component component, Context context, Arguments arguments);
 }

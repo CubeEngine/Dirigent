@@ -20,29 +20,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.cubeengine.dirigent.parser.component.macro;
-
-import org.cubeengine.dirigent.parser.component.ErrorComponent;
-import org.cubeengine.dirigent.parser.component.Text;
+package org.cubeengine.dirigent.formatter.argument;
 
 /**
- * Show the original text of an invalid macro.
- * Gets added to the Message when an invalid macro is encountered.
+ * A Key-Value Pair Argument
  */
-public class IllegalMacro extends Text implements ErrorComponent
+public class Parameter implements Argument
 {
-    private String error;
+    private final String name;
+    private final String value;
 
-    public IllegalMacro(String string, String error)
+    public Parameter(String name, String value)
     {
-        super(string);
-        this.error = error;
+        this.name = name;
+        this.value = value;
     }
 
-    @Override
-    public String getError()
+    public String getName()
     {
-        return error;
+        return name;
+    }
+
+    public String getValue()
+    {
+        return value;
     }
 
     @Override
@@ -52,31 +53,31 @@ public class IllegalMacro extends Text implements ErrorComponent
         {
             return true;
         }
-        if (!(o instanceof IllegalMacro))
-        {
-            return false;
-        }
-        if (!super.equals(o))
+        if (!(o instanceof Parameter))
         {
             return false;
         }
 
-        final IllegalMacro that = (IllegalMacro)o;
+        final Parameter parameter = (Parameter)o;
 
-        return getError().equals(that.getError());
+        if (!getName().equals(parameter.getName()))
+        {
+            return false;
+        }
+        return getValue().equals(parameter.getValue());
     }
 
     @Override
     public int hashCode()
     {
-        int result = super.hashCode();
-        result = 31 * result + getError().hashCode();
+        int result = getName().hashCode();
+        result = 31 * result + getValue().hashCode();
         return result;
     }
 
     @Override
     public String toString()
     {
-        return "IllegalMacro{" + "error='" + error + '\'' + ", string='" + getString() + '\'' + '}';
+        return "Parameter{" + "name='" + name + '\'' + ", value='" + value + '\'' + '}';
     }
 }

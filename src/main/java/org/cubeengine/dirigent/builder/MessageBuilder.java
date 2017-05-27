@@ -24,7 +24,7 @@ package org.cubeengine.dirigent.builder;
 
 import org.cubeengine.dirigent.parser.component.ChainedComponent;
 import org.cubeengine.dirigent.parser.component.ErrorComponent;
-import org.cubeengine.dirigent.parser.component.FoundFormatter;
+import org.cubeengine.dirigent.parser.component.ResolvedMacro;
 import org.cubeengine.dirigent.Component;
 import org.cubeengine.dirigent.parser.component.Text;
 
@@ -55,9 +55,9 @@ public abstract class MessageBuilder<MessageT, BuilderT>
      */
     public final void buildAny(Component component, BuilderT builder)
     {
-        if (component instanceof FoundFormatter)
+        if (component instanceof ResolvedMacro)
         {
-            buildFormatted((FoundFormatter)component, builder);
+            buildFormatted((ResolvedMacro)component, builder);
         }
         else if (component instanceof ChainedComponent)
         {
@@ -85,13 +85,13 @@ public abstract class MessageBuilder<MessageT, BuilderT>
     public abstract void build(Text component, BuilderT builder);
 
     /**
-     * Appends a {@link FoundFormatter} Component to the builder
-     * @param component the found formatter
+     * Appends a {@link ResolvedMacro} Component to the builder
+     * @param c the found formatter
      * @param builder the builder
      */
-    public final void buildFormatted(FoundFormatter component, BuilderT builder)
+    public final void buildFormatted(ResolvedMacro c, BuilderT builder)
     {
-        @SuppressWarnings("unchecked") Component processed = component.getFound().process(component.getArg(), component.getContext());
+        @SuppressWarnings("unchecked") Component processed = c.getFound().process(c.getInput(), c.getContext(), c.getArguments());
         buildAny(processed, builder);
     }
 

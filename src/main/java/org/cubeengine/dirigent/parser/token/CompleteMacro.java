@@ -20,30 +20,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.cubeengine.dirigent.parser.component.macro.argument;
+package org.cubeengine.dirigent.parser.token;
+
+import java.util.List;
+import org.cubeengine.dirigent.formatter.argument.Argument;
 
 /**
- * A Key-Value Pair Argument
+ * A complete Macro with name, position and optional Arguments
  */
-public class Parameter implements Argument
+public class CompleteMacro extends NamedMacro implements Indexed
 {
-    private final String name;
-    private final String value;
+    private int index;
 
-    public Parameter(String name, String value)
+    public CompleteMacro(int index, String name, List<Argument> args)
     {
-        this.name = name;
-        this.value = value;
+        super(name, args);
+        this.index = index;
     }
 
-    public String getName()
+    @Override
+    public int getIndex()
     {
-        return name;
-    }
-
-    public String getValue()
-    {
-        return value;
+        return index;
     }
 
     @Override
@@ -53,31 +51,31 @@ public class Parameter implements Argument
         {
             return true;
         }
-        if (!(o instanceof Parameter))
+        if (!(o instanceof CompleteMacro))
+        {
+            return false;
+        }
+        if (!super.equals(o))
         {
             return false;
         }
 
-        final Parameter parameter = (Parameter)o;
+        final CompleteMacro that = (CompleteMacro)o;
 
-        if (!getName().equals(parameter.getName()))
-        {
-            return false;
-        }
-        return getValue().equals(parameter.getValue());
+        return getIndex() == that.getIndex();
     }
 
     @Override
     public int hashCode()
     {
-        int result = getName().hashCode();
-        result = 31 * result + getValue().hashCode();
+        int result = super.hashCode();
+        result = 31 * result + getIndex();
         return result;
     }
 
     @Override
     public String toString()
     {
-        return "Parameter{" + "name='" + name + '\'' + ", value='" + value + '\'' + '}';
+        return "CompleteMacro{" + "index=" + index + ", name='" + getName() + '\'' + ", args=" + getArgs() + "}";
     }
 }

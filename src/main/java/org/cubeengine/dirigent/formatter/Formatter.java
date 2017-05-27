@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import org.cubeengine.dirigent.Component;
+import org.cubeengine.dirigent.formatter.argument.Arguments;
 
 /**
  * A Formatter for T.
@@ -48,9 +49,10 @@ public abstract class Formatter<T>
      * Formats the argument into a Component for given Context
      * @param arg the argument
      * @param context the Context
+     * @param args
      * @return the resulting Component
      */
-    protected abstract Component format(T arg, Context context);
+    protected abstract Component format(T arg, Context context, Arguments args);
 
     /**
      * Formats the argument into a Component for given Context. Then runs all PostProcessors.
@@ -58,12 +60,12 @@ public abstract class Formatter<T>
      * @param context the Context
      * @return the resulting processed Component
      */
-    public final Component process(T arg, Context context)
+    public final Component process(T arg, Context context, Arguments args)
     {
-        Component result = format(arg, context);
+        Component result = format(arg, context, args);
         for (PostProcessor processor : postProcessors)
         {
-            result = processor.process(result, context);
+            result = processor.process(result, context, args);
         }
         return result;
     }

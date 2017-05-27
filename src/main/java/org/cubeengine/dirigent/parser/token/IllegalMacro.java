@@ -20,37 +20,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.cubeengine.dirigent.parser.component.macro;
+package org.cubeengine.dirigent.parser.token;
 
-import java.util.Collections;
-import java.util.List;
-
-import org.cubeengine.dirigent.parser.component.macro.argument.Argument;
-
-import static java.util.Collections.unmodifiableList;
+import org.cubeengine.dirigent.parser.component.ErrorComponent;
+import org.cubeengine.dirigent.parser.component.Text;
 
 /**
- * A Macro with a name and an optional list of Arguments
+ * Show the original text of an invalid macro.
+ * Gets added to the Message when an invalid macro is encountered.
  */
-public class NamedMacro implements Macro
+public class IllegalMacro extends Text implements ErrorComponent
 {
-    private final String name;
-    private final List<Argument> args;
+    private String error;
 
-    public NamedMacro(String name, List<Argument> args)
+    public IllegalMacro(String string, String error)
     {
-        this.name = name;
-        this.args = args == null ? Collections.<Argument>emptyList() : unmodifiableList(args);
+        super(string);
+        this.error = error;
     }
 
-    public String getName()
+    @Override
+    public String getError()
     {
-        return name;
-    }
-
-    public List<Argument> getArgs()
-    {
-        return args;
+        return error;
     }
 
     @Override
@@ -60,31 +52,31 @@ public class NamedMacro implements Macro
         {
             return true;
         }
-        if (!(o instanceof NamedMacro))
+        if (!(o instanceof IllegalMacro))
+        {
+            return false;
+        }
+        if (!super.equals(o))
         {
             return false;
         }
 
-        final NamedMacro that = (NamedMacro)o;
+        final IllegalMacro that = (IllegalMacro)o;
 
-        if (!getName().equals(that.getName()))
-        {
-            return false;
-        }
-        return getArgs().equals(that.getArgs());
+        return getError().equals(that.getError());
     }
 
     @Override
     public int hashCode()
     {
-        int result = getName().hashCode();
-        result = 31 * result + getArgs().hashCode();
+        int result = super.hashCode();
+        result = 31 * result + getError().hashCode();
         return result;
     }
 
     @Override
     public String toString()
     {
-        return "NamedMacro{" + "name='" + name + '\'' + ", args=" + args + '}';
+        return "IllegalMacro{" + "error='" + error + '\'' + ", string='" + getString() + '\'' + '}';
     }
 }

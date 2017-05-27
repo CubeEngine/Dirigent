@@ -20,28 +20,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.cubeengine.dirigent.parser.component.macro;
-
-import java.util.List;
-import org.cubeengine.dirigent.parser.component.macro.argument.Argument;
+package org.cubeengine.dirigent.formatter.argument;
 
 /**
- * A complete Macro with name, position and optional Arguments
+ * A simple Value Argument
  */
-public class CompleteMacro extends NamedMacro implements Indexed
+public class Value implements Argument
 {
-    private int index;
+    private final String value;
 
-    public CompleteMacro(int index, String name, List<Argument> args)
+    public Value(String value)
     {
-        super(name, args);
-        this.index = index;
+        this.value = value;
     }
 
-    @Override
-    public int getIndex()
+    public String getValue()
     {
-        return index;
+        return value;
     }
 
     @Override
@@ -51,31 +46,25 @@ public class CompleteMacro extends NamedMacro implements Indexed
         {
             return true;
         }
-        if (!(o instanceof CompleteMacro))
-        {
-            return false;
-        }
-        if (!super.equals(o))
+        if (!(o instanceof Value))
         {
             return false;
         }
 
-        final CompleteMacro that = (CompleteMacro)o;
+        final Value value = (Value)o;
 
-        return getIndex() == that.getIndex();
+        return getValue().equals(value.getValue());
     }
 
     @Override
     public int hashCode()
     {
-        int result = super.hashCode();
-        result = 31 * result + getIndex();
-        return result;
+        return getValue().hashCode();
     }
 
     @Override
     public String toString()
     {
-        return "CompleteMacro{" + "index=" + index + ", name='" + getName() + '\'' + ", args=" + getArgs() + "}";
+        return "Value{" + "value='" + value + '\'' + '}';
     }
 }

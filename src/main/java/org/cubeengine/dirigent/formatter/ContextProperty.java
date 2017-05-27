@@ -20,12 +20,45 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.cubeengine.dirigent.parser.component.macro;
+package org.cubeengine.dirigent.formatter;
 
-/**
- * A Macro that has a position
- */
-public interface Indexed extends Macro
+import java.util.HashMap;
+import java.util.Map;
+
+public class ContextProperty<K>
 {
-    int getIndex();
+    public Map<ContextProperty<?>, Object> to(K value)
+    {
+        Map<ContextProperty<?>, Object> map = new HashMap<ContextProperty<?>, Object>(1);
+        map.put(this, value);
+        return map;
+    }
+
+    public Map<ContextProperty<?>, Object> to(K value, Map<ContextProperty<?>, Object> properties)
+    {
+        properties.put(this, value);
+        return properties;
+    }
+
+    public <V extends K> V get(Map<ContextProperty<?>, Object> properties)
+    {
+        return getOrElse(properties, null);
+    }
+
+    public <V extends K> V getOrElse(Map<ContextProperty<?>, Object> properties, V def)
+    {
+        @SuppressWarnings("unchecked")
+        V val = (V)properties.get(this);
+        if (val == null)
+        {
+            return def;
+        }
+        return val;
+    }
+
+    public <V extends K> void set(V value, Map<ContextProperty<?>, Object> properties)
+    {
+        properties.put(this, value);
+    }
+
 }

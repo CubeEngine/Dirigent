@@ -30,16 +30,17 @@ import java.util.regex.Pattern;
 import org.cubeengine.dirigent.Component;
 import org.cubeengine.dirigent.Message;
 import org.cubeengine.dirigent.parser.component.Text;
-import org.cubeengine.dirigent.parser.component.macro.CompleteMacro;
-import org.cubeengine.dirigent.parser.component.macro.IllegalMacro;
-import org.cubeengine.dirigent.parser.component.macro.IndexedDefaultMacro;
-import org.cubeengine.dirigent.parser.component.macro.NamedMacro;
-import org.cubeengine.dirigent.parser.component.macro.argument.Argument;
-import org.cubeengine.dirigent.parser.component.macro.argument.Value;
-import org.cubeengine.dirigent.parser.component.macro.argument.Parameter;
+import org.cubeengine.dirigent.parser.token.CompleteMacro;
+import org.cubeengine.dirigent.parser.token.IllegalMacro;
+import org.cubeengine.dirigent.parser.token.IndexedDefaultMacro;
+import org.cubeengine.dirigent.parser.token.NamedMacro;
+import org.cubeengine.dirigent.formatter.argument.Argument;
+import org.cubeengine.dirigent.formatter.argument.Value;
+import org.cubeengine.dirigent.formatter.argument.Parameter;
+import org.cubeengine.dirigent.parser.token.Token;
 
 import static java.util.regex.Pattern.compile;
-import static org.cubeengine.dirigent.parser.component.macro.DefaultMacro.DEFAULT_MACRO;
+import static org.cubeengine.dirigent.parser.token.DefaultMacro.DEFAULT_MACRO;
 
 /**
  * Parses a raw message to a {@link Message} consisting of {@link Component}s
@@ -65,7 +66,7 @@ public class Parser
     {
     }
 
-    public static Message parseMessage(final String message)
+    public static List<Token> parseMessage(final String message)
     {
         if (message == null)
         {
@@ -73,17 +74,17 @@ public class Parser
         }
         if (message.isEmpty())
         {
-            return Message.EMPTY;
+            return Collections.emptyList();
         }
         if (message.indexOf('{') == -1)
         {
-            return new Message(new Text(message));
+            return Collections.<Token>singletonList(new Text(message));
         }
 
         Matcher textMatcher = TEXT_AND_MACRO.matcher(message);
         Matcher argMatcher = ARGUMENT.matcher("");
 
-        List<Component> components = new ArrayList<Component>();
+        List<Token> components = new ArrayList<Token>();
         String prefix;
         String index;
         String name;
@@ -140,7 +141,7 @@ public class Parser
             }
         }
 
-        return new Message(components);
+        return components;
     }
 
     private static int toInt(String s)

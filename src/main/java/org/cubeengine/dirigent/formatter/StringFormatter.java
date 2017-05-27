@@ -22,8 +22,12 @@
  */
 package org.cubeengine.dirigent.formatter;
 
+import java.util.Locale;
 import org.cubeengine.dirigent.Component;
+import org.cubeengine.dirigent.formatter.argument.Arguments;
 import org.cubeengine.dirigent.parser.component.Text;
+
+import static org.cubeengine.dirigent.formatter.Context.LOCALE;
 
 /**
  * The string formatter formats an {@link Object} with {@link String#valueOf(Object)}. It is possible to control this
@@ -59,29 +63,29 @@ public class StringFormatter extends AbstractFormatter<Object>
     }
 
     @Override
-    protected Component format(Object arg, Context context)
+    protected Component format(Object arg, Context context, Arguments args)
     {
-        return new Text(parseObjectToString(arg, context));
+        return new Text(parseObjectToString(arg, context.get(LOCALE), args));
     }
 
     /**
      * Parses the given object to a string depending on the context.
      *
      * @param object  The object to parse.
-     * @param context The context to use.
+     * @param locale The locale to use.
      *
      * @return The object as a string.
      */
-    protected String parseObjectToString(Object object, Context context)
+    protected String parseObjectToString(Object object, Locale locale, Arguments args)
     {
         final String string = String.valueOf(object);
-        if (context.has(LOWERCASE_FLAG))
+        if (args.has(LOWERCASE_FLAG))
         {
-            return string.toLowerCase(context.getLocale());
+            return string.toLowerCase(locale);
         }
-        if (context.has(UPPERCASE_FLAG))
+        if (args.has(UPPERCASE_FLAG))
         {
-            return string.toUpperCase(context.getLocale());
+            return string.toUpperCase(locale);
         }
         return string;
     }

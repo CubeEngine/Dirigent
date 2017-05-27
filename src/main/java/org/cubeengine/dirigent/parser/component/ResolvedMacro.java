@@ -22,27 +22,26 @@
  */
 package org.cubeengine.dirigent.parser.component;
 
-import java.util.List;
 import org.cubeengine.dirigent.Component;
-import org.cubeengine.dirigent.parser.component.macro.argument.Argument;
+import org.cubeengine.dirigent.formatter.argument.Arguments;
 import org.cubeengine.dirigent.formatter.Context;
 import org.cubeengine.dirigent.formatter.Formatter;
 
 /**
- * A Component containing the formatter found for a macro
+ * A Component containing the formatter found for a token
  */
-public class FoundFormatter implements Component
+public class ResolvedMacro implements Component
 {
     private final Formatter found;
-    private final Object arg;
-    private final List<Argument> arguments;
-    private Context context;
+    private final Object input;
+    private final Arguments arguments;
+    private final Context context;
 
-    public FoundFormatter(Formatter found, Object arg, List<Argument> arguments, Context context)
+    public ResolvedMacro(Formatter found, Object input, Context context, Arguments arguments)
     {
 
         this.found = found;
-        this.arg = arg;
+        this.input = input;
         this.arguments = arguments;
         this.context = context;
     }
@@ -52,14 +51,19 @@ public class FoundFormatter implements Component
         return found;
     }
 
-    public Object getArg()
+    public Object getInput()
     {
-        return arg;
+        return input;
     }
 
     public Context getContext()
     {
-        return context.with(arguments);
+        return context;
+    }
+
+    public Arguments getArguments()
+    {
+        return arguments;
     }
 
     @Override
@@ -69,22 +73,22 @@ public class FoundFormatter implements Component
         {
             return true;
         }
-        if (!(o instanceof FoundFormatter))
+        if (!(o instanceof ResolvedMacro))
         {
             return false;
         }
 
-        final FoundFormatter that = (FoundFormatter)o;
+        final ResolvedMacro that = (ResolvedMacro)o;
 
         if (!getFound().equals(that.getFound()))
         {
             return false;
         }
-        if (!getArg().equals(that.getArg()))
+        if (!getInput().equals(that.getInput()))
         {
             return false;
         }
-        if (!arguments.equals(that.arguments))
+        if (!getArguments().equals(that.getArguments()))
         {
             return false;
         }
@@ -95,8 +99,8 @@ public class FoundFormatter implements Component
     public int hashCode()
     {
         int result = getFound().hashCode();
-        result = 31 * result + getArg().hashCode();
-        result = 31 * result + arguments.hashCode();
+        result = 31 * result + getInput().hashCode();
+        result = 31 * result + getArguments().hashCode();
         result = 31 * result + getContext().hashCode();
         return result;
     }
@@ -104,7 +108,7 @@ public class FoundFormatter implements Component
     @Override
     public String toString()
     {
-        return "FoundFormatter{" + "found=" + found + ", arg=" + arg + ", arguments=" + arguments + ", context="
+        return "ResolvedMacro{" + "found=" + found + ", input=" + input + ", arguments=" + arguments + ", context="
             + context + '}';
     }
 }

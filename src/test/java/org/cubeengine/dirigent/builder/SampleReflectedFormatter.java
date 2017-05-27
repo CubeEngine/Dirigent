@@ -24,6 +24,7 @@ package org.cubeengine.dirigent.builder;
 
 import org.cubeengine.dirigent.Component;
 import org.cubeengine.dirigent.formatter.Context;
+import org.cubeengine.dirigent.formatter.argument.Arguments;
 import org.cubeengine.dirigent.formatter.reflected.Format;
 import org.cubeengine.dirigent.formatter.reflected.Names;
 import org.cubeengine.dirigent.formatter.reflected.ReflectedFormatter;
@@ -36,13 +37,13 @@ import org.cubeengine.dirigent.parser.component.Text;
 public class SampleReflectedFormatter extends ReflectedFormatter
 {
     @Format
-    public Component format(String string, Context context)
+    public Component format(String string, Context context, Arguments args)
     {
         return new Text("[" + string + "]");
     }
 
     @Format
-    public Component format(Integer integer, Context context)
+    public Component format(Integer integer, Context context, Arguments args)
     {
         return new Text("<" + String.valueOf(integer) + ">");
     }

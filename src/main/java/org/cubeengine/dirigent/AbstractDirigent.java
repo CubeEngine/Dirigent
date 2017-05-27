@@ -23,26 +23,23 @@
 package org.cubeengine.dirigent;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
+import org.cubeengine.dirigent.formatter.argument.Arguments;
 import org.cubeengine.dirigent.parser.Parser;
-import org.cubeengine.dirigent.parser.component.FoundFormatter;
+import org.cubeengine.dirigent.parser.component.ResolvedMacro;
 import org.cubeengine.dirigent.parser.component.MissingFormatter;
 import org.cubeengine.dirigent.parser.component.Text;
-import org.cubeengine.dirigent.parser.component.macro.argument.Argument;
-import org.cubeengine.dirigent.parser.component.macro.Indexed;
-import org.cubeengine.dirigent.parser.component.macro.Macro;
-import org.cubeengine.dirigent.parser.component.macro.NamedMacro;
+import org.cubeengine.dirigent.parser.token.Indexed;
+import org.cubeengine.dirigent.parser.token.Macro;
+import org.cubeengine.dirigent.parser.token.NamedMacro;
 import org.cubeengine.dirigent.formatter.ConstantFormatter;
 import org.cubeengine.dirigent.formatter.Context;
 import org.cubeengine.dirigent.formatter.DefaultFormatter;
 import org.cubeengine.dirigent.formatter.Formatter;
 import org.cubeengine.dirigent.formatter.PostProcessor;
-
-import static java.util.Collections.emptyList;
+import org.cubeengine.dirigent.parser.token.Token;
 
 /**
  * Basic implementation of Dirigent providing:
@@ -51,24 +48,31 @@ import static java.util.Collections.emptyList;
  */
 public abstract class AbstractDirigent<MessageT> implements Dirigent<MessageT>
 {
-    private Map<String, List<Formatter>> formatters = new HashMap<String, List<Formatter>>();
+
+    private Map<String, List<Formatter<?>>> formatters = new HashMap<String, List<Formatter<?>>>();
     private List<PostProcessor> postProcessors = new ArrayList<PostProcessor>();
 
     public AbstractDirigent()
     {
-        registerFormatter(new DefaultFormatter());
+        this(new DefaultFormatter());
+    }
+
+    public AbstractDirigent(Formatter<?> defaultFormatter)
+    {
+        registerFormatter(defaultFormatter);
     }
 
     @Override
     public MessageT compose(String source, Object... args)
     {
-        return this.compose(Locale.getDefault(), source, args);
+        return this.compose(Context.create(), source, args);
     }
 
     @Override
-    public MessageT compose(Locale locale, String source, Object... args)
+    public MessageT compose(Context context, String source, Object... args)
     {
-        Message message = check(locale, Parser.parseMessage(source), args);
+        List<Token> tokens = Parser.parseMessage(source);
+        Message message = resolve(tokens, context, args);
         return compose(message);
     }
 
@@ -80,21 +84,21 @@ public abstract class AbstractDirigent<MessageT> implements Dirigent<MessageT>
     protected abstract MessageT compose(Message message);
 
     @Override
-    public Formatter findFormatter(String name, Object arg)
+    public LookupResult findFormatter(String name, Object arg)
     {
-        List<Formatter> list = this.formatters.get(name);
+        List<Formatter<?>> list = this.formatters.get(name);
         if (list == null)
         {
-            return null;
+            return LookupResult.UNKNOWN_NAME;
         }
-        for (Formatter formatter : list)
+        for (Formatter<?> formatter : list)
         {
             if (formatter.isApplicable(arg))
             {
-                return formatter;
+                return new LookupResult(LookupState.OK, formatter);
             }
         }
-        return null;
+        return LookupResult.NONE_APPLICABLE;
     }
 
     @Override
@@ -109,10 +113,10 @@ public abstract class AbstractDirigent<MessageT> implements Dirigent<MessageT>
     {
         for (String name : formatter.names())
         {
-            List<Formatter> list = this.formatters.get(name);
+            List<Formatter<?>> list = this.formatters.get(name);
             if (list == null)
             {
-                list = new ArrayList<Formatter>();
+                list = new ArrayList<Formatter<?>>();
                 formatters.put(name, list);
             }
             list.add(formatter);
@@ -120,91 +124,103 @@ public abstract class AbstractDirigent<MessageT> implements Dirigent<MessageT>
         return this;
     }
 
+    protected Component erroneousMacro(Macro macro, Object input, LookupState state)
+    {
+        return new MissingFormatter(macro, input, state);
+    }
+
     /**
      * Finds Formatter for the messages components and runs global PostProcessors.
      *
-     * @param locale the locale
-     * @param message the parsed message
-     * @param args the message arguments
+     * @param tokens the parsed components
+     * @param context the locale
+     * @param inputs the message arguments
      * @return the modified Message ready to be composed
      */
-    private Message check(Locale locale, Message message, Object[] args)
+    private Message resolve(List<Token> tokens, Context context, Object[] inputs)
     {
-        List<Component> list = new ArrayList<Component>();
-        Context context = new Context(locale);
-        int argumentsIndex = 0;
-        for (Component component : message.getComponents())
+        if (tokens.isEmpty())
         {
-            if (component instanceof Text)
+            return Message.EMPTY;
+        }
+
+        List<Component> list = new ArrayList<Component>();
+        int implicitArgCounter = 0;
+
+        for (Token token : tokens)
+        {
+            Component out;
+            Arguments arguments = Arguments.NONE;
+            if (token instanceof Text)
             {
-                list.add(component);
+                out = (Component)token;
             }
-            else if (component instanceof Macro)
+            else if (token instanceof Macro)
             {
-                int forIndex = argumentsIndex;
-                if (component instanceof Indexed)
+                Macro macro = (Macro)token;
+
+                int argIndex;
+                boolean explicitIndex;
+                if (macro instanceof Indexed)
                 {
-                    forIndex = ((Indexed)component).getIndex();
+                    argIndex = ((Indexed)token).getIndex();
+                    explicitIndex = true;
                 }
-                String name = null; // DefaultMacro
-                List<Argument> arguments = emptyList();
-                if (component instanceof NamedMacro)
+                else
                 {
-                    name = ((NamedMacro)component).getName();
-                    arguments = ((NamedMacro)component).getArgs();
-                }
-                Object arg = null; // may be null because it might be a constant macro
-                if (forIndex < args.length)
-                {
-                    arg = args[forIndex];
-                }
-                Formatter found = this.findFormatter(name, arg);
-                if (found == null)
-                {
-                    list.add(new MissingFormatter(((Macro)component), arg));
-                }
-                if (found instanceof ConstantFormatter)
-                {
-                    arg = null;
+                    argIndex = implicitArgCounter;
+                    explicitIndex = false;
                 }
 
-                if (found != null)
+                // Default macros will not have a name
+                String name = null;
+                if (macro instanceof NamedMacro)
                 {
-                    list.add(new FoundFormatter(found, arg, arguments, context));
+                    NamedMacro named = (NamedMacro)macro;
+                    name = named.getName();
+                    arguments = named.getArgs();
                 }
 
-                if (forIndex == argumentsIndex)
+                Object input = argIndex < inputs.length ? inputs[argIndex] : null; // may be null because it might be a constant macro
+                LookupResult res = this.findFormatter(name, input);
+                Formatter<?> formatter = res.getFormatter();
+                boolean isConstant = formatter instanceof ConstantFormatter;
+
+                if (res.isOK())
                 {
-                    if (!(found instanceof ConstantFormatter))
-                    {
-                        argumentsIndex++;
-                    }
+                    out = new ResolvedMacro(formatter, isConstant ? null : input, context, arguments);
+                }
+                else
+                {
+                    out = erroneousMacro(macro, input, res.getState());
+                }
+
+                if (!explicitIndex && !isConstant)
+                {
+                    implicitArgCounter++;
                 }
 
             }
             else
             {
-                throw new IllegalStateException("The message contains Components that are not Text or Macro: " + component.getClass().getName());
+                throw new IllegalStateException("The message contains Components that are not Text or Macro: " + token.getClass().getName());
             }
-        }
 
-        if (!postProcessors.isEmpty())
-        {
-            for (int i = 0; i < list.size(); i++)
-            {
-                Component component = list.get(i);
-                for (PostProcessor processor : postProcessors)
-                {
-                    component = processor.process(component, context.with(Collections.<Argument>emptyList()));
-                }
-                list.set(i, component);
-            }
-        }
-        if (list.equals(message.getComponents()))
-        {
-            return message;
+            list.add(applyPostProcessors(out, context, arguments));
         }
 
         return new Message(list);
+    }
+
+    private Component applyPostProcessors(Component in, Context context, Arguments args)
+    {
+        Component out = in;
+
+        for (final PostProcessor postProcessor : postProcessors)
+        {
+            out = postProcessor.process(out, context, args);
+        }
+
+        return out;
     }
 }

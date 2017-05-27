@@ -22,13 +22,12 @@
  */
 package org.cubeengine.dirigent.formatter;
 
-import java.util.Collections;
 import java.util.Locale;
 import org.cubeengine.dirigent.Component;
+import org.cubeengine.dirigent.formatter.argument.Arguments;
 import org.cubeengine.dirigent.parser.component.Text;
-import org.cubeengine.dirigent.parser.component.macro.argument.Argument;
-import org.cubeengine.dirigent.parser.component.macro.argument.Parameter;
-import org.cubeengine.dirigent.parser.component.macro.argument.Value;
+import org.cubeengine.dirigent.formatter.argument.Parameter;
+import org.cubeengine.dirigent.formatter.argument.Value;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -85,30 +84,27 @@ public class NumberFormatterTest
     private void checkFormat(final String expected, final Number number, final Locale locale, final String mode,
                              final String value)
     {
-        final Context context = context(locale, mode, value);
-        final Component component = numberFormatter.format(number, context);
+        final Context context = Context.create(locale);
+        final Arguments args = args(mode, value);
+        final Component component = numberFormatter.format(number, context, args);
 
         Assert.assertTrue(component instanceof Text);
         Assert.assertEquals(expected, ((Text)component).getString());
     }
 
-    private Context context(final Locale locale, final String paramName, final String paramValue)
+    private Arguments args(final String paramName, final String paramValue)
     {
-        final Context context = new Context(locale);
-
         if (paramValue == null && paramName != null)
         {
-            context.with(Collections.<Argument>singletonList(new Value(paramName)));
+            return Arguments.create(new Value(paramName));
         }
         else if (paramValue != null && paramName != null)
         {
-            context.with(Collections.<Argument>singletonList(new Parameter(paramName, paramValue)));
+            return Arguments.create(new Parameter(paramName, paramValue));
         }
         else
         {
-            context.with(Collections.<Argument>emptyList());
+            return Arguments.NONE;
         }
-
-        return context;
     }
 }

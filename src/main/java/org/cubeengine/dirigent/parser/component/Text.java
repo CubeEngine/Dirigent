@@ -23,17 +23,18 @@
 package org.cubeengine.dirigent.parser.component;
 
 import org.cubeengine.dirigent.Component;
+import org.cubeengine.dirigent.parser.token.Token;
 
 /**
  * A simple Component for Strings
  */
-public class Text implements Component
+public class Text implements Token, Component
 {
     private String string;
 
     public Text(String string)
     {
-        this.string = string;
+        this.string = String.valueOf(string);
     }
 
     public String getString()

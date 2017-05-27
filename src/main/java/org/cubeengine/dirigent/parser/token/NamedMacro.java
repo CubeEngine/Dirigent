@@ -20,33 +20,69 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.cubeengine.dirigent.formatter;
+package org.cubeengine.dirigent.parser.token;
 
-import org.cubeengine.dirigent.Component;
+import java.util.List;
+
 import org.cubeengine.dirigent.formatter.argument.Arguments;
+import org.cubeengine.dirigent.formatter.argument.Argument;
 
 /**
- * A Formatter for Constant Expressions. This Formatter does not consume arguments.
+ * A Macro with a name and an optional list of Arguments
  */
-public abstract class ConstantFormatter extends Formatter<Void>
+public class NamedMacro implements Macro
 {
-    @Override
-    public boolean isApplicable(Object arg)
+    private final String name;
+    private final Arguments args;
+
+    public NamedMacro(String name, List<Argument> args)
     {
-        return true;
+        this.name = name;
+        this.args = Arguments.create(args);
+    }
+
+    public String getName()
+    {
+        return name;
+    }
+
+    public Arguments getArgs()
+    {
+        return args;
     }
 
     @Override
-    public final Component format(Void arg, Context context, Arguments args)
+    public boolean equals(Object o)
     {
-        return format(context, args);
+        if (this == o)
+        {
+            return true;
+        }
+        if (!(o instanceof NamedMacro))
+        {
+            return false;
+        }
+
+        final NamedMacro that = (NamedMacro)o;
+
+        if (!getName().equals(that.getName()))
+        {
+            return false;
+        }
+        return getArgs().equals(that.getArgs());
     }
 
-    /**
-     * Formats the Constant expression
-     * @param context the context
-     * @param args the arguments
-     * @return the resulting Component
-     */
-    public abstract Component format(Context context, Arguments args);
+    @Override
+    public int hashCode()
+    {
+        int result = getName().hashCode();
+        result = 31 * result + getArgs().hashCode();
+        return result;
+    }
+
+    @Override
+    public String toString()
+    {
+        return "NamedMacro{" + "name='" + name + '\'' + ", args=" + args + '}';
+    }
 }

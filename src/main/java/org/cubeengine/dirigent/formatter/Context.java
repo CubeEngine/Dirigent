@@ -22,23 +22,24 @@
  */
 package org.cubeengine.dirigent.formatter;
 
-import java.util.List;
+import java.util.Collections;
 import java.util.Locale;
-import org.cubeengine.dirigent.parser.component.macro.argument.Argument;
-import org.cubeengine.dirigent.parser.component.macro.argument.Value;
-import org.cubeengine.dirigent.parser.component.macro.argument.Parameter;
+import java.util.Map;
 
 /**
  * The Context of a Macro including Locale and the arguments of the Macro if any
  */
 public class Context
 {
-    private Locale locale;
-    private List<Argument> argumentList;
+    public static final Context EMPTY = new Context(Collections.<ContextProperty<?>, Object>emptyMap());
 
-    public Context(Locale locale)
+    private final Map<ContextProperty<?>, Object> properties;
+
+    public static final ContextProperty<Locale> LOCALE = new ContextProperty<Locale>();
+
+    private Context(Map<ContextProperty<?>, Object> properties)
     {
-        this.locale = locale;
+        this.properties = Collections.unmodifiableMap(properties);
     }
 
     /**
@@ -47,83 +48,17 @@ public class Context
      */
     public Locale getLocale()
     {
-        return locale;
+        return getOrElse(LOCALE, Locale.getDefault());
     }
 
-    /**
-     * Returns the list of arguments
-     * @return the list of arguments
-     */
-    public List<Argument> getArgumentList()
+    public <K, V extends K> V get(ContextProperty<K> key)
     {
-        return argumentList;
+        return key.get(properties);
     }
 
-    /**
-     * Replaces the list of arguments allowing to reuse the context
-     * @param list the list to replace with
-     * @return fluent interface
-     */
-    public Context with(List<Argument> list)
+    public <K, V extends K> V getOrElse(ContextProperty<K> key, V def)
     {
-        this.argumentList = list;
-        return this;
-    }
-
-    /**
-     * Returns the Arguments value for given name or null if not found
-     * @param name the name
-     * @return the value of the Argument by name
-     */
-    public String get(String name)
-    {
-        for (Argument argument : argumentList)
-        {
-            if (argument instanceof Parameter)
-            {
-                if (((Parameter)argument).getName().equals(name))
-                {
-                    return ((Parameter)argument).getValue();
-                }
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Gets the Value of an Argument at a position.
-     *
-     * @param i the position
-     * @return the Argument value
-     */
-    public String get(int i)
-    {
-        if (argumentList.size() >= i + 1)
-        {
-            Argument argument = argumentList.get(i);
-            if (argument instanceof Value)
-            {
-                return ((Value)argument).getValue();
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Returns whether the list of arguments contains given flag
-     * @param value the flag to check for
-     * @return whether the list of arguments contains given flag
-     */
-    public boolean has(String value)
-    {
-        for (Argument argument : argumentList)
-        {
-            if (argument instanceof Value && ((Value)argument).getValue().equals(value))
-            {
-                return true;
-            }
-        }
-        return false;
+        return key.getOrElse(properties, def);
     }
 
     @Override
@@ -140,18 +75,41 @@ public class Context
 
         final Context context = (Context)o;
 
-        if (!getLocale().equals(context.getLocale()))
-        {
-            return false;
-        }
-        return getArgumentList().equals(context.getArgumentList());
+        return properties.equals(context.properties);
     }
 
     @Override
     public int hashCode()
     {
-        int result = getLocale().hashCode();
-        result = 31 * result + getArgumentList().hashCode();
-        return result;
+        return properties.hashCode();
+    }
+
+    /**
+     * Replaces the list of arguments allowing to reuse the context
+     * @param list the list to replace with
+     * @return fluent interface
+     */
+    public Context with(Map<ContextProperty<?>, Object> properties)
+    {
+        return create(properties);
+    }
+
+    public static Context create()
+    {
+        return EMPTY;
+    }
+
+    public static Context create(Locale locale)
+    {
+        return create(LOCALE.to(locale));
+    }
+
+    public static Context create(Map<ContextProperty<?>, Object> properties)
+    {
+        if (properties.isEmpty())
+        {
+            return EMPTY;
+        }
+        return new Context(properties);
     }
 }

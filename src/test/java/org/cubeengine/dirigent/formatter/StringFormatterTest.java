@@ -22,13 +22,11 @@
  */
 package org.cubeengine.dirigent.formatter;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Locale;
 import org.cubeengine.dirigent.Component;
+import org.cubeengine.dirigent.formatter.argument.Arguments;
 import org.cubeengine.dirigent.parser.component.Text;
-import org.cubeengine.dirigent.parser.component.macro.argument.Argument;
-import org.cubeengine.dirigent.parser.component.macro.argument.Value;
+import org.cubeengine.dirigent.formatter.argument.Value;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -50,18 +48,17 @@ public class StringFormatterTest
 
     private void checkFormat(final String expected, final Object object, final Locale locale, final String flag)
     {
-        final List<Argument> arguments;
+        final Arguments arguments;
         if (flag == null)
         {
-            arguments = Collections.emptyList();
+            arguments = Arguments.NONE;
         }
         else
         {
-            arguments = Collections.<Argument>singletonList(new Value(flag));
+            arguments = Arguments.create(new Value(flag));
         }
 
-        final Context context = new Context(locale).with(arguments);
-        final Component component = stringFormatter.format(object, context);
+        final Component component = stringFormatter.format(object, Context.create(locale), arguments);
 
         Assert.assertTrue(component instanceof Text);
         Assert.assertEquals(expected, ((Text)component).getString());

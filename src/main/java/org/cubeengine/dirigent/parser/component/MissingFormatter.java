@@ -22,20 +22,24 @@
  */
 package org.cubeengine.dirigent.parser.component;
 
-import org.cubeengine.dirigent.parser.component.macro.Macro;
+import org.cubeengine.dirigent.Dirigent.LookupState;
+import org.cubeengine.dirigent.parser.token.Macro;
+import org.cubeengine.dirigent.parser.token.NamedMacro;
 
 /**
- * A Component signaling a no Formatter could be found for a macro
+ * A Component signaling a no Formatter could be found for a token
  */
 public class MissingFormatter implements ErrorComponent
 {
     private Macro missing;
     private Object arg;
+    private final LookupState state;
 
-    public MissingFormatter(Macro missing, Object arg)
+    public MissingFormatter(Macro missing, Object arg, LookupState state)
     {
         this.missing = missing;
         this.arg = arg;
+        this.state = state;
     }
 
     public Macro getMissing()
@@ -43,7 +47,7 @@ public class MissingFormatter implements ErrorComponent
         return missing;
     }
 
-    public Object getArg()
+    public Object getInput()
     {
         return arg;
     }
@@ -51,7 +55,22 @@ public class MissingFormatter implements ErrorComponent
     @Override
     public String getError()
     {
-        return "Formatter not found";
+        switch (state)
+        {
+            case NONE_APPLICABLE:
+                return "Formatter not applicable to " + arg + "!";
+            case UNKNOWN_NAME:
+                if (missing instanceof NamedMacro)
+                {
+                    return "Formatter not found: " + ((NamedMacro)missing).getName();
+                }
+                else
+                {
+                    return "Formatter not found";
+                }
+            default:
+                return "Formatter lookup failed!";
+        }
     }
 
     @Override
@@ -72,14 +91,14 @@ public class MissingFormatter implements ErrorComponent
         {
             return false;
         }
-        return getArg().equals(that.getArg());
+        return getInput().equals(that.getInput());
     }
 
     @Override
     public int hashCode()
     {
         int result = getMissing().hashCode();
-        result = 31 * result + getArg().hashCode();
+        result = 31 * result + getInput().hashCode();
         return result;
     }
 

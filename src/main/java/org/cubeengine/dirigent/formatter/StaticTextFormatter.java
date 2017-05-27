@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import org.cubeengine.dirigent.Component;
+import org.cubeengine.dirigent.formatter.argument.Arguments;
 import org.cubeengine.dirigent.parser.component.Text;
 
 /**
@@ -64,9 +65,9 @@ public class StaticTextFormatter extends ConstantFormatter
     }
 
     @Override
-    public Component format(Context context)
+    public Component format(Context context, Arguments args)
     {
-        return new Text(context.get(0));
+        return new Text(args.get(0));
     }
 
     @Override

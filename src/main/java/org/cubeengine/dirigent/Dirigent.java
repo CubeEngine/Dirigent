@@ -23,6 +23,7 @@
 package org.cubeengine.dirigent;
 
 import java.util.Locale;
+import org.cubeengine.dirigent.formatter.Context;
 import org.cubeengine.dirigent.formatter.Formatter;
 import org.cubeengine.dirigent.formatter.PostProcessor;
 
@@ -49,7 +50,7 @@ public interface Dirigent<MessageT>
      * @param args the message arguments
      * @return the composed message
      */
-    MessageT compose(Locale locale, String source, Object... args);
+    MessageT compose(Context context, String source, Object... args);
 
     /**
      * Adds a new Formatter to use when composing the messages
@@ -71,5 +72,42 @@ public interface Dirigent<MessageT>
      * @param arg the argument to pass to the formatter
      * @return the formatter or null if not found
      */
-    Formatter findFormatter(String name, Object arg);
+    LookupResult findFormatter(String name, Object arg);
+
+    final class LookupResult
+    {
+        public static final LookupResult UNKNOWN_NAME = new LookupResult(LookupState.UNKNOWN_NAME, null);
+        public static final LookupResult NONE_APPLICABLE = new LookupResult(LookupState.NONE_APPLICABLE, null);
+
+        private final LookupState state;
+        private final Formatter<?> formatter;
+
+        public LookupResult(LookupState state, Formatter<?> formatter)
+        {
+            this.state = state;
+            this.formatter = formatter;
+        }
+
+        public boolean isOK()
+        {
+            return getState() == LookupState.OK;
+        }
+
+        public LookupState getState()
+        {
+            return state;
+        }
+
+        public Formatter<?> getFormatter()
+        {
+            return formatter;
+        }
+    }
+
+    enum LookupState
+    {
+        OK,
+        UNKNOWN_NAME,
+        NONE_APPLICABLE
+    }
 }

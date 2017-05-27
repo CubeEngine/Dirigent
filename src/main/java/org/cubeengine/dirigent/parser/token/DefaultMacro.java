@@ -20,13 +20,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.cubeengine.dirigent.parser.component.macro;
-
-import org.cubeengine.dirigent.Component;
+package org.cubeengine.dirigent.parser.token;
 
 /**
- * A Macro that can be processed by a formatter
+ * An empty Macro
  */
-public interface Macro extends Component
+public class DefaultMacro implements Macro
 {
+    public static final DefaultMacro DEFAULT_MACRO = new DefaultMacro();
+
+    @Override
+    public String toString()
+    {
+        return "DefaultMacro";
+    }
 }

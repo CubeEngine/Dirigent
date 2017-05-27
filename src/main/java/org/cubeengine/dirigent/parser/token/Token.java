@@ -20,51 +20,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.cubeengine.dirigent.parser.component.macro.argument;
+package org.cubeengine.dirigent.parser.token;
 
 /**
- * A simple Value Argument
+ * A Macro that can be processed by a formatter
  */
-public class Value implements Argument
+public interface Token
 {
-    private final String value;
-
-    public Value(String value)
-    {
-        this.value = value;
-    }
-
-    public String getValue()
-    {
-        return value;
-    }
-
-    @Override
-    public boolean equals(Object o)
-    {
-        if (this == o)
-        {
-            return true;
-        }
-        if (!(o instanceof Value))
-        {
-            return false;
-        }
-
-        final Value value = (Value)o;
-
-        return getValue().equals(value.getValue());
-    }
-
-    @Override
-    public int hashCode()
-    {
-        return getValue().hashCode();
-    }
-
-    @Override
-    public String toString()
-    {
-        return "Value{" + "value='" + value + '\'' + '}';
-    }
 }

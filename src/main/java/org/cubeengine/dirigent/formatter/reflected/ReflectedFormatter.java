@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import org.cubeengine.dirigent.formatter.argument.Arguments;
 import org.cubeengine.dirigent.formatter.Formatter;
 import org.cubeengine.dirigent.Component;
 import org.cubeengine.dirigent.formatter.Context;
@@ -66,30 +67,31 @@ public abstract class ReflectedFormatter extends Formatter<Object>
             {
                 Class<?>[] parameterTypes = method.getParameterTypes();
                 if (method.getReturnType() == Component.class &&
-                    parameterTypes.length == 2 &&
-                    parameterTypes[1] == Context.class)
+                    parameterTypes.length == 3 &&
+                    parameterTypes[1] == Context.class &&
+                    parameterTypes[2] == Arguments.class)
                 {
                     method.setAccessible(true);
                     this.formats.put(parameterTypes[0], method);
                 }
                 else
                 {
-                    throw new IllegalArgumentException("The format Methods must have the Object to format and a FormatContext as parameters");
+                    throw new IllegalArgumentException("The format methods must take the Object to format, a Context and the Arguments as parameters: " + getClass().getName());
                 }
             }
         }
     }
 
     @Override
-    protected Component format(Object arg, Context context)
+    protected Component format(Object input, Context context, Arguments args)
     {
         for (Class<?> tClass : formats.keySet())
         {
-            if (tClass.isAssignableFrom(arg.getClass()))
+            if (tClass.isAssignableFrom(input.getClass()))
             {
                 try
                 {
-                    return (Component)formats.get(tClass).invoke(this, arg, context);
+                    return (Component)formats.get(tClass).invoke(this, input, context, args);
                 }
                 catch (IllegalAccessException e)
                 {

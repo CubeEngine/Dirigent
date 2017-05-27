@@ -24,52 +24,51 @@ package org.cubeengine.dirigent.parser;
 
 import java.util.Arrays;
 import java.util.List;
-import org.cubeengine.dirigent.Component;
-import org.cubeengine.dirigent.Message;
 import org.cubeengine.dirigent.parser.component.Text;
-import org.cubeengine.dirigent.parser.component.macro.CompleteMacro;
-import org.cubeengine.dirigent.parser.component.macro.IllegalMacro;
-import org.cubeengine.dirigent.parser.component.macro.IndexedDefaultMacro;
-import org.cubeengine.dirigent.parser.component.macro.NamedMacro;
-import org.cubeengine.dirigent.parser.component.macro.argument.Argument;
-import org.cubeengine.dirigent.parser.component.macro.argument.Value;
-import org.cubeengine.dirigent.parser.component.macro.argument.Parameter;
+import org.cubeengine.dirigent.parser.token.CompleteMacro;
+import org.cubeengine.dirigent.parser.token.IllegalMacro;
+import org.cubeengine.dirigent.parser.token.IndexedDefaultMacro;
+import org.cubeengine.dirigent.parser.token.NamedMacro;
+import org.cubeengine.dirigent.formatter.argument.Argument;
+import org.cubeengine.dirigent.formatter.argument.Value;
+import org.cubeengine.dirigent.formatter.argument.Parameter;
+import org.cubeengine.dirigent.parser.token.Token;
 import org.junit.Test;
 
 import static java.util.Arrays.asList;
 import static org.cubeengine.dirigent.parser.Parser.parseMessage;
 import static org.cubeengine.dirigent.parser.Parser.stripBackslashes;
-import static org.cubeengine.dirigent.parser.component.macro.DefaultMacro.DEFAULT_MACRO;
+import static org.cubeengine.dirigent.parser.token.DefaultMacro.DEFAULT_MACRO;
 import static org.junit.Assert.assertEquals;
 
 public class ParserTest
 {
-    public static Message msg(Component... components)
+    public static List<Token> msg(Token... components)
     {
-        return new Message(components(components));
+        return tokens(components);
     }
 
-    public static List<Component> components(Component... components)
+    public static List<Token> tokens(Token... components)
     {
         return Arrays.asList(components);
     }
 
-    public static Component txt(String s)
+    public static Token txt(String s)
     {
         return new Text(s);
     }
 
-    public static Component named(String name, Argument... args)
+    public static Token named(String name, Argument... args)
     {
         return new NamedMacro(name, asList(args));
     }
 
-    public static Component indexed(int i)
+    public static Token indexed(int i)
     {
         return new IndexedDefaultMacro(i);
     }
 
-    public static Component complete(int i, String name, Argument... args)
+    public static Token complete(int i, String name, Argument... args)
     {
         return new CompleteMacro(i, name, asList(args));
     }
@@ -84,7 +83,7 @@ public class ParserTest
         return new Parameter(name, val);
     }
 
-    public static Component err(String s)
+    public static Token err(String s)
     {
         return new IllegalMacro(s, "Encountered macro start, but no valid macro followed.");
     }

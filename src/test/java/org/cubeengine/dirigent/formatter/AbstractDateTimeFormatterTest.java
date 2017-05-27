@@ -29,12 +29,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
-import java.util.concurrent.TimeUnit;
 import org.cubeengine.dirigent.Component;
+import org.cubeengine.dirigent.formatter.argument.Arguments;
 import org.cubeengine.dirigent.parser.component.Text;
-import org.cubeengine.dirigent.parser.component.macro.argument.Argument;
-import org.cubeengine.dirigent.parser.component.macro.argument.Parameter;
-import org.cubeengine.dirigent.parser.component.macro.argument.Value;
+import org.cubeengine.dirigent.formatter.argument.Argument;
+import org.cubeengine.dirigent.formatter.argument.Parameter;
+import org.cubeengine.dirigent.formatter.argument.Value;
 import org.junit.Assert;
 
 /**
@@ -75,16 +75,16 @@ public abstract class AbstractDateTimeFormatterTest
     private void checkFormat(final String expected, final Date date, final Locale locale, final String defaultStyle,
                              final String dateStyle, final String timeStyle, final String format)
     {
-        final Context context = new Context(locale);
-        context.with(createArguments(defaultStyle, dateStyle, timeStyle, format));
+        final Context context = Context.create(locale);
+        final Arguments args = createArguments(defaultStyle, dateStyle, timeStyle, format);
 
-        final Component component = formatter.format(date, context);
+        final Component component = formatter.format(date, context, args);
 
         Assert.assertTrue(component instanceof Text);
         Assert.assertEquals(expected, ((Text)component).getString());
     }
 
-    private List<Argument> createArguments(final String defaultStyle, final String dateStyle, final String timeStyle,
+    private Arguments createArguments(final String defaultStyle, final String dateStyle, final String timeStyle,
                                            final String format)
     {
         final List<Argument> arguments = new LinkedList<Argument>();
@@ -106,6 +106,6 @@ public abstract class AbstractDateTimeFormatterTest
             arguments.add(new Parameter(DateTimeFormatter.FORMAT_PARAM_NAME, format));
         }
 
-        return arguments;
+        return Arguments.create(arguments);
     }
 }

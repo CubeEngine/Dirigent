@@ -25,8 +25,12 @@ package org.cubeengine.dirigent.formatter;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
+import java.util.Locale;
 import org.cubeengine.dirigent.Component;
+import org.cubeengine.dirigent.formatter.argument.Arguments;
 import org.cubeengine.dirigent.parser.component.Text;
+
+import static org.cubeengine.dirigent.formatter.Context.LOCALE;
 
 /**
  * The number formatter formats a {@link Number} object with a {@link NumberFormat}. The class has a {@link Mode} which
@@ -89,9 +93,9 @@ public class NumberFormatter extends AbstractFormatter<Number>
     }
 
     @Override
-    protected Component format(Number arg, Context context)
+    protected Component format(Number arg, Context context, Arguments args)
     {
-        return new Text(parseNumberToString(arg, context));
+        return new Text(parseNumberToString(arg, context, args));
     }
 
     /**
@@ -100,11 +104,12 @@ public class NumberFormatter extends AbstractFormatter<Number>
      * @param number  The number to parse.
      * @param context The context to use.
      *
+     * @param args
      * @return The number as a string.
      */
-    protected String parseNumberToString(Number number, Context context)
+    protected String parseNumberToString(Number number, Context context, Arguments args)
     {
-        final NumberFormat numberFormat = parseFormatter(context);
+        final NumberFormat numberFormat = parseFormatter(context, args);
         return numberFormat.format(number);
     }
 
@@ -113,30 +118,32 @@ public class NumberFormatter extends AbstractFormatter<Number>
      *
      * @param context The context.
      *
+     * @param args
      * @return the {@link NumberFormat}.
      */
-    private NumberFormat parseFormatter(Context context)
+    private NumberFormat parseFormatter(Context context, Arguments args)
     {
-        final String format = context.get(FORMAT_PARAM_NAME);
+        final String format = args.get(FORMAT_PARAM_NAME);
+        Locale locale = context.get(LOCALE);
         if (format != null)
         {
-            return new DecimalFormat(format, DecimalFormatSymbols.getInstance(context.getLocale()));
+            return new DecimalFormat(format, DecimalFormatSymbols.getInstance(locale));
         }
 
-        final Mode mode = Mode.loadFromContext(context, this.defaultMode);
+        final Mode mode = Mode.loadFromContext(args, this.defaultMode);
         if (Mode.INTEGER.equals(mode))
         {
-            return NumberFormat.getIntegerInstance(context.getLocale());
+            return NumberFormat.getIntegerInstance(locale);
         }
         if (Mode.CURRENCY.equals(mode))
         {
-            return NumberFormat.getCurrencyInstance(context.getLocale());
+            return NumberFormat.getCurrencyInstance(locale);
         }
         if (Mode.PERCENT.equals(mode))
         {
-            return NumberFormat.getPercentInstance(context.getLocale());
+            return NumberFormat.getPercentInstance(locale);
         }
-        return NumberFormat.getInstance(context.getLocale());
+        return NumberFormat.getInstance(locale);
     }
 
     /**
@@ -160,22 +167,22 @@ public class NumberFormatter extends AbstractFormatter<Number>
         /**
          * Loads the mode from the formatter context or returns the default mode if the context doesn't specify one.
          *
-         * @param context     The context.
+         * @param args     The context.
          * @param defaultMode The default mode.
          *
          * @return the loaded mode.
          */
-        private static Mode loadFromContext(Context context, Mode defaultMode)
+        private static Mode loadFromContext(Arguments args, Mode defaultMode)
         {
-            if (context.has(INTEGER_MODE_FLAG))
+            if (args.has(INTEGER_MODE_FLAG))
             {
                 return INTEGER;
             }
-            if (context.has(CURRENCY_MODE_FLAG))
+            if (args.has(CURRENCY_MODE_FLAG))
             {
                 return CURRENCY;
             }
-            if (context.has(PERCENT_MODE_FLAG))
+            if (args.has(PERCENT_MODE_FLAG))
             {
                 return PERCENT;
             }

@@ -25,8 +25,12 @@ package org.cubeengine.dirigent.formatter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 import org.cubeengine.dirigent.Component;
+import org.cubeengine.dirigent.formatter.argument.Arguments;
 import org.cubeengine.dirigent.parser.component.Text;
+
+import static org.cubeengine.dirigent.formatter.Context.LOCALE;
 
 /**
  * The date time formatter formats a {@link Date} object with a {@link DateFormat}. The class has a {@link Mode} which
@@ -98,9 +102,9 @@ public class DateTimeFormatter extends AbstractFormatter<Date>
     }
 
     @Override
-    protected Component format(Date arg, Context context)
+    protected Component format(Date arg, Context context, Arguments args)
     {
-        return new Text(parseDateToString(arg, context));
+        return new Text(parseDateToString(arg, context, args));
     }
 
     /**
@@ -109,11 +113,12 @@ public class DateTimeFormatter extends AbstractFormatter<Date>
      * @param date    The date to parse.
      * @param context The context to use.
      *
+     * @param args
      * @return The number as a string.
      */
-    protected String parseDateToString(Date date, Context context)
+    protected String parseDateToString(Date date, Context context, Arguments args)
     {
-        final DateFormat dateFormat = parseFormatter(context);
+        final DateFormat dateFormat = parseFormatter(context, args);
         return dateFormat.format(date);
     }
 
@@ -122,31 +127,34 @@ public class DateTimeFormatter extends AbstractFormatter<Date>
      *
      * @param context The context.
      *
+     * @param args
      * @return the {@link DateFormat}.
      */
-    private DateFormat parseFormatter(Context context)
+    private DateFormat parseFormatter(Context context, Arguments args)
     {
-        final String format = context.get(FORMAT_PARAM_NAME);
+        final String format = args.get(FORMAT_PARAM_NAME);
         if (format != null)
         {
             return new SimpleDateFormat(format, context.getLocale());
         }
 
-        final int defaultFormatStyle = parseDateFormatStyle(context);
-        final int dateFormatStyle = parseDateFormatStyle(context.get(DATE_PARAM_NAME), defaultFormatStyle);
-        final int timeFormatStyle = parseDateFormatStyle(context.get(TIME_PARAM_NAME), defaultFormatStyle);
+        final int defaultFormatStyle = parseDateFormatStyle(args);
+        final int dateFormatStyle = parseDateFormatStyle(args.get(DATE_PARAM_NAME), defaultFormatStyle);
+        final int timeFormatStyle = parseDateFormatStyle(args.get(TIME_PARAM_NAME), defaultFormatStyle);
+
+        final Locale locale = context.get(LOCALE);
 
         if (Mode.DATE_TIME.equals(mode))
         {
-            return DateFormat.getDateTimeInstance(dateFormatStyle, timeFormatStyle, context.getLocale());
+            return DateFormat.getDateTimeInstance(dateFormatStyle, timeFormatStyle, locale);
         }
         else if (Mode.DATE.equals(mode))
         {
-            return DateFormat.getDateInstance(dateFormatStyle, context.getLocale());
+            return DateFormat.getDateInstance(dateFormatStyle, locale);
         }
         else if (Mode.TIME.equals(mode))
         {
-            return DateFormat.getTimeInstance(timeFormatStyle, context.getLocale());
+            return DateFormat.getTimeInstance(timeFormatStyle, locale);
         }
         return DateFormat.getInstance();
     }
@@ -188,25 +196,24 @@ public class DateTimeFormatter extends AbstractFormatter<Date>
     /**
      * Parses the default style of the {@link DateFormat} from context labels.
      *
-     * @param context The context.
-     *
+     * @param args
      * @return The id of the style.
      */
-    private int parseDateFormatStyle(Context context)
+    private int parseDateFormatStyle(Arguments args)
     {
-        if (context.has(SHORT_STYLE))
+        if (args.has(SHORT_STYLE))
         {
             return DateFormat.SHORT;
         }
-        else if (context.has(MEDIUM_STYLE))
+        else if (args.has(MEDIUM_STYLE))
         {
             return DateFormat.MEDIUM;
         }
-        else if (context.has(LONG_STYLE))
+        else if (args.has(LONG_STYLE))
         {
             return DateFormat.LONG;
         }
-        else if (context.has(FULL_STYLE))
+        else if (args.has(FULL_STYLE))
         {
             return DateFormat.FULL;
         }

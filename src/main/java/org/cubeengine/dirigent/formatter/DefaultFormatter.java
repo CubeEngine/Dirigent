@@ -24,6 +24,7 @@ package org.cubeengine.dirigent.formatter;
 
 import java.util.Set;
 import org.cubeengine.dirigent.Component;
+import org.cubeengine.dirigent.formatter.argument.Arguments;
 import org.cubeengine.dirigent.parser.component.Text;
 
 import static java.util.Collections.singleton;
@@ -40,7 +41,7 @@ public class DefaultFormatter extends Formatter<Object>
     }
 
     @Override
-    protected Component format(Object arg, Context context)
+    protected Component format(Object arg, Context context, Arguments args)
     {
         return new Text(String.valueOf(arg));
     }

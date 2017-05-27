@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 import org.cubeengine.dirigent.Component;
+import org.cubeengine.dirigent.formatter.argument.Arguments;
 import org.cubeengine.dirigent.formatter.Context;
 import org.cubeengine.dirigent.formatter.CurrencyFormatter;
 import org.cubeengine.dirigent.formatter.DateFormatter;
@@ -68,7 +69,7 @@ public class StringCompositorTest
 
     private String compose(String raw, Object... args)
     {
-        return compositor.compose(Locale.GERMANY, raw, args);
+        return compositor.compose(Context.create(Locale.GERMANY), raw, args);
     }
 
     @Test
@@ -128,14 +129,14 @@ public class StringCompositorTest
     public void testFormatterWithWrongParameter() throws Exception
     {
         // TODO here I would expect something else
-        assertEquals("msg: Formatter not found", compose("msg: {number}", "string"));
+        assertEquals("msg: Formatter not applicable to string!", compose("msg: {number}", "string"));
     }
 
     @Test
     public void testUnavailableFormatterName() throws Exception
     {
         // TODO here I would expect something else
-        assertEquals("msg: Formatter not found", compose("msg: {blub}", "string"));
+        assertEquals("msg: Formatter not found: blub", compose("msg: {blub}", "string"));
     }
 
     @Test
@@ -148,9 +149,9 @@ public class StringCompositorTest
     @Test
     public void testPostProcessor() throws Exception
     {
-        compositor.findFormatter(null, "").addPostProcessor(new PostProcessor()
+        compositor.findFormatter(null, "").getFormatter().addPostProcessor(new PostProcessor()
         {
-            public Component process(Component component, Context context)
+            public Component process(Component component, Context context, Arguments args)
             {
                 if (component instanceof Text)
                 {
@@ -165,7 +166,7 @@ public class StringCompositorTest
 
         compositor.addPostProcessor(new PostProcessor()
         {
-            public Component process(Component component, Context context)
+            public Component process(Component component, Context context, Arguments args)
             {
                 if (component instanceof Text)
                 {

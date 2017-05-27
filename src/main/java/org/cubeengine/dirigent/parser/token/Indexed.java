@@ -20,52 +20,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.cubeengine.dirigent.parser.component.macro;
+package org.cubeengine.dirigent.parser.token;
 
 /**
- * A Macro with position and no name
+ * A Macro that has a position
  */
-public class IndexedDefaultMacro extends DefaultMacro implements Indexed
+public interface Indexed extends Macro
 {
-    private final int index;
-
-    public IndexedDefaultMacro(int index)
-    {
-        this.index = index;
-    }
-
-    @Override
-    public int getIndex()
-    {
-        return index;
-    }
-
-    @Override
-    public boolean equals(Object o)
-    {
-        if (this == o)
-        {
-            return true;
-        }
-        if (!(o instanceof IndexedDefaultMacro))
-        {
-            return false;
-        }
-
-        final IndexedDefaultMacro that = (IndexedDefaultMacro)o;
-
-        return getIndex() == that.getIndex();
-    }
-
-    @Override
-    public int hashCode()
-    {
-        return getIndex();
-    }
-
-    @Override
-    public String toString()
-    {
-        return "IndexedDefaultMacro{" + "index=" + index + "}";
-    }
+    int getIndex();
 }

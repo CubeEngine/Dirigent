@@ -22,11 +22,10 @@
  */
 package org.cubeengine.dirigent.formatter;
 
-import java.util.Collections;
 import java.util.Locale;
 import org.cubeengine.dirigent.Component;
+import org.cubeengine.dirigent.formatter.argument.Arguments;
 import org.cubeengine.dirigent.parser.component.Text;
-import org.cubeengine.dirigent.parser.component.macro.argument.Argument;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -48,8 +47,7 @@ public class IntegerFormatterTest
 
     private void checkFormat(final String expected, final Number number, final Locale locale)
     {
-        final Context context = new Context(locale).with(Collections.<Argument>emptyList());
-        final Component component = integerFormatter.format(number, context);
+        final Component component = integerFormatter.format(number, Context.create(locale), Arguments.NONE);
 
         Assert.assertTrue(component instanceof Text);
         Assert.assertEquals(expected, ((Text)component).getString());
