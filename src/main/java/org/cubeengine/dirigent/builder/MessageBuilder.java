@@ -49,20 +49,35 @@ public abstract class MessageBuilder<MessageT, BuilderT>
      * Returns the built message
      *
      * @param builderT the builder
-     * @param context  the context
+     * @param context the context
      *
      * @return the built message
      */
     public abstract MessageT finalize(BuilderT builderT, Context context);
 
     /**
+     * Appends a chain of Components to the builder
+     *
+     * @param group the chained Components
+     * @param builder the builder
+     * @param context the context
+     */
+    public void buildGroup(ComponentGroup group, BuilderT builder, Context context)
+    {
+        for (Component component : group.getComponents())
+        {
+            buildAny(component, builder, context);
+        }
+    }
+
+    /**
      * Appends a Component to the builder
      *
      * @param component the component
-     * @param builder   the builder
-     * @param context   the context
+     * @param builder the builder
+     * @param context the context
      */
-    public final void buildAny(Component component, BuilderT builder, Context context)
+    protected final void buildAny(Component component, BuilderT builder, Context context)
     {
         if (component instanceof ResolvedMacro)
         {
@@ -90,19 +105,19 @@ public abstract class MessageBuilder<MessageT, BuilderT>
      * Appends a {@link Text} Component to the builder
      *
      * @param component the text
-     * @param builder   the builder
-     * @param context   the context
+     * @param builder the builder
+     * @param context the context
      */
-    public abstract void buildText(TextComponent component, BuilderT builder, Context context);
+    protected abstract void buildText(TextComponent component, BuilderT builder, Context context);
 
     /**
      * Appends a {@link ResolvedMacro} Component to the builder
      *
-     * @param c       the found formatter
+     * @param c the found formatter
      * @param builder the builder
      * @param context the context
      */
-    public final void buildResolved(ResolvedMacro c, BuilderT builder, Context context)
+    protected final void buildResolved(ResolvedMacro c, BuilderT builder, Context context)
     {
         Component processed = c.getFormatter().process(c.getInput(), c.getContext(), c.getArguments());
         buildAny(processed, builder, context);
@@ -112,33 +127,18 @@ public abstract class MessageBuilder<MessageT, BuilderT>
      * Handles a {@link UnresolvableMacro}
      *
      * @param component the component
-     * @param builder   the builder
-     * @param context   the context
-     */
-    public abstract void buildUnresolvable(UnresolvableMacro component, BuilderT builder, Context context);
-
-    /**
-     * Appends a chain of Components to the builder
-     *
-     * @param group   the chained Components
      * @param builder the builder
      * @param context the context
      */
-    public void buildGroup(ComponentGroup group, BuilderT builder, Context context)
-    {
-        for (Component component : group.getComponents())
-        {
-            buildAny(component, builder, context);
-        }
-    }
+    protected abstract void buildUnresolvable(UnresolvableMacro component, BuilderT builder, Context context);
 
     /**
-     * Appends a Component to the builder.
+     * Appends a {@link Component} to the builder.
      * Implement this to handle custom Components
      *
      * @param component the component
-     * @param builder   the builder
-     * @param context   the context
+     * @param builder the builder
+     * @param context the context
      */
-    public abstract void buildOther(Component component, BuilderT builder, Context context);
+    protected abstract void buildOther(Component component, BuilderT builder, Context context);
 }

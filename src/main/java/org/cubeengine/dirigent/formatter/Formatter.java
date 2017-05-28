@@ -30,14 +30,11 @@ import org.cubeengine.dirigent.context.Context;
 import org.cubeengine.dirigent.formatter.argument.Arguments;
 
 /**
- * <p>
  * Formatters are used to format message parameters. In general a specific formatter can be used for a specific object
  * type which is the generic type of this class.
- * </p>
- * <p>
+ *
  * A {@link PostProcessor} can be added to a Formatter to run after the formatting process and manipulate the created
  * {@link Component}.
- * </p>
  *
  * @param <T> the object type to format
  */
@@ -61,28 +58,28 @@ public abstract class Formatter<T>
      * Formats the parameter into a {@link Component} for given compose {@link Context} with the help of the specified
      * {@link Arguments} object.
      *
-     * @param param   The parameter to format.
+     * @param input The message input parameter to format.
      * @param context The compose context.
-     * @param args    The arguments of the macro.
+     * @param args The arguments of the macro.
      *
      * @return the resulting Component
      */
-    protected abstract Component format(T param, Context context, Arguments args);
+    protected abstract Component format(T input, Context context, Arguments args);
 
     /**
      * Formats the parameter into a {@link Component} for given compose {@link Context} with the help of the specified
      * {@link Arguments} object. Therefore it calls the {@link #format(Object, Context, Arguments)} method which must
      * be implemented by sub classes. Afterwards all attached {@link PostProcessor}s are executed.
      *
-     * @param param   the parameter to format.
+     * @param input the message input parameter to format.
      * @param context the compose context.
-     * @param args    The arguments of the macro.
+     * @param args The arguments of the macro.
      *
      * @return the resulting processed Component
      */
-    public final Component process(T param, Context context, Arguments args)
+    public final Component process(T input, Context context, Arguments args)
     {
-        Component result = format(param, context, args);
+        Component result = format(input, context, args);
         for (PostProcessor processor : postProcessors)
         {
             result = processor.process(result, context, args);

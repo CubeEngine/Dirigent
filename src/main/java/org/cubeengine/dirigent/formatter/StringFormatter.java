@@ -64,15 +64,15 @@ public class StringFormatter extends AbstractFormatter<Object>
     }
 
     @Override
-    protected Component format(Object param, Context context, Arguments args)
+    protected Component format(Object input, Context context, Arguments args)
     {
-        return new Text(parseObjectToString(param, context.get(LOCALE), args));
+        return new Text(parseObjectToString(input, context.get(LOCALE), args));
     }
 
     /**
      * Parses the given object to a string depending on the context.
      *
-     * @param object  The object to parse.
+     * @param object The object to parse.
      * @param locale The locale to use.
      *
      * @return The object as a string.

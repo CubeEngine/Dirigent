@@ -43,9 +43,9 @@ public class DefaultFormatter extends Formatter<Object>
     }
 
     @Override
-    protected Component format(Object param, Context context, Arguments args)
+    protected Component format(Object input, Context context, Arguments args)
     {
-        return new Text(String.valueOf(param));
+        return new Text(String.valueOf(input));
     }
 
     @Override

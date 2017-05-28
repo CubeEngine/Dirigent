@@ -27,25 +27,33 @@ import org.cubeengine.dirigent.context.Context;
 import org.cubeengine.dirigent.parser.component.ComponentGroup;
 
 /**
- * A Dirigent implementation using Builders
+ * A Dirigent implementation using Builders.
  *
  * @param <MessageT> the resulting MessageType
  * @param <BuilderT> the Builder Type
  */
 public class BuilderDirigent<MessageT, BuilderT> extends AbstractDirigent<MessageT>
 {
+    /**
+     * The builder to use for composing the target message.
+     */
     private MessageBuilder<MessageT, BuilderT> mBuilder;
 
+    /**
+     * Constructor.
+     *
+     * @param mBuilder The builder to use for composing a {@link ComponentGroup} to the target message.
+     */
     public BuilderDirigent(MessageBuilder<MessageT, BuilderT> mBuilder)
     {
         this.mBuilder = mBuilder;
     }
 
     @Override
-    protected MessageT compose(ComponentGroup group, Context context)
+    protected MessageT compose(ComponentGroup componentGroup, Context context)
     {
         BuilderT builder = mBuilder.newBuilder();
-        mBuilder.buildGroup(group, builder, context);
+        mBuilder.buildGroup(componentGroup, builder, context);
         return mBuilder.finalize(builder, context);
     }
 }

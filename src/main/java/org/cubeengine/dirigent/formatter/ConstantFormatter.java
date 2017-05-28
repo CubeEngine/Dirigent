@@ -27,8 +27,8 @@ import org.cubeengine.dirigent.context.Context;
 import org.cubeengine.dirigent.formatter.argument.Arguments;
 
 /**
- * Indicates a specific Formatter which doesn't need any message parameters. Instead it's used for constant expressions
- * which don't consume any parameters.
+ * Indicates a specific Formatter which doesn't need any message input parameters. Instead it's used for constant
+ * expressions which don't consume any parameters.
  */
 public abstract class ConstantFormatter extends Formatter<Void>
 {
@@ -39,7 +39,7 @@ public abstract class ConstantFormatter extends Formatter<Void>
     }
 
     @Override
-    public final Component format(Void param, Context context, Arguments args)
+    public final Component format(Void input, Context context, Arguments args)
     {
         return format(context, args);
     }
@@ -48,7 +48,7 @@ public abstract class ConstantFormatter extends Formatter<Void>
      * Formats the Constant expression
      *
      * @param context The compose context
-     * @param args    The arguments of the macro.
+     * @param args The arguments of the macro.
      *
      * @return the resulting Component
      */

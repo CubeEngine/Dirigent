@@ -35,19 +35,16 @@ import org.cubeengine.dirigent.parser.Text;
 import static org.cubeengine.dirigent.context.Contexts.LOCALE;
 
 /**
- * <p>
  * The date time formatter formats a {@link Date} object with a {@link DateFormat}. The class has a {@link Mode} which
  * can be passed as a constructor parameter. This mode specifies whether the instance formats a {@link Date} object to a
  * date, a time or a date time representation by default. The default constructors uses the data time representation.
- * </p>
- * <p>
+ *
  * In a message it's possible to control the format with two types of options. The first possibility is specifying a
  * "format" parameter. This parameter creates a {@link SimpleDateFormat} with the specified format. Furthermore it's
  * possible to specify one of the flags "short", "medium", "long" and "full". This controls the style of a
  * {@link DateFormat} instance. Specified as a flag this style is used for date and time. With one of the parameters
  * "date" and "time" it's possible to control both styles independently. Furthermore the {@link java.util.Locale} is
  * respected and passed to the format.
- * </p>
  */
 public class DateTimeFormatter extends AbstractFormatter<Date>
 {
@@ -107,9 +104,9 @@ public class DateTimeFormatter extends AbstractFormatter<Date>
     }
 
     @Override
-    protected Component format(Date param, Context context, Arguments args)
+    protected Component format(Date input, Context context, Arguments args)
     {
-        return new Text(parseDateToString(param, context, args));
+        return new Text(parseDateToString(input, context, args));
     }
 
     /**

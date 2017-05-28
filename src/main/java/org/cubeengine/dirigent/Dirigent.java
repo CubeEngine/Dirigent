@@ -22,7 +22,6 @@
  */
 package org.cubeengine.dirigent;
 
-import java.util.Locale;
 import org.cubeengine.dirigent.context.Context;
 import org.cubeengine.dirigent.formatter.Formatter;
 import org.cubeengine.dirigent.formatter.PostProcessor;
@@ -37,37 +36,37 @@ import org.cubeengine.dirigent.parser.MacroResolutionResult;
 public interface Dirigent<MessageT>
 {
     /**
-     * Composes a message using the {@link Locale#getDefault()} Locale.
+     * Composes a message using a default {@link Context}.
      *
-     * @param source the source message
-     * @param args   the message arguments
+     * @param source The source message.
+     * @param inputs The message parameters.
      *
-     * @return the composed Message
+     * @return the composed message.
      */
-    MessageT compose(String source, Object... args);
+    MessageT compose(String source, Object... inputs);
 
     /**
-     * Composes a message
+     * Composes a message.
      *
-     * @param context the context
-     * @param source  the source message
-     * @param args    the message arguments
+     * @param context The compose context.
+     * @param source The source message.
+     * @param inputs The message parameters.
      *
-     * @return the composed message
+     * @return the composed message.
      */
-    MessageT compose(Context context, String source, Object... args);
+    MessageT compose(Context context, String source, Object... inputs);
 
     /**
-     * Adds a new Formatter to use when composing the messages
+     * Adds a new {@link Formatter} to use when composing the messages.
      *
-     * @param formatter the formatter to add
+     * @param formatter The formatter to add.
      *
      * @return fluent interface
      */
     Dirigent registerFormatter(Formatter<?> formatter);
 
     /**
-     * Adds a new PostProcessor to run over all MessageComponents
+     * Adds a new {@link PostProcessor} to run over all MessageComponents.
      *
      * @param postProcessor the PostProcessor to add
      *
@@ -76,12 +75,13 @@ public interface Dirigent<MessageT>
     Dirigent addPostProcessor(PostProcessor postProcessor);
 
     /**
-     * Finds a Formatter for given name and argument
+     * Finds a {@link Formatter} for given name and input parameter.
      *
-     * @param name the name of the formatter
-     * @param arg  the argument to pass to the formatter
+     * @param name The name of the formatter.
+     * @param input The input parameter to pass to the formatter.
      *
-     * @return the formatter or null if not found
+     * @return a {@link MacroResolutionResult} representing a {@link org.cubeengine.dirigent.parser.MacroResolutionState}
+     * and the {@link Formatter} to use.
      */
-    MacroResolutionResult findFormatter(String name, Object arg);
+    MacroResolutionResult findFormatter(String name, Object input);
 }

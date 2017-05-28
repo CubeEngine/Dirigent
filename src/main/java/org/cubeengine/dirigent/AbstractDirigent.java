@@ -47,51 +47,56 @@ import org.cubeengine.dirigent.parser.token.Token;
 
 /**
  * Basic implementation of Dirigent providing:
- * - Parsing the message but not composing the final message
+ * - Parsing the source message but not composing the final message components
  * - Formatters and PostProcessors
  */
 public abstract class AbstractDirigent<MessageT> implements Dirigent<MessageT>
 {
-
+    /**
+     * The registered formatter.
+     */
     private Map<String, List<Formatter<?>>> formatters = new HashMap<String, List<Formatter<?>>>();
+    /**
+     * The attached post processors.
+     */
     private List<PostProcessor> postProcessors = new ArrayList<PostProcessor>();
 
-    public AbstractDirigent()
+    protected AbstractDirigent()
     {
         this(new DefaultFormatter());
     }
 
-    public AbstractDirigent(Formatter<?> defaultFormatter)
+    protected AbstractDirigent(Formatter<?> defaultFormatter)
     {
         registerFormatter(defaultFormatter);
     }
 
     @Override
-    public MessageT compose(String source, Object... args)
+    public MessageT compose(String source, Object... inputs)
     {
-        return this.compose(Contexts.createContext(), source, args);
+        return this.compose(Contexts.createContext(), source, inputs);
     }
 
     @Override
-    public MessageT compose(Context context, String source, Object... args)
+    public MessageT compose(Context context, String source, Object... inputs)
     {
         List<Token> tokens = Tokenizer.tokenize(source);
-        ComponentGroup message = resolve(tokens, context, args);
+        ComponentGroup message = resolve(tokens, context, inputs);
         return compose(message, context);
     }
 
     /**
-     * Composes the parsed Message into the final form
+     * Composes the parsed {@link ComponentGroup} into the final form.
      *
-     * @param message the parsed message
-     * @param context the context
+     * @param componentGroup A component group holding the entire message components.
+     * @param context The compose context.
      *
-     * @return the composed Message
+     * @return the composed message.
      */
-    protected abstract MessageT compose(ComponentGroup message, Context context);
+    protected abstract MessageT compose(ComponentGroup componentGroup, Context context);
 
     @Override
-    public MacroResolutionResult findFormatter(String name, Object arg)
+    public MacroResolutionResult findFormatter(String name, Object input)
     {
         List<Formatter<?>> list = this.formatters.get(name);
         if (list == null)
@@ -100,7 +105,7 @@ public abstract class AbstractDirigent<MessageT> implements Dirigent<MessageT>
         }
         for (Formatter<?> formatter : list)
         {
-            if (formatter.isApplicable(arg))
+            if (formatter.isApplicable(input))
             {
                 return new MacroResolutionResult(MacroResolutionState.OK, formatter);
             }
@@ -132,13 +137,14 @@ public abstract class AbstractDirigent<MessageT> implements Dirigent<MessageT>
     }
 
     /**
-     * Finds Formatter for the messages components and runs global PostProcessors.
+     * Iterates through the provided {@link Token}s and converts them to {@link Component}s. Therefore the method uses
+     * the registered {@link Formatter} and runs global {@link PostProcessor}s.
      *
-     * @param tokens  the parsed components
-     * @param context the context
-     * @param inputs  the message arguments
+     * @param tokens The parsed tokens.
+     * @param context The compose context.
+     * @param inputs The message input parameters.
      *
-     * @return the modified Message ready to be composed
+     * @return A {@link ComponentGroup} holding all the {@link Component}s representing the input {@link Token}s.
      */
     @SuppressWarnings("unchecked")
     private ComponentGroup resolve(List<Token> tokens, Context context, Object[] inputs)
@@ -193,7 +199,8 @@ public abstract class AbstractDirigent<MessageT> implements Dirigent<MessageT>
 
                 if (res.isOK())
                 {
-                    out = new ResolvedMacro((Formatter<Object>)formatter, isConstant ? null : input, context, arguments);
+                    out = new ResolvedMacro((Formatter<Object>)formatter, isConstant ? null : input, context,
+                                            arguments);
                 }
                 else
                 {
@@ -208,7 +215,7 @@ public abstract class AbstractDirigent<MessageT> implements Dirigent<MessageT>
             else
             {
                 throw new IllegalStateException(
-                    "The message contains Components that are not Text or Macro: " + token.getClass().getName());
+                    "The message contains Tokens that are not Text or Macro: " + token.getClass().getName());
             }
 
             list.add(applyPostProcessors(out, context, arguments));
@@ -217,6 +224,15 @@ public abstract class AbstractDirigent<MessageT> implements Dirigent<MessageT>
         return new ComponentGroup(list);
     }
 
+    /**
+     * Executes all attached {@link PostProcessor}s to process the specified {@link Component}.
+     *
+     * @param in The component to process.
+     * @param context The compose context.
+     * @param args The macro arguments.
+     *
+     * @return The processed component.
+     */
     private Component applyPostProcessors(Component in, Context context, Arguments args)
     {
         Component out = in;
