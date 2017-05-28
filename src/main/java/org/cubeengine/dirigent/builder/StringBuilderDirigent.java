@@ -22,13 +22,29 @@
  */
 package org.cubeengine.dirigent.builder;
 
+import org.cubeengine.dirigent.formatter.Formatter;
+
 /**
- * A {@link org.cubeengine.dirigent.Dirigent} implementation creating String compositions by using a {@link StringBuilder}.
+ * A {@link org.cubeengine.dirigent.Dirigent} implementation creating String compositions by using a {@link
+ * StringBuilder}.
  */
 public class StringBuilderDirigent extends BuilderDirigent<String, StringBuilder>
 {
+    /**
+     * Constructor.
+     */
     public StringBuilderDirigent()
     {
         super(new StringMessageBuilder());
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param defaultFormatter The default formatter.
+     */
+    public StringBuilderDirigent(final Formatter<Object> defaultFormatter)
+    {
+        super(new StringMessageBuilder(), defaultFormatter);
     }
 }

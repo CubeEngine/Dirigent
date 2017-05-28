@@ -61,14 +61,27 @@ public abstract class AbstractDirigent<MessageT> implements Dirigent<MessageT>
      */
     private List<PostProcessor> postProcessors = new ArrayList<PostProcessor>();
 
+    /**
+     * The default formatter.
+     */
+    private Formatter<Object> defaultFormatter;
+
+    /**
+     * Constructor. Uses the {@link DefaultFormatter} as the default formatter.
+     */
     protected AbstractDirigent()
     {
         this(new DefaultFormatter());
     }
 
-    protected AbstractDirigent(Formatter<?> defaultFormatter)
+    /**
+     * Constructor.
+     *
+     * @param defaultFormatter The default formatter to use.
+     */
+    protected AbstractDirigent(final Formatter<Object> defaultFormatter)
     {
-        registerFormatter(defaultFormatter);
+        this.defaultFormatter = defaultFormatter;
     }
 
     @Override
@@ -98,6 +111,11 @@ public abstract class AbstractDirigent<MessageT> implements Dirigent<MessageT>
     @Override
     public MacroResolutionResult findFormatter(String name, Object input)
     {
+        if (name == null)
+        {
+            return new MacroResolutionResult(MacroResolutionState.OK, defaultFormatter);
+        }
+
         List<Formatter<?>> list = this.formatters.get(name);
         if (list == null)
         {

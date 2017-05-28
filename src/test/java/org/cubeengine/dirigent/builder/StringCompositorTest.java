@@ -40,6 +40,7 @@ import org.cubeengine.dirigent.formatter.StringFormatter;
 import org.cubeengine.dirigent.formatter.TimeFormatter;
 import org.cubeengine.dirigent.formatter.argument.Arguments;
 import org.cubeengine.dirigent.parser.Text;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -144,6 +145,13 @@ public class StringCompositorTest
     {
         assertEquals("Test: 1 and static text with 2",
                      compose("Test: {number} and {text:static text} with {number}", 1, 2));
+    }
+
+    @Test
+    public void testChangeDefaultFormatter() throws Exception
+    {
+        BuilderDirigent<String, StringBuilder> compositor = new StringBuilderDirigent(new ReverseStringFormatter());
+        Assert.assertEquals("esrever", compositor.compose("{}", "reverse"));
     }
 
     @Test

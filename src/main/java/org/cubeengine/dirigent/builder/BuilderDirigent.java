@@ -24,6 +24,7 @@ package org.cubeengine.dirigent.builder;
 
 import org.cubeengine.dirigent.AbstractDirigent;
 import org.cubeengine.dirigent.context.Context;
+import org.cubeengine.dirigent.formatter.Formatter;
 import org.cubeengine.dirigent.parser.component.ComponentGroup;
 
 /**
@@ -37,7 +38,7 @@ public class BuilderDirigent<MessageT, BuilderT> extends AbstractDirigent<Messag
     /**
      * The builder to use for composing the target message.
      */
-    private MessageBuilder<MessageT, BuilderT> mBuilder;
+    private final MessageBuilder<MessageT, BuilderT> mBuilder;
 
     /**
      * Constructor.
@@ -46,6 +47,18 @@ public class BuilderDirigent<MessageT, BuilderT> extends AbstractDirigent<Messag
      */
     public BuilderDirigent(MessageBuilder<MessageT, BuilderT> mBuilder)
     {
+        this.mBuilder = mBuilder;
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param mBuilder The builder to use for composing a {@link ComponentGroup} to the target message.
+     * @param defaultFormatter The default formatter to use.
+     */
+    public BuilderDirigent(MessageBuilder<MessageT, BuilderT> mBuilder, Formatter<Object> defaultFormatter)
+    {
+        super(defaultFormatter);
         this.mBuilder = mBuilder;
     }
 
