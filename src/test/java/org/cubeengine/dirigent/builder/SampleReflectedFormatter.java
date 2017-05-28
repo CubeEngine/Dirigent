@@ -37,9 +37,14 @@ import org.cubeengine.dirigent.parser.Text;
 public class SampleReflectedFormatter extends ReflectedFormatter
 {
     @Format
-    public Component format(String string, Context context, Arguments args)
+    public Component format(String string, Context context)
     {
         return new Text("[" + string + "]");
+    }
+
+    @Format
+    public Component format(Number number) {
+        return new Text(String.valueOf(number));
     }
 
     @Format

@@ -23,20 +23,40 @@
 package org.cubeengine.dirigent.parser.component;
 
 import org.cubeengine.dirigent.Component;
-import org.cubeengine.dirigent.formatter.argument.Arguments;
 import org.cubeengine.dirigent.context.Context;
 import org.cubeengine.dirigent.formatter.Formatter;
+import org.cubeengine.dirigent.formatter.argument.Arguments;
 
 /**
  * A Component containing the formatter found for a token
  */
 public class ResolvedMacro implements Component
 {
+    /**
+     * The formatter which is responsible of formatting the messages input parameter.
+     */
     private final Formatter<Object> formatter;
+    /**
+     * The messages input parameter.
+     */
     private final Object input;
+    /**
+     * The macro arguments.
+     */
     private final Arguments arguments;
+    /**
+     * The compose context.
+     */
     private final Context context;
 
+    /**
+     * Constructor.
+     *
+     * @param formatter The formatter which is responsible of formatting the messages input parameter.
+     * @param input The messages input parameter.
+     * @param context The macro arguments.
+     * @param arguments The compose context.
+     */
     public ResolvedMacro(Formatter<Object> formatter, Object input, Context context, Arguments arguments)
     {
 
@@ -46,21 +66,41 @@ public class ResolvedMacro implements Component
         this.context = context;
     }
 
+    /**
+     * Returns the {@link Formatter} which is responsible of formatting the messages input parameters.
+     *
+     * @return the formatter.
+     */
     public Formatter<Object> getFormatter()
     {
         return formatter;
     }
 
+    /**
+     * Returns the messages input parameter.
+     *
+     * @return the input parameter.
+     */
     public Object getInput()
     {
         return input;
     }
 
+    /**
+     * Returns the compose context.
+     *
+     * @return the compose context.
+     */
     public Context getContext()
     {
         return context;
     }
 
+    /**
+     * Returns the macro argument.
+     *
+     * @return the macro argument.
+     */
     public Arguments getArguments()
     {
         return arguments;
@@ -108,7 +148,7 @@ public class ResolvedMacro implements Component
     @Override
     public String toString()
     {
-        return "ResolvedMacro{" + "formatter=" + formatter + ", input=" + input + ", arguments=" + arguments + ", context="
-            + context + '}';
+        return "ResolvedMacro{" + "formatter=" + formatter + ", input=" + input + ", arguments=" + arguments
+            + ", context=" + context + '}';
     }
 }

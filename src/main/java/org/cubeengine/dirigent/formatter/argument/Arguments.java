@@ -28,13 +28,31 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * A class holding all {@link Argument} objects of a single {@link org.cubeengine.dirigent.parser.token.Macro}.
+ * Furthermore it provides a few static helper methods to create a new instance.
+ */
 public class Arguments
 {
+    /**
+     * Static reference of an arguments object without an argument.
+     */
     public static final Arguments NONE = new Arguments(Collections.<Argument>emptyList());
 
+    /**
+     * List of {@link Value} arguments.
+     */
     private final List<String> values;
+    /**
+     * Map of {@link Parameter} arguments.
+     */
     private final Map<String, String> parameters;
 
+    /**
+     * Constructor. Splits the arguments into a {@link Value} list and a map for {@link Parameter} arguments.
+     *
+     * @param rawArgs The list of arguments.
+     */
     public Arguments(List<Argument> rawArgs)
     {
         List<String> values = new ArrayList<String>();
@@ -60,7 +78,7 @@ public class Arguments
     }
 
     /**
-     * Returns the list of arguments
+     * Returns the list of {@link Value} arguments.
      *
      * @return the list of arguments
      */
@@ -70,11 +88,11 @@ public class Arguments
     }
 
     /**
-     * Returns the argument value for given name or null if not found.
+     * Returns the {@link Parameter} argument value for given name or {@code null} if not found.
      *
-     * @param name the name
+     * @param name The name of the {@link Parameter}.
      *
-     * @return the value of the Argument by name
+     * @return the value of the argument by name.
      */
     public String get(String name)
     {
@@ -82,12 +100,12 @@ public class Arguments
     }
 
     /**
-     * Returns the argument value for given name or the given default if not found.
+     * Returns the {@link Parameter} argument value for given name or the given default if not found.
      *
-     * @param name the name
-     * @param def the default value
+     * @param name The name of the {@link Parameter}.
+     * @param def The default value.
      *
-     * @return the value of the Argument by name
+     * @return the value of the argument by name or the default value.
      */
     public String getOrElse(String name, String def)
     {
@@ -100,23 +118,19 @@ public class Arguments
     }
 
     /**
-     * Returns the unnamed value at a position or null if the position is not within bounds.
+     * Returns the unnamed {@link Value} argument at a position or {@code null] if the position is not within bounds.
      *
-     * @param i the position
+     * @param i The position.
      *
-     * @return the Argument value
+     * @return the value argument.
      */
     public String get(int i)
     {
-        if (i >= 0 && i < values.size())
-        {
-            return values.get(i);
-        }
-        return null;
+        return getOrElse(i, null);
     }
 
     /**
-     * Returns the unnamed value at a position or the default if the position is not within bounds.
+     * Returns the unnamed {@link Value} argument at a position or the default if the position is not within bounds.
      *
      * @param i the position
      * @param def the default value
@@ -125,20 +139,20 @@ public class Arguments
      */
     public String getOrElse(int i, String def)
     {
-        String val = get(i);
-        if (val == null)
+        if (i >= 0 && i < values.size())
         {
-            return def;
+            return values.get(i);
         }
-        return val;
+        return def;
     }
 
     /**
-     * Returns whether the list of arguments contains given flag
+     * Returns whether the list of {@link Value} arguments contains a given value. This might be used to check for
+     * specific flags.
      *
-     * @param value the flag to check for
+     * @param value The value argument to check for.
      *
-     * @return whether the list of arguments contains given flag
+     * @return whether the list of {@link Value} arguments contains the given value.
      */
     public boolean has(String value)
     {
@@ -191,16 +205,36 @@ public class Arguments
         return "Arguments{" + "values=" + values + ", parameters=" + parameters + '}';
     }
 
+    /**
+     * Creates a new object without any arguments.
+     *
+     * @return the created object.
+     */
     public static Arguments create()
     {
         return NONE;
     }
 
+    /**
+     * Creates a new object with the specified argument.
+     *
+     * @param arg The argument.
+     *
+     * @return the created object.
+     */
     public static Arguments create(Argument arg)
     {
         return create(Collections.singletonList(arg));
     }
 
+    /**
+     * Creates a new object with the list of arguments. It checks for the number of argument entries and creates an
+     * empty arguments object if necessary.
+     *
+     * @param args The list of arguments.
+     *
+     * @return the created object.
+     */
     public static Arguments create(List<Argument> args)
     {
         if (args == null || args.isEmpty())

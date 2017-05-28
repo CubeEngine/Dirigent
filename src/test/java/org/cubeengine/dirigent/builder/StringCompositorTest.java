@@ -123,6 +123,7 @@ public class StringCompositorTest
     public void testReflectedFormatterIntegration() throws Exception
     {
         assertEquals("msg: [string]", compose("msg: {sample}", "string"));
+        assertEquals("msg: 5.6", compose("msg: {sample}", 5.6d));
         assertEquals("msg: <42>", compose("msg: {reflected}", 42));
     }
 

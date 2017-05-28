@@ -27,31 +27,63 @@ import org.cubeengine.dirigent.parser.MacroResolutionState;
 import org.cubeengine.dirigent.parser.token.Macro;
 
 /**
- * A Component signaling a no Formatter could be found for a token
+ * A Component signaling that a Formatter could not be resolved. This might be because a formatter couldn't be found for
+ * a macro.
  */
 public class UnresolvableMacro implements Component
 {
+    /**
+     * The macro which couldn't be resolved.
+     */
     private Macro macro;
-    private Object arg;
+    /**
+     * The messages input parameter.
+     */
+    private Object input;
+    /**
+     * The macro resolution state.
+     */
     private final MacroResolutionState state;
 
-    public UnresolvableMacro(Macro macro, Object arg, MacroResolutionState state)
+    /**
+     * Constructor.
+     *
+     * @param macro The macro which couldn't be resolved.
+     * @param input The messages input parameter.
+     * @param state The macro resolution state.
+     */
+    public UnresolvableMacro(Macro macro, Object input, MacroResolutionState state)
     {
         this.macro = macro;
-        this.arg = arg;
+        this.input = input;
         this.state = state;
     }
 
+    /**
+     * Returns the macro which couldn't be resolved.
+     *
+     * @return the macro.
+     */
     public Macro getMacro()
     {
         return macro;
     }
 
+    /**
+     * Returns the messages input parameter.
+     *
+     * @return the input parameter.
+     */
     public Object getInput()
     {
-        return arg;
+        return input;
     }
 
+    /**
+     * Returns the macro resolution state indicating the reason for being unresolved.
+     *
+     * @return the macro resolution state.
+     */
     public MacroResolutionState getState()
     {
         return state;
@@ -89,6 +121,6 @@ public class UnresolvableMacro implements Component
     @Override
     public String toString()
     {
-        return "UnresolvableMacro{" + "macro=" + macro + ", arg=" + arg + '}';
+        return "UnresolvableMacro{" + "macro=" + macro + ", input=" + input + '}';
     }
 }

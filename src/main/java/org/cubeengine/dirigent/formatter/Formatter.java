@@ -55,8 +55,8 @@ public abstract class Formatter<T>
     public abstract boolean isApplicable(Object input);
 
     /**
-     * Formats the parameter into a {@link Component} for given compose {@link Context} with the help of the specified
-     * {@link Arguments} object.
+     * Formats the input parameter into a {@link Component} for given compose {@link Context} with the help of the
+     * specified {@link Arguments} object.
      *
      * @param input The message input parameter to format.
      * @param context The compose context.
@@ -67,9 +67,9 @@ public abstract class Formatter<T>
     protected abstract Component format(T input, Context context, Arguments args);
 
     /**
-     * Formats the parameter into a {@link Component} for given compose {@link Context} with the help of the specified
-     * {@link Arguments} object. Therefore it calls the {@link #format(Object, Context, Arguments)} method which must
-     * be implemented by sub classes. Afterwards all attached {@link PostProcessor}s are executed.
+     * Formats the input parameter into a {@link Component} for given compose {@link Context} with the help of the
+     * specified {@link Arguments} object. Therefore it calls the {@link #format(Object, Context, Arguments)} method
+     * which must be implemented by sub classes. Afterwards all attached {@link PostProcessor}s are executed.
      *
      * @param input the message input parameter to format.
      * @param context the compose context.

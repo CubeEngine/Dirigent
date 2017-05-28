@@ -33,29 +33,32 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import org.cubeengine.dirigent.formatter.argument.Arguments;
-import org.cubeengine.dirigent.formatter.Formatter;
 import org.cubeengine.dirigent.Component;
 import org.cubeengine.dirigent.context.Context;
+import org.cubeengine.dirigent.formatter.Formatter;
+import org.cubeengine.dirigent.formatter.argument.Arguments;
 
 import static java.util.Arrays.asList;
 
 /**
- * <p>
- *     A Formatter using annotations and reflection to allow multiple Classes to be processes by the same Formatter
- * </p>
- * <p>
- *     An implemented ReflectedFormatter needs a @Names Annotation on its declaration and at least one Method like this:
- * </p>
- * <p>
- *     public String format(T object, MacroContext context) with a @Format Annotation
- * </p>
+ * A Formatter using annotations and reflection to allow multiple Classes to be processes by the same Formatter. An
+ * implemented ReflectedFormatter needs a {@link Names} Annotation on its declaration and at least one Method like
+ * this: {@code public String format(T object, MacroContext context)} with a {@link Format} Annotation
  */
 public abstract class ReflectedFormatter extends Formatter<Object>
 {
+    /**
+     * Map storing the {@link Formatter} declared in this implementation.
+     */
     private Map<Class<?>, Formatter> formats = new HashMap<Class<?>, Formatter>();
+    /**
+     * The macro names triggering one of the {@link Formatter}.
+     */
     private Set<String> names;
 
+    /**
+     * Constructor. Loads the macro names and the declared {@link Format} methods.
+     */
     protected ReflectedFormatter()
     {
         if (!this.getClass().isAnnotationPresent(Names.class))
@@ -70,6 +73,10 @@ public abstract class ReflectedFormatter extends Formatter<Object>
         }
     }
 
+    /**
+     * Loads all methods with a {@link Format} annotation, creates an individual {@link Formatter} instance and stores
+     * them to the {@link #formats} map.
+     */
     private void findFormatMethods()
     {
         for (Method method : this.getClass().getMethods())
@@ -87,6 +94,15 @@ public abstract class ReflectedFormatter extends Formatter<Object>
         }
     }
 
+    /**
+     * Creates a {@link Formatter} executing a {@link Format} method.
+     *
+     * @param method The {@link Format} method.
+     * @param sig The method input parameter type.
+     * @param prio The priority of this formatter.
+     *
+     * @return A {@link Formatter} object.
+     */
     private Formatter createFormatter(Method method, Class<?>[] sig, int prio)
     {
         if (method.getReturnType() != Component.class)
@@ -111,7 +127,8 @@ public abstract class ReflectedFormatter extends Formatter<Object>
             }
             else
             {
-                throw new InvalidFormatMethodException(getClass(), method, "Format methods may only take Context and Arguments parameters!");
+                throw new InvalidFormatMethodException(getClass(), method,
+                                                       "Format methods may only take Context and Arguments parameters!");
             }
         }
         else if (sig.length == 3)
@@ -126,12 +143,14 @@ public abstract class ReflectedFormatter extends Formatter<Object>
             }
             else
             {
-                throw new InvalidFormatMethodException(getClass(), method, "Format methods may only take Context and Arguments parameters!");
+                throw new InvalidFormatMethodException(getClass(), method,
+                                                       "Format methods may only take Context and Arguments parameters!");
             }
         }
         else
         {
-            throw new InvalidFormatMethodException(getClass(), method, "Format methods must take at most 3 parameters!");
+            throw new InvalidFormatMethodException(getClass(), method,
+                                                   "Format methods must take at most 3 parameters!");
         }
         return new Formatter(this, method, prio, invoker);
     }
@@ -193,6 +212,9 @@ public abstract class ReflectedFormatter extends Formatter<Object>
         return false;
     }
 
+    /**
+     * This kind of a formatter is used to store the method information and invoke it easily.
+     */
     private static final class Formatter
     {
         final Object host;
@@ -200,6 +222,14 @@ public abstract class ReflectedFormatter extends Formatter<Object>
         final int prio;
         final Invoker invoker;
 
+        /**
+         * Constructor.
+         *
+         * @param host The parent {@link ReflectedFormatter} owning the method.
+         * @param method The actual method.
+         * @param prio The formatter priority.
+         * @param invoker The invoker object used for formatting.
+         */
         public Formatter(Object host, Method method, int prio, Invoker invoker)
         {
             this.host = host;
@@ -208,6 +238,16 @@ public abstract class ReflectedFormatter extends Formatter<Object>
             this.invoker = invoker;
         }
 
+        /**
+         * Formats the input parameter into a {@link Component} for given compose {@link Context} with the help of the
+         * specified {@link Arguments} object by executing the formatter method.
+         *
+         * @param in The message input parameter to format.
+         * @param ctx The compose context.
+         * @param args The macro arguments.
+         *
+         * @return the resulting component.
+         */
         public final Component format(Object in, Context ctx, Arguments args)
         {
             try
@@ -225,51 +265,91 @@ public abstract class ReflectedFormatter extends Formatter<Object>
         }
     }
 
+    /**
+     * Interface which invokes a specified method.
+     */
     private interface Invoker
     {
-        Object invoke(Object host, Method method, Object in, Context ctx, Arguments args) throws InvocationTargetException, IllegalAccessException;
+        /**
+         * Invokes the method.
+         *
+         * @param host The host of the method. In this context it's always the {@link ReflectedFormatter}.
+         * @param method The method to invoke.
+         * @param in The message input parameter to format.
+         * @param ctx The compose context.
+         * @param args The macro arguments.
+         *
+         * @return the resulting component.
+         *
+         * @throws InvocationTargetException if the method couldn't be executed with success.
+         * @throws IllegalAccessException if the method can't be executed because of wrong access rights.
+         */
+        Object invoke(Object host, Method method, Object in, Context ctx,
+                      Arguments args) throws InvocationTargetException, IllegalAccessException;
     }
 
+    /**
+     * Invokes format methods having all parameters in the default order - the input parameter, the compose context, the
+     * macro arguments.
+     */
     private static final class CompleteContextFirst implements Invoker
     {
         @Override
-        public Object invoke(Object host, Method method, Object in, Context ctx, Arguments args) throws InvocationTargetException, IllegalAccessException
+        public Object invoke(Object host, Method method, Object in, Context ctx,
+                             Arguments args) throws InvocationTargetException, IllegalAccessException
         {
             return method.invoke(host, in, ctx, args);
         }
     }
 
+    /**
+     * Invokes format methods having all parameters but not in the default order but 1st the input parameter, than the
+     * macro arguments and than the compose context.
+     */
     private static final class CompleteArgsFirst implements Invoker
     {
         @Override
-        public Object invoke(Object host, Method method, Object in, Context ctx, Arguments args) throws InvocationTargetException, IllegalAccessException
+        public Object invoke(Object host, Method method, Object in, Context ctx,
+                             Arguments args) throws InvocationTargetException, IllegalAccessException
         {
             return method.invoke(host, in, args, ctx);
         }
     }
 
+    /**
+     * Invokes format methods only having the input parameter and the compose context.
+     */
     private static final class ContextOnly implements Invoker
     {
         @Override
-        public Object invoke(Object host, Method method, Object in, Context ctx, Arguments args) throws InvocationTargetException, IllegalAccessException
+        public Object invoke(Object host, Method method, Object in, Context ctx,
+                             Arguments args) throws InvocationTargetException, IllegalAccessException
         {
             return method.invoke(host, in, ctx);
         }
     }
 
+    /**
+     * Invokes format methods only having the input parameter and the macro arguments.
+     */
     private static final class ArgsOnly implements Invoker
     {
         @Override
-        public Object invoke(Object host, Method method, Object in, Context ctx, Arguments args) throws InvocationTargetException, IllegalAccessException
+        public Object invoke(Object host, Method method, Object in, Context ctx,
+                             Arguments args) throws InvocationTargetException, IllegalAccessException
         {
             return method.invoke(host, in, args);
         }
     }
 
+    /**
+     * Invokes format methods only having the input parameter.
+     */
     private static final class InputOnly implements Invoker
     {
         @Override
-        public Object invoke(Object host, Method method, Object in, Context ctx, Arguments args) throws InvocationTargetException, IllegalAccessException
+        public Object invoke(Object host, Method method, Object in, Context ctx,
+                             Arguments args) throws InvocationTargetException, IllegalAccessException
         {
             return method.invoke(host, in);
         }

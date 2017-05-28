@@ -27,5 +27,10 @@ package org.cubeengine.dirigent.parser.token;
  */
 public interface Indexed extends Macro
 {
+    /**
+     * The position index of the message input parameter which shall be formatted with this macro.
+     *
+     * @return the position index.
+     */
     int getIndex();
 }

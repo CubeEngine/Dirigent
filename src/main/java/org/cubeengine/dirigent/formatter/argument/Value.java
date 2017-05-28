@@ -23,7 +23,7 @@
 package org.cubeengine.dirigent.formatter.argument;
 
 /**
- * A simple value argument
+ * A simple value argument of a macro.
  */
 public class Value implements Argument
 {

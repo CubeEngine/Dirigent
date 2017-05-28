@@ -29,5 +29,10 @@ import org.cubeengine.dirigent.Component;
  */
 public interface TextComponent extends Component
 {
+    /**
+     * Returns the text of this component.
+     *
+     * @return the text.
+     */
     String getText();
 }

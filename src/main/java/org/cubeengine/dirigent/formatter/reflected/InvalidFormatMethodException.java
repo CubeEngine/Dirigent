@@ -24,6 +24,9 @@ package org.cubeengine.dirigent.formatter.reflected;
 
 import java.lang.reflect.Method;
 
+/**
+ * This exception is thrown if the {@link Format} annotation is on a method which can't be used for formatting.
+ */
 public class InvalidFormatMethodException extends RuntimeException
 {
     private final Class<?> clazz;
