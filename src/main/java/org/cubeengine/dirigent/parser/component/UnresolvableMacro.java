@@ -22,7 +22,6 @@
  */
 package org.cubeengine.dirigent.parser.component;
 
-import org.cubeengine.dirigent.Component;
 import org.cubeengine.dirigent.parser.MacroResolutionState;
 import org.cubeengine.dirigent.parser.token.Macro;
 

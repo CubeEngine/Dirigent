@@ -24,7 +24,6 @@ package org.cubeengine.dirigent.parser.component;
 
 import java.util.Collections;
 import java.util.List;
-import org.cubeengine.dirigent.Component;
 
 /**
  * Multiple components grouped together to form a single logical unit.

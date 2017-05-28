@@ -26,7 +26,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-import org.cubeengine.dirigent.Component;
+import org.cubeengine.dirigent.parser.component.Component;
 import org.cubeengine.dirigent.context.Context;
 import org.cubeengine.dirigent.context.Contexts;
 import org.cubeengine.dirigent.formatter.argument.Arguments;

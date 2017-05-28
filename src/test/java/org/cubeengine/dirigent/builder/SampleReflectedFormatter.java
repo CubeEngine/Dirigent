@@ -22,7 +22,7 @@
  */
 package org.cubeengine.dirigent.builder;
 
-import org.cubeengine.dirigent.Component;
+import org.cubeengine.dirigent.parser.component.Component;
 import org.cubeengine.dirigent.context.Context;
 import org.cubeengine.dirigent.formatter.argument.Arguments;
 import org.cubeengine.dirigent.formatter.reflected.Format;

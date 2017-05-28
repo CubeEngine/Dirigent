@@ -26,7 +26,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
-import org.cubeengine.dirigent.Component;
+import org.cubeengine.dirigent.parser.component.Component;
 import org.cubeengine.dirigent.context.Context;
 import org.cubeengine.dirigent.formatter.CurrencyFormatter;
 import org.cubeengine.dirigent.formatter.DateFormatter;

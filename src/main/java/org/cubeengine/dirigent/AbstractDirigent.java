@@ -37,6 +37,7 @@ import org.cubeengine.dirigent.parser.MacroResolutionResult;
 import org.cubeengine.dirigent.parser.MacroResolutionState;
 import org.cubeengine.dirigent.parser.Text;
 import org.cubeengine.dirigent.parser.Tokenizer;
+import org.cubeengine.dirigent.parser.component.Component;
 import org.cubeengine.dirigent.parser.component.ComponentGroup;
 import org.cubeengine.dirigent.parser.component.ResolvedMacro;
 import org.cubeengine.dirigent.parser.component.UnresolvableMacro;
