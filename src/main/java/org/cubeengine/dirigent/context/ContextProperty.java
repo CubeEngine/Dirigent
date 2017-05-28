@@ -30,7 +30,7 @@ public class ContextProperty<K>
     {
         this(new DefaultProvider<K>() {
             @Override
-            public K defaultValue()
+            public K defaultValue(Context context)
             {
                 return null;
             }

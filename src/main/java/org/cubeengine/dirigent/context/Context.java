@@ -110,7 +110,7 @@ public class Context
         K val = (K)properties.get(key);
         if (val == null)
         {
-            return defaultProvider.defaultValue();
+            return defaultProvider.defaultValue(this);
         }
         return val;
     }

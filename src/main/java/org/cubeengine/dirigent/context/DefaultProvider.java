@@ -24,5 +24,5 @@ package org.cubeengine.dirigent.context;
 
 public interface DefaultProvider<T>
 {
-    T defaultValue();
+    T defaultValue(Context context);
 }

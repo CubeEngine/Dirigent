@@ -47,7 +47,7 @@ public class Contexts
     public static final ContextProperty<Locale> LOCALE = new ContextProperty<Locale>(new DefaultProvider<Locale>()
     {
         @Override
-        public Locale defaultValue()
+        public Locale defaultValue(Context context)
         {
             return Locale.getDefault();
         }
@@ -56,26 +56,28 @@ public class Contexts
     /**
      * This property identifies a {@link TimeZone} instance in a context.
      */
-    public static final ContextProperty<TimeZone> TIMEZONE = new ContextProperty<TimeZone>(new DefaultProvider<TimeZone>()
-    {
-        @Override
-        public TimeZone defaultValue()
+    public static final ContextProperty<TimeZone> TIMEZONE = new ContextProperty<TimeZone>(
+        new DefaultProvider<TimeZone>()
         {
-            return TimeZone.getDefault();
-        }
-    });
+            @Override
+            public TimeZone defaultValue(Context context)
+            {
+                return TimeZone.getDefault();
+            }
+        });
 
     /**
      * This property identifies a {@link Currency} instance in a context.
      */
-    public static final ContextProperty<Currency> CURRENCY = new ContextProperty<Currency>(new DefaultProvider<Currency>()
-    {
-        @Override
-        public Currency defaultValue()
+    public static final ContextProperty<Currency> CURRENCY = new ContextProperty<Currency>(
+        new DefaultProvider<Currency>()
         {
-            return Currency.getInstance(Locale.getDefault());
-        }
-    });
+            @Override
+            public Currency defaultValue(Context context)
+            {
+                return Currency.getInstance(context.get(LOCALE));
+            }
+        });
 
     /**
      * Creates a new empty context.
