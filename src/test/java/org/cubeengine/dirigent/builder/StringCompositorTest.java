@@ -26,7 +26,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
-import org.cubeengine.dirigent.parser.component.Component;
 import org.cubeengine.dirigent.context.Context;
 import org.cubeengine.dirigent.formatter.CurrencyFormatter;
 import org.cubeengine.dirigent.formatter.DateFormatter;
@@ -40,6 +39,7 @@ import org.cubeengine.dirigent.formatter.StringFormatter;
 import org.cubeengine.dirigent.formatter.TimeFormatter;
 import org.cubeengine.dirigent.formatter.argument.Arguments;
 import org.cubeengine.dirigent.parser.Text;
+import org.cubeengine.dirigent.parser.component.Component;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -185,5 +185,13 @@ public class StringCompositorTest
         });
 
         assertEquals("#sharp#", compose("sharp"));
+    }
+
+    @Test
+    public void testInputPositioning() throws Exception
+    {
+        assertEquals("I am 1 test", compose("{} {string} {long} {}", "I", "am", 1L, "test"));
+        assertEquals("Doubling echo echo", compose("{} {1} {}", "Doubling", "echo", "unimportant"));
+        assertEquals("echo Doubling echo", compose("{0} {1} {}", "echo", "Doubling", "unimportant"));
     }
 }
