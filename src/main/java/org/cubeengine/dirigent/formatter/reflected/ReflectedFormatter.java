@@ -36,13 +36,19 @@ import org.cubeengine.dirigent.context.Context;
 import static java.util.Arrays.asList;
 
 /**
- * A Formatter using annotations and reflection to allow multiple Classes to be processes by the same Formatter
- * <p>An implemented ReflectedFormatter needs a @Names Annotation on its declaration and at least one Method like this:
- * <p>public String format(T object, MacroContext context) with a @Format Annotation
+ * <p>
+ *     A Formatter using annotations and reflection to allow multiple Classes to be processes by the same Formatter
+ * </p>
+ * <p>
+ *     An implemented ReflectedFormatter needs a @Names Annotation on its declaration and at least one Method like this:
+ * </p>
+ * <p>
+ *     public String format(T object, MacroContext context) with a @Format Annotation
+ * </p>
  */
 public abstract class ReflectedFormatter extends Formatter<Object>
 {
-    private Map<Class, Method> formats = new HashMap<Class, Method>();
+    private Map<Class, FormatterInvoker> formats = new HashMap<Class, FormatterInvoker>();
     private Set<String> names;
 
     protected ReflectedFormatter()
@@ -63,22 +69,62 @@ public abstract class ReflectedFormatter extends Formatter<Object>
     {
         for (Method method : this.getClass().getMethods())
         {
-            if ("format".equals(method.getName()) && method.isAnnotationPresent(Format.class))
+            if (method.isAnnotationPresent(Format.class))
             {
                 Class<?>[] parameterTypes = method.getParameterTypes();
-                if (method.getReturnType() == Component.class &&
-                    parameterTypes.length == 3 &&
-                    parameterTypes[1] == Context.class &&
-                    parameterTypes[2] == Arguments.class)
+                if (parameterTypes.length == 0)
                 {
-                    method.setAccessible(true);
-                    this.formats.put(parameterTypes[0], method);
+                    throw new IllegalArgumentException("Format methods must take at least 1 parameter!");
                 }
-                else
-                {
-                    throw new IllegalArgumentException("The format methods must take the Object to format, a Context and the Arguments as parameters: " + getClass().getName());
-                }
+                this.formats.put(parameterTypes[0], createInvoker(method, parameterTypes));
             }
+        }
+    }
+
+    private FormatterInvoker createInvoker(Method method, Class<?>[] sig)
+    {
+        if (method.getReturnType() != Component.class)
+        {
+            throw new InvalidFormatMethodException(getClass(), method, "Format methods must return Component!");
+        }
+
+        if (sig.length == 1)
+        {
+            return new InputOnly(method);
+        }
+        else if (sig.length == 2)
+        {
+            if (sig[1] == Context.class)
+            {
+                return new ContextOnly(method);
+            }
+            else if (sig[1] == Arguments.class)
+            {
+                return new ArgsOnly(method);
+            }
+            else
+            {
+                throw new InvalidFormatMethodException(getClass(), method, "Format methods may only take Context and Arguments parameters!");
+            }
+        }
+        else if (sig.length == 3)
+        {
+            if (sig[1] == Context.class && sig[2] == Arguments.class)
+            {
+                return new CompleteContextFirst(method);
+            }
+            else if (sig[1] == Arguments.class && sig[2] == Context.class)
+            {
+                return new CompleteArgsFirst(method);
+            }
+            else
+            {
+                throw new InvalidFormatMethodException(getClass(), method, "Format methods may only take Context and Arguments parameters!");
+            }
+        }
+        else
+        {
+            throw new InvalidFormatMethodException(getClass(), method, "Format methods must take at most 3 parameters!");
         }
     }
 
@@ -96,7 +142,6 @@ public abstract class ReflectedFormatter extends Formatter<Object>
                 catch (IllegalAccessException e)
                 {
                     // These cannot happen as it got checked before:
-                    throw new IllegalArgumentException(e);
                 }
                 catch (InvocationTargetException e)
                 {
@@ -128,5 +173,103 @@ public abstract class ReflectedFormatter extends Formatter<Object>
             }
         }
         return false;
+    }
+
+    private abstract class FormatterInvoker
+    {
+        final Method method;
+
+        FormatterInvoker(Method method)
+        {
+            this.method = method;
+        }
+
+        public final Context format(Object in, Context ctx, Arguments args)
+        {
+            try
+            {
+                return (Context)invoke(ReflectedFormatter.this, in, ctx, args);
+            }
+            catch (InvocationTargetException e)
+            {
+                throw new RuntimeException(e);
+            }
+            catch (IllegalAccessException e)
+            {
+                throw new RuntimeException(e);
+            }
+        }
+
+        public abstract Object invoke(Object host, Object in, Context ctx, Arguments args) throws InvocationTargetException, IllegalAccessException;
+    }
+
+    private final class CompleteContextFirst extends FormatterInvoker
+    {
+        CompleteContextFirst(Method method)
+        {
+            super(method);
+        }
+
+        @Override
+        public Object invoke(Object host, Object in, Context ctx, Arguments args) throws InvocationTargetException, IllegalAccessException
+        {
+            return method.invoke(host, in, ctx, args);
+        }
+    }
+
+    private final class CompleteArgsFirst extends FormatterInvoker
+    {
+        CompleteArgsFirst(Method method)
+        {
+            super(method);
+        }
+
+        @Override
+        public Object invoke(Object host, Object in, Context ctx, Arguments args) throws InvocationTargetException, IllegalAccessException
+        {
+            return method.invoke(host, in, args, ctx);
+        }
+    }
+
+    private final class ContextOnly extends FormatterInvoker
+    {
+        ContextOnly(Method method)
+        {
+            super(method);
+        }
+
+        @Override
+        public Object invoke(Object host, Object in, Context ctx, Arguments args) throws InvocationTargetException, IllegalAccessException
+        {
+            return method.invoke(host, in, ctx);
+        }
+    }
+
+    private final class ArgsOnly extends FormatterInvoker
+    {
+        ArgsOnly(Method method)
+        {
+            super(method);
+        }
+
+        @Override
+        public Object invoke(Object host, Object in, Context ctx, Arguments args) throws InvocationTargetException, IllegalAccessException
+        {
+            return method.invoke(host, in, args);
+        }
+    }
+
+    private final class InputOnly extends FormatterInvoker
+    {
+        InputOnly(Method method)
+        {
+            super(method);
+        }
+
+        @Override
+        public Object invoke(Object host, Object in, Context ctx, Arguments args) throws InvocationTargetException, IllegalAccessException
+        {
+            return method.invoke(host, in);
+        }
     }
 }
