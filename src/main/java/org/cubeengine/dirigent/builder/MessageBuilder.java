@@ -119,7 +119,7 @@ public abstract class MessageBuilder<MessageT, BuilderT>
      */
     protected final void buildResolved(ResolvedMacro c, BuilderT builder, Context context)
     {
-        Component processed = c.getFormatter().process(c.getInput(), c.getContext(), c.getArguments());
+        Component processed = c.getFormatter().process(c.getInput(), context, c.getArguments());
         buildAny(processed, builder, context);
     }
 

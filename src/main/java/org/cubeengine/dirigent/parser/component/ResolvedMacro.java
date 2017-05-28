@@ -23,7 +23,6 @@
 package org.cubeengine.dirigent.parser.component;
 
 import org.cubeengine.dirigent.Component;
-import org.cubeengine.dirigent.context.Context;
 import org.cubeengine.dirigent.formatter.Formatter;
 import org.cubeengine.dirigent.formatter.argument.Arguments;
 
@@ -44,26 +43,19 @@ public class ResolvedMacro implements Component
      * The macro arguments.
      */
     private final Arguments arguments;
-    /**
-     * The compose context.
-     */
-    private final Context context;
 
     /**
      * Constructor.
      *
      * @param formatter The formatter which is responsible of formatting the messages input parameter.
      * @param input The messages input parameter.
-     * @param context The macro arguments.
      * @param arguments The compose context.
      */
-    public ResolvedMacro(Formatter<Object> formatter, Object input, Context context, Arguments arguments)
+    public ResolvedMacro(Formatter<Object> formatter, Object input, Arguments arguments)
     {
-
         this.formatter = formatter;
         this.input = input;
         this.arguments = arguments;
-        this.context = context;
     }
 
     /**
@@ -84,16 +76,6 @@ public class ResolvedMacro implements Component
     public Object getInput()
     {
         return input;
-    }
-
-    /**
-     * Returns the compose context.
-     *
-     * @return the compose context.
-     */
-    public Context getContext()
-    {
-        return context;
     }
 
     /**
@@ -128,11 +110,7 @@ public class ResolvedMacro implements Component
         {
             return false;
         }
-        if (!getArguments().equals(that.getArguments()))
-        {
-            return false;
-        }
-        return getContext().equals(that.getContext());
+        return getArguments().equals(that.getArguments());
     }
 
     @Override
@@ -141,14 +119,12 @@ public class ResolvedMacro implements Component
         int result = getFormatter().hashCode();
         result = 31 * result + getInput().hashCode();
         result = 31 * result + getArguments().hashCode();
-        result = 31 * result + getContext().hashCode();
         return result;
     }
 
     @Override
     public String toString()
     {
-        return "ResolvedMacro{" + "formatter=" + formatter + ", input=" + input + ", arguments=" + arguments
-            + ", context=" + context + '}';
+        return "ResolvedMacro{" + "formatter=" + formatter + ", input=" + input + ", arguments=" + arguments + '}';
     }
 }

@@ -199,8 +199,7 @@ public abstract class AbstractDirigent<MessageT> implements Dirigent<MessageT>
 
                 if (res.isOK())
                 {
-                    out = new ResolvedMacro((Formatter<Object>)formatter, isConstant ? null : input, context,
-                                            arguments);
+                    out = new ResolvedMacro((Formatter<Object>)formatter, isConstant ? null : input, arguments);
                 }
                 else
                 {
