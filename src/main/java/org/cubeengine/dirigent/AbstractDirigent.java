@@ -29,9 +29,9 @@ import java.util.Map;
 import org.cubeengine.dirigent.context.Context;
 import org.cubeengine.dirigent.context.Contexts;
 import org.cubeengine.dirigent.formatter.ConstantFormatter;
-import org.cubeengine.dirigent.formatter.DefaultFormatter;
 import org.cubeengine.dirigent.formatter.Formatter;
 import org.cubeengine.dirigent.formatter.PostProcessor;
+import org.cubeengine.dirigent.formatter.StringFormatter;
 import org.cubeengine.dirigent.formatter.argument.Arguments;
 import org.cubeengine.dirigent.parser.MacroResolutionResult;
 import org.cubeengine.dirigent.parser.MacroResolutionState;
@@ -68,11 +68,11 @@ public abstract class AbstractDirigent<MessageT> implements Dirigent<MessageT>
     private Formatter<Object> defaultFormatter;
 
     /**
-     * Constructor. Uses the {@link DefaultFormatter} as the default formatter.
+     * Constructor. Uses the {@link StringFormatter} as the default formatter.
      */
     protected AbstractDirigent()
     {
-        this(new DefaultFormatter());
+        this(new StringFormatter());
     }
 
     /**
