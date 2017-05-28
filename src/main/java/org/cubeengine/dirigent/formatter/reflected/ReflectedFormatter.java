@@ -129,27 +129,26 @@ public abstract class ReflectedFormatter extends Formatter<Object>
     }
 
     @Override
-    protected Component format(Object input, Context context, Arguments args)
+    protected Component format(final Object input, Context context, Arguments args)
     {
-        for (Class<?> tClass : formats.keySet())
+        final Class<?> inputClass = input.getClass();
+        Class<?> candidate = null;
+        for (Class<?> formatterClass : formats.keySet())
         {
-            if (tClass.isAssignableFrom(input.getClass()))
+            if (inputClass == formatterClass)
             {
-                try
-                {
-                    return (Component)formats.get(tClass).invoke(this, input, context, args);
-                }
-                catch (IllegalAccessException e)
-                {
-                    // These cannot happen as it got checked before:
-                }
-                catch (InvocationTargetException e)
-                {
-                    throw new IllegalArgumentException(e);
-                }
+                return this.formats.get(formatterClass).format(input, context, args);
+            }
+            else if (formatterClass.isAssignableFrom(inputClass))
+            {
+                candidate = formatterClass;
             }
         }
-        return null;
+        if (candidate == null)
+        {
+            return null;
+        }
+        return formats.get(candidate).format(input, context, args);
     }
 
     @Override
@@ -184,11 +183,11 @@ public abstract class ReflectedFormatter extends Formatter<Object>
             this.method = method;
         }
 
-        public final Context format(Object in, Context ctx, Arguments args)
+        public final Component format(Object in, Context ctx, Arguments args)
         {
             try
             {
-                return (Context)invoke(ReflectedFormatter.this, in, ctx, args);
+                return (Component)invoke(ReflectedFormatter.this, in, ctx, args);
             }
             catch (InvocationTargetException e)
             {
