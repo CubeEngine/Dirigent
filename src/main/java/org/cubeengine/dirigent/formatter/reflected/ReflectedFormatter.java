@@ -24,6 +24,7 @@ package org.cubeengine.dirigent.formatter.reflected;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -61,12 +62,13 @@ public abstract class ReflectedFormatter extends Formatter<Object>
      */
     protected ReflectedFormatter()
     {
-        if (!this.getClass().isAnnotationPresent(Names.class))
+        Names namesAnnotation = getClass().getAnnotation(Names.class);
+        if (namesAnnotation == null)
         {
             throw new AnnotationMissingException(Names.class);
         }
-        names = new HashSet<String>(asList(this.getClass().getAnnotation(Names.class).value()));
-        this.findFormatMethods();
+        this.names = new HashSet<String>(asList(namesAnnotation.value()));
+        this.formats = findFormatMethods();
         if (this.formats.isEmpty())
         {
             throw new AnnotationMissingException(Format.class);
@@ -77,8 +79,9 @@ public abstract class ReflectedFormatter extends Formatter<Object>
      * Loads all methods with a {@link Format} annotation, creates an individual {@link Formatter} instance and stores
      * them to the {@link #formats} map.
      */
-    private void findFormatMethods()
+    private Map<Class<?>, Formatter> findFormatMethods()
     {
+        final Map<Class<?>, Formatter> formats = new HashMap<Class<?>, Formatter>();
         for (Method method : this.getClass().getMethods())
         {
             Format formatAnnotation = method.getAnnotation(Format.class);
@@ -87,11 +90,12 @@ public abstract class ReflectedFormatter extends Formatter<Object>
                 Class<?>[] parameterTypes = method.getParameterTypes();
                 if (parameterTypes.length == 0)
                 {
-                    throw new IllegalArgumentException("Format methods must take at least 1 parameter!");
+                    throw new InvalidFormatMethodException(getClass(), method, "Format methods must take at least 1 parameter!");
                 }
-                this.formats.put(parameterTypes[0], createFormatter(method, parameterTypes, formatAnnotation.value()));
+                formats.put(parameterTypes[0], createFormatter(method, parameterTypes, formatAnnotation.value()));
             }
         }
+        return formats;
     }
 
     /**

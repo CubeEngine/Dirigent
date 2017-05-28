@@ -82,6 +82,9 @@ public class StringCompositorTest
 
         msg = "Another pure String \\with escape character";
         assertEquals(msg, compose(msg));
+
+        msg = "";
+        assertEquals(msg, compose(msg));
     }
 
     @Test

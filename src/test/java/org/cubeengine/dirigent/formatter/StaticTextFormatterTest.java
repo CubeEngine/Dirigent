@@ -46,6 +46,12 @@ public class StaticTextFormatterTest
         checkFormat("some Text", Locale.GERMANY, "some Text");
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void testInputValidation()
+    {
+        new StaticTextFormatter((String[])null);
+    }
+
     private void checkFormat(final String expected, final Locale locale, final String argument)
     {
         final Arguments arguments;

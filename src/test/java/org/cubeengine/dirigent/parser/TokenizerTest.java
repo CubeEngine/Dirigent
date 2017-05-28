@@ -113,7 +113,11 @@ public class TokenizerTest
         assertEquals(
             tokens(txt("text and a macro "), complete(1, "name", arg("and parameter", "with value"), arg("multiple"), arg("and one", "more")), txt(" more text")),
             tokenize("text and a macro {1:name#with index and comment:and parameter=with value:multiple:and one=more} more text"));
+    }
 
+    @Test
+    public void testInvalidTokens()
+    {
         assertEquals(
             tokens(txt("illegal macro "), err("{starts but wont end")),
             tokenize("illegal macro {starts but wont end"));
@@ -149,5 +153,23 @@ public class TokenizerTest
         assertEquals("static", unescape("static", "=:}\\"));
         assertEquals("static \\\\ tex:t\\", unescape("static \\\\\\\\ tex\\:t\\\\", "=:}\\"));
         assertEquals("static \\\\ tex\\:t\\", unescape("static \\\\\\\\ tex\\:t\\\\", "=}\\"));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testNullMessage()
+    {
+        Tokenizer.tokenize(null);
+    }
+
+    @Test
+    public void testIntegerConversion()
+    {
+        assertEquals(tokens(indexed(11)), tokenize("{11}"));
+    }
+
+    @Test
+    public void testIntegerValidation()
+    {
+        assertEquals(tokens(named("1a")), tokenize("{1a}"));
     }
 }
