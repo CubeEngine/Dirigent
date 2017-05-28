@@ -129,14 +129,12 @@ public class StringCompositorTest
     @Test
     public void testFormatterWithWrongParameter() throws Exception
     {
-        // TODO here I would expect something else
         assertEquals("msg: {{unresolved: number}}", compose("msg: {number}", "string"));
     }
 
     @Test
     public void testUnavailableFormatterName() throws Exception
     {
-        // TODO here I would expect something else
         assertEquals("msg: {{unresolved: blub}}", compose("msg: {blub}", "string"));
     }
 
