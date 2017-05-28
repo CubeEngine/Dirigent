@@ -24,9 +24,14 @@ package org.cubeengine.dirigent.formatter.reflected;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import org.cubeengine.dirigent.formatter.argument.Arguments;
 import org.cubeengine.dirigent.formatter.Formatter;
@@ -48,7 +53,7 @@ import static java.util.Arrays.asList;
  */
 public abstract class ReflectedFormatter extends Formatter<Object>
 {
-    private Map<Class, FormatterInvoker> formats = new HashMap<Class, FormatterInvoker>();
+    private Map<Class<?>, Formatter> formats = new HashMap<Class<?>, Formatter>();
     private Set<String> names;
 
     protected ReflectedFormatter()
@@ -69,38 +74,40 @@ public abstract class ReflectedFormatter extends Formatter<Object>
     {
         for (Method method : this.getClass().getMethods())
         {
-            if (method.isAnnotationPresent(Format.class))
+            Format formatAnnotation = method.getAnnotation(Format.class);
+            if (formatAnnotation != null)
             {
                 Class<?>[] parameterTypes = method.getParameterTypes();
                 if (parameterTypes.length == 0)
                 {
                     throw new IllegalArgumentException("Format methods must take at least 1 parameter!");
                 }
-                this.formats.put(parameterTypes[0], createInvoker(method, parameterTypes));
+                this.formats.put(parameterTypes[0], createFormatter(method, parameterTypes, formatAnnotation.value()));
             }
         }
     }
 
-    private FormatterInvoker createInvoker(Method method, Class<?>[] sig)
+    private Formatter createFormatter(Method method, Class<?>[] sig, int prio)
     {
         if (method.getReturnType() != Component.class)
         {
             throw new InvalidFormatMethodException(getClass(), method, "Format methods must return Component!");
         }
 
+        final Invoker invoker;
         if (sig.length == 1)
         {
-            return new InputOnly(method);
+            invoker = new InputOnly();
         }
         else if (sig.length == 2)
         {
             if (sig[1] == Context.class)
             {
-                return new ContextOnly(method);
+                invoker = new ContextOnly();
             }
             else if (sig[1] == Arguments.class)
             {
-                return new ArgsOnly(method);
+                invoker = new ArgsOnly();
             }
             else
             {
@@ -111,11 +118,11 @@ public abstract class ReflectedFormatter extends Formatter<Object>
         {
             if (sig[1] == Context.class && sig[2] == Arguments.class)
             {
-                return new CompleteContextFirst(method);
+                invoker = new CompleteContextFirst();
             }
             else if (sig[1] == Arguments.class && sig[2] == Context.class)
             {
-                return new CompleteArgsFirst(method);
+                invoker = new CompleteArgsFirst();
             }
             else
             {
@@ -126,29 +133,41 @@ public abstract class ReflectedFormatter extends Formatter<Object>
         {
             throw new InvalidFormatMethodException(getClass(), method, "Format methods must take at most 3 parameters!");
         }
+        return new Formatter(this, method, prio, invoker);
     }
 
     @Override
     protected Component format(final Object input, Context context, Arguments args)
     {
         final Class<?> inputClass = input.getClass();
-        Class<?> candidate = null;
-        for (Class<?> formatterClass : formats.keySet())
+        final List<Formatter> candidates = new ArrayList<Formatter>();
+        for (Entry<Class<?>, Formatter> entry : formats.entrySet())
         {
+            Class<?> formatterClass = entry.getKey();
             if (inputClass == formatterClass)
             {
+                // exact match will be used directly
                 return this.formats.get(formatterClass).format(input, context, args);
             }
             else if (formatterClass.isAssignableFrom(inputClass))
             {
-                candidate = formatterClass;
+                candidates.add(entry.getValue());
             }
         }
-        if (candidate == null)
+        if (candidates.isEmpty())
         {
             return null;
         }
-        return formats.get(candidate).format(input, context, args);
+        Collections.sort(candidates, new Comparator<ReflectedFormatter.Formatter>()
+        {
+            @Override
+            public int compare(ReflectedFormatter.Formatter a, ReflectedFormatter.Formatter b)
+            {
+                // sort descending, so the highest priority value will be first.
+                return b.prio - a.prio;
+            }
+        });
+        return candidates.get(0).format(input, context, args);
     }
 
     @Override
@@ -174,20 +193,26 @@ public abstract class ReflectedFormatter extends Formatter<Object>
         return false;
     }
 
-    private abstract class FormatterInvoker
+    private static final class Formatter
     {
+        final Object host;
         final Method method;
+        final int prio;
+        final Invoker invoker;
 
-        FormatterInvoker(Method method)
+        public Formatter(Object host, Method method, int prio, Invoker invoker)
         {
+            this.host = host;
             this.method = method;
+            this.prio = prio;
+            this.invoker = invoker;
         }
 
         public final Component format(Object in, Context ctx, Arguments args)
         {
             try
             {
-                return (Component)invoke(ReflectedFormatter.this, in, ctx, args);
+                return (Component)invoker.invoke(host, method, in, ctx, args);
             }
             catch (InvocationTargetException e)
             {
@@ -198,75 +223,53 @@ public abstract class ReflectedFormatter extends Formatter<Object>
                 throw new RuntimeException(e);
             }
         }
-
-        public abstract Object invoke(Object host, Object in, Context ctx, Arguments args) throws InvocationTargetException, IllegalAccessException;
     }
 
-    private final class CompleteContextFirst extends FormatterInvoker
+    private interface Invoker
     {
-        CompleteContextFirst(Method method)
-        {
-            super(method);
-        }
+        Object invoke(Object host, Method method, Object in, Context ctx, Arguments args) throws InvocationTargetException, IllegalAccessException;
+    }
 
+    private static final class CompleteContextFirst implements Invoker
+    {
         @Override
-        public Object invoke(Object host, Object in, Context ctx, Arguments args) throws InvocationTargetException, IllegalAccessException
+        public Object invoke(Object host, Method method, Object in, Context ctx, Arguments args) throws InvocationTargetException, IllegalAccessException
         {
             return method.invoke(host, in, ctx, args);
         }
     }
 
-    private final class CompleteArgsFirst extends FormatterInvoker
+    private static final class CompleteArgsFirst implements Invoker
     {
-        CompleteArgsFirst(Method method)
-        {
-            super(method);
-        }
-
         @Override
-        public Object invoke(Object host, Object in, Context ctx, Arguments args) throws InvocationTargetException, IllegalAccessException
+        public Object invoke(Object host, Method method, Object in, Context ctx, Arguments args) throws InvocationTargetException, IllegalAccessException
         {
             return method.invoke(host, in, args, ctx);
         }
     }
 
-    private final class ContextOnly extends FormatterInvoker
+    private static final class ContextOnly implements Invoker
     {
-        ContextOnly(Method method)
-        {
-            super(method);
-        }
-
         @Override
-        public Object invoke(Object host, Object in, Context ctx, Arguments args) throws InvocationTargetException, IllegalAccessException
+        public Object invoke(Object host, Method method, Object in, Context ctx, Arguments args) throws InvocationTargetException, IllegalAccessException
         {
             return method.invoke(host, in, ctx);
         }
     }
 
-    private final class ArgsOnly extends FormatterInvoker
+    private static final class ArgsOnly implements Invoker
     {
-        ArgsOnly(Method method)
-        {
-            super(method);
-        }
-
         @Override
-        public Object invoke(Object host, Object in, Context ctx, Arguments args) throws InvocationTargetException, IllegalAccessException
+        public Object invoke(Object host, Method method, Object in, Context ctx, Arguments args) throws InvocationTargetException, IllegalAccessException
         {
             return method.invoke(host, in, args);
         }
     }
 
-    private final class InputOnly extends FormatterInvoker
+    private static final class InputOnly implements Invoker
     {
-        InputOnly(Method method)
-        {
-            super(method);
-        }
-
         @Override
-        public Object invoke(Object host, Object in, Context ctx, Arguments args) throws InvocationTargetException, IllegalAccessException
+        public Object invoke(Object host, Method method, Object in, Context ctx, Arguments args) throws InvocationTargetException, IllegalAccessException
         {
             return method.invoke(host, in);
         }

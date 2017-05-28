@@ -36,4 +36,10 @@ import java.lang.annotation.Target;
 @Documented
 public @interface Format
 {
+    /**
+     * Priority value, higher values means higher priority.
+     *
+     * @return the priority
+     */
+    int value() default 0;
 }
