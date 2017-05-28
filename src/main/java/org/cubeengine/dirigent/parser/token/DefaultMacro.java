@@ -27,6 +27,9 @@ package org.cubeengine.dirigent.parser.token;
  */
 public class DefaultMacro implements Macro
 {
+    /**
+     * A constant instance representing this macro.
+     */
     public static final DefaultMacro DEFAULT_MACRO = new DefaultMacro();
 
     @Override

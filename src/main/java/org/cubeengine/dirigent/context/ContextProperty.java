@@ -22,13 +22,25 @@
  */
 package org.cubeengine.dirigent.context;
 
+/**
+ * Represents the key of a context property.
+ *
+ * @param <K> The type of the property value.
+ */
 public class ContextProperty<K>
 {
+    /**
+     * The default provider which is used to obtain a default value.
+     */
     private final DefaultProvider<K> defaultProvider;
 
+    /**
+     * Constructor. Adds a default provider returning null as default value.
+     */
     public ContextProperty()
     {
-        this(new DefaultProvider<K>() {
+        this(new DefaultProvider<K>()
+        {
             @Override
             public K defaultValue(Context context)
             {
@@ -37,11 +49,23 @@ public class ContextProperty<K>
         });
     }
 
+    /**
+     * Constructor.
+     *
+     * @param defaultProvider The default provider which is used to obtain a default value.
+     */
     public ContextProperty(DefaultProvider<K> defaultProvider)
     {
         this.defaultProvider = defaultProvider;
     }
 
+    /**
+     * Creates a new property mapping which maps the specified value to the context property.
+     *
+     * @param value The value.
+     *
+     * @return the created property mapping.
+     */
     public final PropertyMapping<K> with(K value)
     {
         return new PropertyMapping<K>(this, value);
@@ -52,7 +76,8 @@ public class ContextProperty<K>
      *
      * @return the default value, might be null.
      */
-    public DefaultProvider<K> getDefaultProvider() {
+    public DefaultProvider<K> getDefaultProvider()
+    {
         return defaultProvider;
     }
 }

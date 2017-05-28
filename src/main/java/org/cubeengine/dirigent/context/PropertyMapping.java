@@ -22,11 +22,22 @@
  */
 package org.cubeengine.dirigent.context;
 
+/**
+ * Helper class representing a context value with the related context property.
+ *
+ * @param <T> The type of the value.
+ */
 public final class PropertyMapping<T>
 {
     public final ContextProperty<T> property;
     public final T value;
 
+    /**
+     * Constructor.
+     *
+     * @param property The context property.
+     * @param value The value.
+     */
     public PropertyMapping(ContextProperty<T> property, T value)
     {
         this.property = property;

@@ -29,28 +29,61 @@ import org.cubeengine.dirigent.formatter.Formatter;
  */
 public final class MacroResolutionResult
 {
-    public static final MacroResolutionResult UNKNOWN_NAME = new MacroResolutionResult(MacroResolutionState.UNKNOWN_NAME, null);
-    public static final MacroResolutionResult NONE_APPLICABLE = new MacroResolutionResult(MacroResolutionState.NONE_APPLICABLE, null);
+    /**
+     * Holds a constant for a {@link MacroResolutionResult} representing the state {@link
+     * MacroResolutionState#UNKNOWN_NAME} indicating that no formatter exists for the given macro name.
+     */
+    public static final MacroResolutionResult UNKNOWN_NAME = new MacroResolutionResult(
+        MacroResolutionState.UNKNOWN_NAME, null);
+    /**
+     * Holds a constant for a {@link MacroResolutionResult} representing the state {@link
+     * MacroResolutionState#NONE_APPLICABLE} indicating that a formatter exists for the given macro name, but the isn't
+     * applicable to the given message input parameter.
+     */
+    public static final MacroResolutionResult NONE_APPLICABLE = new MacroResolutionResult(
+        MacroResolutionState.NONE_APPLICABLE, null);
 
     private final MacroResolutionState state;
     private final Formatter<?> formatter;
 
+    /**
+     * Constructor.
+     *
+     * @param state The resolution state.
+     * @param formatter The formatter.
+     */
     public MacroResolutionResult(MacroResolutionState state, Formatter<?> formatter)
     {
         this.state = state;
         this.formatter = formatter;
     }
 
+    /**
+     * Returns the information whether the {@link MacroResolutionState} is {@link MacroResolutionState#OK} whcih means
+     * that a formatter could be determined for a {@link org.cubeengine.dirigent.parser.token.Macro}.
+     *
+     * @return whether the state is {@link MacroResolutionState#OK}.
+     */
     public boolean isOK()
     {
         return getState() == MacroResolutionState.OK;
     }
 
+    /**
+     * Returns the {@link MacroResolutionState} representing the resolution state.
+     *
+     * @return the state.
+     */
     public MacroResolutionState getState()
     {
         return state;
     }
 
+    /**
+     * Returns the found {@link Formatter}.
+     *
+     * @return the formatter.
+     */
     public Formatter<?> getFormatter()
     {
         return formatter;

@@ -27,8 +27,16 @@ package org.cubeengine.dirigent.parser.token;
  */
 public class IndexedDefaultMacro extends DefaultMacro implements Indexed
 {
+    /**
+     * The position index of the message input parameter which shall be formatted with this macro.
+     */
     private final int index;
 
+    /**
+     * Constructor.
+     *
+     * @param index The position index of the message input parameter which shall be formatted with this macro.
+     */
     public IndexedDefaultMacro(int index)
     {
         this.index = index;

@@ -28,24 +28,46 @@ import org.cubeengine.dirigent.formatter.argument.Arguments;
 import org.cubeengine.dirigent.formatter.argument.Argument;
 
 /**
- * A macro with a name and an optional list of Arguments
+ * A macro with a name and an optional list of arguments.
  */
 public class NamedMacro implements Macro
 {
+    /**
+     * The name of the macro.
+     */
     private final String name;
+    /**
+     * The arguments of the macro.
+     */
     private final Arguments args;
 
+    /**
+     * Constructor.
+     *
+     * @param name The name of the macros.
+     * @param args The arguments of the macro.
+     */
     public NamedMacro(String name, List<Argument> args)
     {
         this.name = name;
         this.args = Arguments.create(args);
     }
 
+    /**
+     * Returns the name of the macro.
+     *
+     * @return the name.
+     */
     public String getName()
     {
         return name;
     }
 
+    /**
+     * Returns the arguments of the macro.
+     *
+     * @return the arguments.
+     */
     public Arguments getArgs()
     {
         return args;

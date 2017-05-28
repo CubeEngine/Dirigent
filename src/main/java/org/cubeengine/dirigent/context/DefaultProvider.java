@@ -22,7 +22,19 @@
  */
 package org.cubeengine.dirigent.context;
 
+/**
+ * The default provider is used to obtain a default value for a {@link ContextProperty}.
+ *
+ * @param <T> The type of the value.
+ */
 public interface DefaultProvider<T>
 {
+    /**
+     * Obtains a default value for a {@link ContextProperty}.
+     *
+     * @param context The compose context.
+     *
+     * @return the default value.
+     */
     T defaultValue(Context context);
 }

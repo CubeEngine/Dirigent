@@ -30,8 +30,18 @@ import org.cubeengine.dirigent.formatter.argument.Argument;
  */
 public class CompleteMacro extends NamedMacro implements Indexed
 {
+    /**
+     * The position index of the message input parameter which shall be formatted with this macro.
+     */
     private int index;
 
+    /**
+     * Constructor.
+     *
+     * @param index The position index of the message input parameter which shall be formatted with this macro.
+     * @param name The name of the macros.
+     * @param args The arguments of the macro.
+     */
     public CompleteMacro(int index, String name, List<Argument> args)
     {
         super(name, args);

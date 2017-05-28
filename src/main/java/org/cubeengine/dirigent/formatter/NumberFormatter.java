@@ -127,7 +127,7 @@ public class NumberFormatter extends AbstractFormatter<Number>
     private NumberFormat parseFormatter(Context context, Arguments args)
     {
         final String format = args.get(FORMAT_PARAM_NAME);
-        Locale locale = context.get(LOCALE);
+        final Locale locale = context.get(LOCALE);
         if (format != null)
         {
             return new DecimalFormat(format, DecimalFormatSymbols.getInstance(locale));

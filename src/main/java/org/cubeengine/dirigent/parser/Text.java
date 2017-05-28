@@ -26,17 +26,30 @@ import org.cubeengine.dirigent.parser.component.TextComponent;
 import org.cubeengine.dirigent.parser.token.Token;
 
 /**
- * A simple component for static strings.
+ * A simple component and token for static strings.
  */
 public class Text implements Token, TextComponent
 {
+    /**
+     * The actual text.
+     */
     private String string;
 
+    /**
+     * Constructor.
+     *
+     * @param string The actual text.
+     */
     public Text(String string)
     {
         this.string = String.valueOf(string);
     }
 
+    /**
+     * Returns the actual text.
+     *
+     * @return the text.
+     */
     public String getText()
     {
         return string;
