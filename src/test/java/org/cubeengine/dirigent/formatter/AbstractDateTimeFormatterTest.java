@@ -31,11 +31,11 @@ import java.util.Locale;
 import java.util.TimeZone;
 import org.cubeengine.dirigent.Component;
 import org.cubeengine.dirigent.context.Context;
-import org.cubeengine.dirigent.formatter.argument.Arguments;
-import org.cubeengine.dirigent.parser.Text;
 import org.cubeengine.dirigent.formatter.argument.Argument;
+import org.cubeengine.dirigent.formatter.argument.Arguments;
 import org.cubeengine.dirigent.formatter.argument.Parameter;
 import org.cubeengine.dirigent.formatter.argument.Value;
+import org.cubeengine.dirigent.parser.Text;
 import org.junit.Assert;
 
 import static org.cubeengine.dirigent.context.Contexts.createContext;
@@ -52,7 +52,8 @@ public abstract class AbstractDateTimeFormatterTest
         this.formatter = formatter;
     }
 
-    protected Date createDate() {
+    protected Date createDate()
+    {
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
         final Calendar calendar = GregorianCalendar.getInstance(Locale.US);
         calendar.set(2017, Calendar.MAY, 25, 15, 13, 21);
@@ -61,24 +62,31 @@ public abstract class AbstractDateTimeFormatterTest
 
     protected void checkFormat(final String expected, final Date date, final Locale locale, final String style)
     {
-        checkFormat(expected, date, locale, style, null, null, null);
+        checkFormat(expected, date, locale, TimeZone.getDefault(), style, null, null, null);
+    }
+
+    protected void checkFormat(final String expected, final Date date, final Locale locale, final TimeZone timeZone,
+                               final String style)
+    {
+        checkFormat(expected, date, locale, timeZone, style, null, null, null);
     }
 
     protected void checkFormat(final String expected, final Date date, final String format)
     {
-        checkFormat(expected, date, Locale.US, null, null, null, format);
+        checkFormat(expected, date, Locale.US, TimeZone.getDefault(), null, null, null, format);
     }
 
     protected void checkFormat(final String expected, final Date date, final Locale locale, final String defaultStyle,
                                final String dateStyle, final String timeStyle)
     {
-        checkFormat(expected, date, locale, defaultStyle, dateStyle, timeStyle, null);
+        checkFormat(expected, date, locale, TimeZone.getDefault(), defaultStyle, dateStyle, timeStyle, null);
     }
 
-    private void checkFormat(final String expected, final Date date, final Locale locale, final String defaultStyle,
-                             final String dateStyle, final String timeStyle, final String format)
+    private void checkFormat(final String expected, final Date date, final Locale locale, final TimeZone timeZone,
+                             final String defaultStyle, final String dateStyle, final String timeStyle,
+                             final String format)
     {
-        final Context context = createContext(locale);
+        final Context context = createContext(locale, timeZone);
         final Arguments args = createArguments(defaultStyle, dateStyle, timeStyle, format);
 
         final Component component = formatter.format(date, context, args);
@@ -88,7 +96,7 @@ public abstract class AbstractDateTimeFormatterTest
     }
 
     private Arguments createArguments(final String defaultStyle, final String dateStyle, final String timeStyle,
-                                           final String format)
+                                      final String format)
     {
         final List<Argument> arguments = new LinkedList<Argument>();
 

@@ -28,6 +28,7 @@ import java.text.NumberFormat;
 import java.util.Locale;
 import org.cubeengine.dirigent.Component;
 import org.cubeengine.dirigent.context.Context;
+import org.cubeengine.dirigent.context.Contexts;
 import org.cubeengine.dirigent.formatter.argument.Arguments;
 import org.cubeengine.dirigent.parser.Text;
 
@@ -87,7 +88,7 @@ public class NumberFormatter extends AbstractFormatter<Number>
     /**
      * Constructor.
      *
-     * @param mode  The default mode of the formatter. May be null.
+     * @param mode The default mode of the formatter. May be null.
      * @param names The names triggering this formatter.
      */
     public NumberFormatter(Mode mode, String... names)
@@ -105,15 +106,16 @@ public class NumberFormatter extends AbstractFormatter<Number>
     /**
      * Parses the given number to a string depending on the context.
      *
-     * @param number  The number to parse.
+     * @param number The number to parse.
      * @param context The context to use.
-     * @param args    The arguments of the macro.
+     * @param args The arguments of the macro.
      *
      * @return The number as a string.
      */
     protected String parseNumberToString(Number number, Context context, Arguments args)
     {
         final NumberFormat numberFormat = parseFormatter(context, args);
+        numberFormat.setCurrency(context.get(Contexts.CURRENCY));
         return numberFormat.format(number);
     }
 
@@ -121,7 +123,7 @@ public class NumberFormatter extends AbstractFormatter<Number>
      * Parses the {@link NumberFormat} to use from the context arguments.
      *
      * @param context The context.
-     * @param args    The arguments of the macro.
+     * @param args The arguments of the macro.
      *
      * @return the {@link NumberFormat}.
      */
@@ -171,7 +173,7 @@ public class NumberFormatter extends AbstractFormatter<Number>
         /**
          * Loads the mode from the formatter context or returns the default mode if the context doesn't specify one.
          *
-         * @param args        The arguments of the macro.
+         * @param args The arguments of the macro.
          * @param defaultMode The default mode.
          *
          * @return the loaded mode.

@@ -22,17 +22,18 @@
  */
 package org.cubeengine.dirigent.formatter;
 
+import java.util.Currency;
 import java.util.Locale;
 import org.cubeengine.dirigent.Component;
 import org.cubeengine.dirigent.context.Context;
 import org.cubeengine.dirigent.formatter.argument.Arguments;
-import org.cubeengine.dirigent.parser.Text;
 import org.cubeengine.dirigent.formatter.argument.Parameter;
 import org.cubeengine.dirigent.formatter.argument.Value;
+import org.cubeengine.dirigent.parser.Text;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static org.cubeengine.dirigent.context.Contexts.createContext;
+import static org.cubeengine.dirigent.context.Contexts.*;
 
 /**
  * Tests the {@link NumberFormatter}.
@@ -51,7 +52,8 @@ public class NumberFormatterTest
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testFormatWithWrongFormat() {
+    public void testFormatWithWrongFormat()
+    {
         checkFormat("", 123, Locale.GERMANY, NumberFormatter.FORMAT_PARAM_NAME, ".,.,");
     }
 
@@ -71,6 +73,16 @@ public class NumberFormatterTest
     }
 
     @Test
+    public void testFormatCurrencyWithStaticCurrency()
+    {
+        final Currency currency = Currency.getInstance(Locale.US);
+        checkFormat("12.345,00 USD", 12345, Locale.GERMANY, currency, NumberFormatter.CURRENCY_MODE_FLAG, null);
+        checkFormat("$12,345.00", 12345, Locale.US, currency, NumberFormatter.CURRENCY_MODE_FLAG, null);
+        checkFormat("12 345,00 USD", 12345, Locale.FRANCE, currency, NumberFormatter.CURRENCY_MODE_FLAG, null);
+        checkFormat("USD12,345.00", 12345, Locale.UK, currency, NumberFormatter.CURRENCY_MODE_FLAG, null);
+    }
+
+    @Test
     public void testFormatPercent()
     {
         checkFormat("12%", 0.12, Locale.GERMANY, NumberFormatter.PERCENT_MODE_FLAG, null);
@@ -87,7 +99,13 @@ public class NumberFormatterTest
     private void checkFormat(final String expected, final Number number, final Locale locale, final String mode,
                              final String value)
     {
-        final Context context = createContext(locale);
+        checkFormat(expected, number, locale, Currency.getInstance(locale), mode, value);
+    }
+
+    private void checkFormat(final String expected, final Number number, final Locale locale, final Currency currency,
+                             final String mode, final String value)
+    {
+        final Context context = createContext(LOCALE.with(locale), CURRENCY.with(currency));
         final Arguments args = args(mode, value);
         final Component component = numberFormatter.format(number, context, args);
 

@@ -24,6 +24,7 @@ package org.cubeengine.dirigent.formatter;
 
 import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 import org.junit.Test;
 
 /**
@@ -76,5 +77,15 @@ public class DateTimeFormatterTest extends AbstractDateTimeFormatterTest
         final Date date = createDate();
 
         checkFormat("2017.05.25 15:13:21", date, "YYYY.MM.dd HH:mm:ss");
+    }
+
+    @Test
+    public void testFormatWithDifferentTimezone()
+    {
+        final Date date = createDate();
+        final TimeZone timeZone = TimeZone.getTimeZone("Europe/Berlin");
+
+        checkFormat("25.05.17 17:13", date, Locale.GERMANY, timeZone, "short");
+        checkFormat("5/25/17 5:13 PM", date, Locale.US, timeZone, "short");
     }
 }

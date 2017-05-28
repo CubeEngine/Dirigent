@@ -28,6 +28,7 @@ import java.util.Date;
 import java.util.Locale;
 import org.cubeengine.dirigent.Component;
 import org.cubeengine.dirigent.context.Context;
+import org.cubeengine.dirigent.context.Contexts;
 import org.cubeengine.dirigent.formatter.argument.Arguments;
 import org.cubeengine.dirigent.parser.Text;
 
@@ -96,7 +97,7 @@ public class DateTimeFormatter extends AbstractFormatter<Date>
     /**
      * Constructor.
      *
-     * @param mode  The default mode of the formatter.
+     * @param mode The default mode of the formatter.
      * @param names The names triggering this formatter.
      */
     public DateTimeFormatter(Mode mode, String... names)
@@ -114,15 +115,16 @@ public class DateTimeFormatter extends AbstractFormatter<Date>
     /**
      * Parses the given date to a string depending on the context.
      *
-     * @param date    The date to parse.
+     * @param date The date to parse.
      * @param context The context to use.
-     * @param args    The arguments of the macro.
+     * @param args The arguments of the macro.
      *
      * @return The number as a string.
      */
     protected String parseDateToString(Date date, Context context, Arguments args)
     {
         final DateFormat dateFormat = parseFormatter(context, args);
+        dateFormat.setTimeZone(context.get(Contexts.TIMEZONE));
         return dateFormat.format(date);
     }
 
@@ -130,7 +132,7 @@ public class DateTimeFormatter extends AbstractFormatter<Date>
      * Parses the {@link DateFormat} to use from the context arguments.
      *
      * @param context The context.
-     * @param args    The arguments of the macro.
+     * @param args The arguments of the macro.
      *
      * @return the {@link DateFormat}.
      */
@@ -165,7 +167,7 @@ public class DateTimeFormatter extends AbstractFormatter<Date>
     /**
      * Parses the style of the {@link DateFormat} from a string label.
      *
-     * @param text         The string label.
+     * @param text The string label.
      * @param defaultStyle The default style.
      *
      * @return the parsed style or the default style if it's an incorrect style.
