@@ -6,11 +6,123 @@ Directs your composition
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.cubeengine/dirigent/badge.svg?style=flat)](https://maven-badges.herokuapp.com/maven-central/org.cubeengine/dirigent)
 [![Build Status](https://travis-ci.org/CubeEngine/Dirigent.svg?branch=master)](https://travis-ci.org/CubeEngine/Dirigent)
 
-A compact formatting framework intended to be used in conjuction with translated messages.
+little overview! finds macros in a text and replaces them with input parameters
 
-The Dirigent#compose(String source, Object... args) method will try to convert every occurrence of macros with the following syntax:
+("A compact formatting framework intended to be used in conjunction with translated messages.
 
- ```{[[<position>:]type[#<label>][:<args>]]}``` or ```{[position]}```
+The `Dirigent#compose(Context context, String source, Object... inputs)` method will try to convert every occurrence of macros in the message with a parameter input.")
+
+# Macro
+
+In this context macros follow this syntax:
+
+ ```{[[<position>:]type[#<label>][:<args>]]}``` or just ```{[position]}```
+ 
+ description of all macro components
+ a few example macros with my examples from master thesis
+
+# Process
+
+Here describe the internal process of the AbstractDirigent class a little
+- show main methods (with context and empty context)
+- Split messages into tokens Text, Macro 
+- convert tokens to components: Text, ResolvedMacro (Formatter + PostProcessors), UnresolvedMacro (two types)
+- composing the components part of sub implementations (like BuilderDirigent which is described later)
+
+# Context
+
+what is the context, what can it be used for, where is it important?
+what kind of properties are available already? Contexts class
+
+# Formatter
+
+explain formatter, default formatter for default macro
+show abstractformatter und reflectedformatter for easy usage
+
+## Available Formatters
+
+dirigent provides a few formatters already; They all provide default macro names, but they can be changed with the constructor
+
+### StringFormatter
+
+explanation
+
+flags: uppercase, lowercase
+context-properties: none
+default-names: blub
+
+### NumberFormatter
+
+explanation
+
+- flags: integer, currency, percent
+- params: format
+- context-properties: LOCALE, CURRENCY
+- default-names: blub
+
+#### IntegerFormatter
+
+starts in integer mode by default
+
+- default-names: blub
+
+#### CurrencyFormatter
+
+starts in currency mode by default
+
+- default-names: blub
+
+#### PercentFormatter
+
+starts in percent mode by default
+
+- default-names: blub
+
+### DateTimeFormatter
+
+explanation
+
+- flags: short, medium, long, full
+- params: format, date, time
+- context-properties: LOCALE, TIMEZONE
+- default-names: blub
+
+#### DateFormatter
+
+explanation
+
+- default-names: blub
+
+#### TimeFormatter
+
+explanation
+
+- default-names: blub
+
+### StaticTextFormatter
+
+explanation
+
+- args: text
+- params: none
+- context-properties: none
+- default-names: text
+
+# Post Processors
+
+what is it? How can they be used? dirigent + formatter
+
+# BuilderDirigent
+
+composes a message with a builder
+
+StaticBuilderDirigent
+
+how to control components, how to handle own components from own formatter
+
+---------
+
+# Old Stuff
 
 Just using ```{}``` or ```{<position>}``` will result in the macro being replaced by String.valueOf(...) of the Nth messageArgument or the messageArgument at the specified position.
 
