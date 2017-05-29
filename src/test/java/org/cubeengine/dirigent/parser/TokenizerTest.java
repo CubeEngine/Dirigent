@@ -143,6 +143,10 @@ public class TokenizerTest
         assertEquals(
             tokens(txt("escaping "), named("in", arg("arg"))),
             tokenize("escaping {in#la\\:b\\el:arg}"));
+
+        assertEquals(
+            tokens(txt("escaping "), named("in", arg("and#}=:\\arg"))),
+            tokenize("escaping {in#la#be\\}l:and#\\}\\=\\:\\\\arg}"));
     }
 
     @Test
