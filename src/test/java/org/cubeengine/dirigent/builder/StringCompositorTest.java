@@ -158,6 +158,13 @@ public class StringCompositorTest
     }
 
     @Test
+    public void testNullDefaultFormatter() throws Exception
+    {
+        BuilderDirigent<String, StringBuilder> compositor = new StringBuilderDirigent(null);
+        Assert.assertEquals("{{unresolved}}", compositor.compose("{}", "reverse"));
+    }
+
+    @Test
     public void testPostProcessor() throws Exception
     {
         compositor.findFormatter(null, "").getFormatter().addPostProcessor(new PostProcessor()

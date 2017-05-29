@@ -112,7 +112,7 @@ public abstract class AbstractDirigent<MessageT> implements Dirigent<MessageT>
     @Override
     public MacroResolutionResult findFormatter(String name, Object input)
     {
-        if (name == null)
+        if (name == null && defaultFormatter != null)
         {
             return new MacroResolutionResult(MacroResolutionState.OK, defaultFormatter);
         }
