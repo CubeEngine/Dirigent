@@ -133,6 +133,10 @@ public class TokenizerTest
         assertEquals(
             tokens(txt("illegal macro "), err("{starts#lab\\}el:has arguments but wont end")),
             tokenize("illegal macro {starts#lab\\}el:has arguments but wont end"));
+
+        assertEquals(
+            tokens(txt("illegal macro"), err("{first some static text and "), named("second")),
+            tokenize("illegal macro {first some static text and {second}"));
     }
 
     @Test
