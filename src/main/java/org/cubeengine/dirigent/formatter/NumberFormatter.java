@@ -43,7 +43,7 @@ import static org.cubeengine.dirigent.context.Contexts.LOCALE;
  *
  * In a message it's possible to control the format with two types of options. The first possibility is specifying a
  * "format" parameter. This parameter creates a {@link DecimalFormat} object with the specified format. Furthermore it's
- * possible to specify one of the flags "integer", "currency", "percent". This informationen loads the
+ * possible to specify one of the flags "integer", "currency", "percent". This information loads the
  * {@link NumberFormat} via {@link NumberFormat#getIntegerInstance()}, {@link NumberFormat#getCurrencyInstance()} or
  * {@link NumberFormat#getPercentInstance()}. It is the same functionality as handled by the {@link Mode}. The default
  * behaviour loads the format with the {@link NumberFormat#getInstance()} method. Furthermore the locale is respected
