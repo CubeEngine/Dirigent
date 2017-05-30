@@ -212,9 +212,9 @@ public class StringCompositorTest
         assertEquals("echo Doubling echo", compose("{0} {1} {}", "echo", "Doubling", "unimportant"));
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void testIllegalMacro() throws Exception
     {
-        assertEquals("", compose("illegal macro {illegal"));
+        assertEquals("illegal macro {illegal", compose("illegal macro {illegal"));
     }
 }

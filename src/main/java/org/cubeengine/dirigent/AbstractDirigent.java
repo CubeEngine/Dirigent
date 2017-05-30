@@ -40,6 +40,7 @@ import org.cubeengine.dirigent.parser.Tokenizer;
 import org.cubeengine.dirigent.parser.component.Component;
 import org.cubeengine.dirigent.parser.component.ComponentGroup;
 import org.cubeengine.dirigent.parser.component.ResolvedMacro;
+import org.cubeengine.dirigent.parser.component.TextComponent;
 import org.cubeengine.dirigent.parser.component.UnresolvableMacro;
 import org.cubeengine.dirigent.parser.token.Indexed;
 import org.cubeengine.dirigent.parser.token.Macro;
@@ -180,7 +181,7 @@ public abstract class AbstractDirigent<MessageT> implements Dirigent<MessageT>
         {
             Component out;
             Arguments arguments = Arguments.NONE;
-            if (token instanceof Text)
+            if (token instanceof TextComponent)
             {
                 out = (Component)token;
             }
