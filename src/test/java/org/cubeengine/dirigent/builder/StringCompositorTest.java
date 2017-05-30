@@ -164,6 +164,13 @@ public class StringCompositorTest
         Assert.assertEquals("{{unresolved}}", compositor.compose("{}", "reverse"));
     }
 
+    @Test(expected = IllegalStateException.class)
+    public void testDefaultFormatterWhichDoesNotHandleTheInputType() throws Exception
+    {
+        BuilderDirigent<String, StringBuilder> compositor = new StringBuilderDirigent(new SampleReflectedFormatter());
+        compositor.compose("{}", new Date());
+    }
+
     @Test
     public void testPostProcessor() throws Exception
     {
@@ -203,5 +210,11 @@ public class StringCompositorTest
         assertEquals("I am 1 test", compose("{} {string} {long} {}", "I", "am", 1L, "test"));
         assertEquals("Doubling echo echo", compose("{} {1} {}", "Doubling", "echo", "unimportant"));
         assertEquals("echo Doubling echo", compose("{0} {1} {}", "echo", "Doubling", "unimportant"));
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void testIllegalMacro() throws Exception
+    {
+        assertEquals("", compose("illegal macro {illegal"));
     }
 }
