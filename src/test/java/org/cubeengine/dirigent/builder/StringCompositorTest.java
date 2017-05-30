@@ -129,6 +129,7 @@ public class StringCompositorTest
         assertEquals("msg: [string]", compose("msg: {sample}", "string"));
         assertEquals("msg: 5.6", compose("msg: {sample}", 5.6d));
         assertEquals("msg: <42>", compose("msg: {reflected}", 42));
+        assertEquals("msg: {{unresolved: reflected}}", compose("msg: {reflected}", new Date()));
     }
 
     @Test
