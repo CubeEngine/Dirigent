@@ -135,8 +135,44 @@ public class TokenizerTest
             tokenize("illegal macro {starts#lab\\}el:has arguments but wont end"));
 
         assertEquals(
-            tokens(txt("illegal macro"), err("{first some static text and "), named("second")),
-            tokenize("illegal macro {first some static text and {second}"));
+            tokens(txt("illegal macro "), err("{ text and "), named("second")),
+            tokenize("illegal macro { text and {second}"));
+
+        assertEquals(
+            tokens(txt("illegal macro "), err("{0 text and "), named("second")),
+            tokenize("illegal macro {0 text and {second}"));
+
+        assertEquals(
+            tokens(txt("illegal macro "), err("{text and "), named("second")),
+            tokenize("illegal macro {text and {second}"));
+
+        assertEquals(
+            tokens(txt("illegal macro "), err("{0:text and "), named("second")),
+            tokenize("illegal macro {0:text and {second}"));
+
+        assertEquals(
+            tokens(txt("illegal macro "), err("{0:text#label and "), named("second")),
+            tokenize("illegal macro {0:text#label and {second}"));
+
+        assertEquals(
+            tokens(txt("illegal macro "), err("{0:text#label:arg and "), named("second")),
+            tokenize("illegal macro {0:text#label:arg and {second}"));
+
+        assertEquals(
+            tokens(txt("illegal macro "), err("{text#label:arg and "), named("second")),
+            tokenize("illegal macro {text#label:arg and {second}"));
+
+        assertEquals(
+            tokens(txt("illegal macro "), err("{text#label and "), named("second")),
+            tokenize("illegal macro {text#label and {second}"));
+
+        assertEquals(
+            tokens(txt("illegal macro "), err("{text:arg and "), named("second")),
+            tokenize("illegal macro {text:arg and {second}"));
+
+        assertEquals(
+            tokens(txt("illegal macro "), err("{0:text:arg and "), named("second")),
+            tokenize("illegal macro {0:text:arg and {second}"));
     }
 
     @Test
