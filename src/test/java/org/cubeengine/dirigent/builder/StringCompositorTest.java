@@ -121,6 +121,8 @@ public class StringCompositorTest
         assertEquals("msg: 42", compose("msg: {string}", 42));
 
         assertEquals("msg: static text", compose("msg: {text:static text}"));
+
+        assertEquals("msg: {{unresolved: number}}", compose("msg: {number}", (Double)null));
     }
 
     @Test
@@ -130,6 +132,7 @@ public class StringCompositorTest
         assertEquals("msg: 5.6", compose("msg: {sample}", 5.6d));
         assertEquals("msg: <42>", compose("msg: {reflected}", 42));
         assertEquals("msg: {{unresolved: reflected}}", compose("msg: {reflected}", new Date()));
+        assertEquals("msg: {{unresolved: reflected}}", compose("msg: {reflected}", (String)null));
     }
 
     @Test
