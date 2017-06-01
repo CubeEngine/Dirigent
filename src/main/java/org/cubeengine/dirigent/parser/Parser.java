@@ -255,6 +255,13 @@ public class Parser
         {
             return "" + input.charAt(offset);
         }
+        // TODO decide if valid: if outside macro, but starts with {, unescape as if inside macro
+        // this is based on the idea of invalid macros and should be reconsidered.
+        // TODO this prevents the tokenizer from merging adjcacent strings when backtracking
+        if (!insideMacro && input.charAt(offset) == Tokenizer.MACRO_BEGIN)
+        {
+            insideMacro = true;
+        }
         StringBuilder stripped = new StringBuilder();
         int end = offset + length;
         char c, n;
