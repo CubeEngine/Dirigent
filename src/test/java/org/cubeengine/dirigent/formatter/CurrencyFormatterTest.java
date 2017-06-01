@@ -36,7 +36,7 @@ import static org.cubeengine.dirigent.context.Contexts.createContext;
  */
 public class CurrencyFormatterTest
 {
-    private CurrencyFormatter currencyFormatter = new CurrencyFormatter();
+    private final CurrencyFormatter currencyFormatter = new CurrencyFormatter();
 
     @Test
     public void testFormat()
@@ -44,6 +44,12 @@ public class CurrencyFormatterTest
         checkFormat("12.345,00 €", 12345, Locale.GERMANY);
         checkFormat("$12,345.00", 12345, Locale.US);
         checkFormat("45,26 €", 45.258, Locale.GERMANY);
+    }
+
+    @Test
+    public void testFormatInvalidLocaleForCurrency()
+    {
+        checkFormat("¤ 45,26", 45.258, Locale.GERMAN);
     }
 
     private void checkFormat(final String expected, final Number number, final Locale locale)
