@@ -20,32 +20,57 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.cubeengine.dirigent.parser.token;
+package org.cubeengine.dirigent.parser.element;
+
+import java.util.List;
+
+import org.cubeengine.dirigent.formatter.argument.Arguments;
+import org.cubeengine.dirigent.formatter.argument.Argument;
 
 /**
- * A macro with position, but no name.
+ * A macro with a name and an optional list of arguments.
  */
-public class IndexedDefaultMacro extends DefaultMacro implements Indexed
+public class NamedMacro implements Macro
 {
     /**
-     * The position index of the message input parameter which shall be formatted with this macro.
+     * The name of the macro.
      */
-    private final int index;
+    private final String name;
+    /**
+     * The arguments of the macro.
+     */
+    private final Arguments args;
 
     /**
      * Constructor.
      *
-     * @param index The position index of the message input parameter which shall be formatted with this macro.
+     * @param name The name of the macros.
+     * @param args The arguments of the macro.
      */
-    public IndexedDefaultMacro(int index)
+    public NamedMacro(String name, List<Argument> args)
     {
-        this.index = index;
+        this.name = name;
+        this.args = Arguments.create(args);
     }
 
-    @Override
-    public int getIndex()
+    /**
+     * Returns the name of the macro.
+     *
+     * @return the name.
+     */
+    public String getName()
     {
-        return index;
+        return name;
+    }
+
+    /**
+     * Returns the arguments of the macro.
+     *
+     * @return the arguments.
+     */
+    public Arguments getArgs()
+    {
+        return args;
     }
 
     @Override
@@ -55,25 +80,31 @@ public class IndexedDefaultMacro extends DefaultMacro implements Indexed
         {
             return true;
         }
-        if (!(o instanceof IndexedDefaultMacro))
+        if (!(o instanceof NamedMacro))
         {
             return false;
         }
 
-        final IndexedDefaultMacro that = (IndexedDefaultMacro)o;
+        final NamedMacro that = (NamedMacro)o;
 
-        return getIndex() == that.getIndex();
+        if (!getName().equals(that.getName()))
+        {
+            return false;
+        }
+        return getArgs().equals(that.getArgs());
     }
 
     @Override
     public int hashCode()
     {
-        return getIndex();
+        int result = getName().hashCode();
+        result = 31 * result + getArgs().hashCode();
+        return result;
     }
 
     @Override
     public String toString()
     {
-        return "IndexedDefaultMacro{" + "index=" + index + "}";
+        return "NamedMacro{" + "name='" + name + '\'' + ", args=" + args + '}';
     }
 }

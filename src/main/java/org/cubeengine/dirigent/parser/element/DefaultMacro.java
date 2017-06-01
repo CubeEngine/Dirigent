@@ -20,11 +20,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.cubeengine.dirigent.parser.token;
+package org.cubeengine.dirigent.parser.element;
 
 /**
- * A part of the input message. Implementations will add further meaning.
+ * An empty (no name, no index) macro.
  */
-public interface Token
+public class DefaultMacro implements Macro
 {
+    /**
+     * A constant instance representing this macro.
+     */
+    public static final DefaultMacro DEFAULT_MACRO = new DefaultMacro();
+
+    @Override
+    public String toString()
+    {
+        return "DefaultMacro";
+    }
 }

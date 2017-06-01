@@ -60,7 +60,7 @@ public final class MacroResolutionResult
 
     /**
      * Returns the information whether the {@link MacroResolutionState} is {@link MacroResolutionState#OK} whcih means
-     * that a formatter could be determined for a {@link org.cubeengine.dirigent.parser.token.Macro}.
+     * that a formatter could be determined for a {@link org.cubeengine.dirigent.parser.element.Macro}.
      *
      * @return whether the state is {@link MacroResolutionState#OK}.
      */

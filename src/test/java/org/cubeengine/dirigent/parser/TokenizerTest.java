@@ -24,44 +24,44 @@ package org.cubeengine.dirigent.parser;
 
 import java.util.Arrays;
 import java.util.List;
-import org.cubeengine.dirigent.parser.token.CompleteMacro;
-import org.cubeengine.dirigent.parser.token.IndexedDefaultMacro;
-import org.cubeengine.dirigent.parser.token.NamedMacro;
+import org.cubeengine.dirigent.parser.element.CompleteMacro;
+import org.cubeengine.dirigent.parser.element.IndexedDefaultMacro;
+import org.cubeengine.dirigent.parser.element.NamedMacro;
 import org.cubeengine.dirigent.formatter.argument.Argument;
 import org.cubeengine.dirigent.formatter.argument.Value;
 import org.cubeengine.dirigent.formatter.argument.Parameter;
-import org.cubeengine.dirigent.parser.token.Token;
+import org.cubeengine.dirigent.parser.element.Element;
 import org.junit.Test;
 
 import static java.util.Arrays.asList;
 import static org.cubeengine.dirigent.parser.Tokenizer.tokenize;
 import static org.cubeengine.dirigent.parser.Tokenizer.unescape;
-import static org.cubeengine.dirigent.parser.token.DefaultMacro.DEFAULT_MACRO;
+import static org.cubeengine.dirigent.parser.element.DefaultMacro.DEFAULT_MACRO;
 import static org.junit.Assert.assertEquals;
 
 public class TokenizerTest
 {
-    public static List<Token> tokens(Token... components)
+    public static List<Element> tokens(Element... components)
     {
         return Arrays.asList(components);
     }
 
-    public static Token txt(String s)
+    public static Element txt(String s)
     {
         return new Text(s);
     }
 
-    public static Token named(String name, Argument... args)
+    public static Element named(String name, Argument... args)
     {
         return new NamedMacro(name, asList(args));
     }
 
-    public static Token indexed(int i)
+    public static Element indexed(int i)
     {
         return new IndexedDefaultMacro(i);
     }
 
-    public static Token complete(int i, String name, Argument... args)
+    public static Element complete(int i, String name, Argument... args)
     {
         return new CompleteMacro(i, name, asList(args));
     }
@@ -76,7 +76,7 @@ public class TokenizerTest
         return new Parameter(name, val);
     }
 
-    public static Token err(String s)
+    public static Element err(String s)
     {
         return new InvalidMacro(s);
     }

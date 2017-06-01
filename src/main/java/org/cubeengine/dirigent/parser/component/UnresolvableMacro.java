@@ -23,7 +23,7 @@
 package org.cubeengine.dirigent.parser.component;
 
 import org.cubeengine.dirigent.parser.MacroResolutionState;
-import org.cubeengine.dirigent.parser.token.Macro;
+import org.cubeengine.dirigent.parser.element.Macro;
 
 /**
  * A Component signaling that a Formatter could not be resolved. This might be because a formatter couldn't be found for

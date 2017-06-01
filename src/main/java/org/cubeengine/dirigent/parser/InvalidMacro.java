@@ -23,7 +23,7 @@
 package org.cubeengine.dirigent.parser;
 
 import org.cubeengine.dirigent.parser.component.TextComponent;
-import org.cubeengine.dirigent.parser.token.Token;
+import org.cubeengine.dirigent.parser.element.Element;
 
 /**
  * <p>
@@ -35,7 +35,7 @@ import org.cubeengine.dirigent.parser.token.Token;
  *     but never sees a valid closing curly brace.
  * </p>
  */
-public class InvalidMacro implements Token, TextComponent
+public class InvalidMacro implements Element, TextComponent
 {
     private final String text;
 

@@ -20,11 +20,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.cubeengine.dirigent.parser.token;
+package org.cubeengine.dirigent.parser.element;
 
 /**
  * A token representing a macro that can be processed by a formatter
  */
-public interface Macro extends Token
+public interface Macro extends Element
 {
 }

@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * A class holding all {@link Argument} objects of a single {@link org.cubeengine.dirigent.parser.token.Macro}.
+ * A class holding all {@link Argument} objects of a single {@link org.cubeengine.dirigent.parser.element.Macro}.
  * Furthermore it provides a few static helper methods to create a new instance.
  */
 public class Arguments

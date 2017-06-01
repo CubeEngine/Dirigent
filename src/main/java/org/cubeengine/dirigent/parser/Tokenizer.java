@@ -22,180 +22,241 @@
  */
 package org.cubeengine.dirigent.parser;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import org.cubeengine.dirigent.parser.token.CompleteMacro;
-import org.cubeengine.dirigent.parser.token.IndexedDefaultMacro;
-import org.cubeengine.dirigent.parser.token.NamedMacro;
-import org.cubeengine.dirigent.formatter.argument.Argument;
-import org.cubeengine.dirigent.formatter.argument.Value;
-import org.cubeengine.dirigent.formatter.argument.Parameter;
-import org.cubeengine.dirigent.parser.token.Token;
-
-import static java.util.regex.Pattern.compile;
-import static org.cubeengine.dirigent.parser.token.DefaultMacro.DEFAULT_MACRO;
-
 /**
- * Processes a raw message to a {@link List} consisting of {@link Token}'s
+ * Processes a raw message to a {@link TokenBuffer}
  */
 public class Tokenizer
 {
-    private static final Pattern TEXT_AND_MACRO = compile(
-        //  |  some text          |             | index     |   | name  || label                    | |  the parameters                                        |         | broken macro            |
-        "\\G((?:\\\\[{\\\\]|[^{])*)(?:(\\{(?:(?:(0|[1-9]\\d*):)?([^:#}]+)(?:#(?:\\\\[:}\\\\]|[^:}])+)?((?::(?:\\\\[=:}\\\\]|[^=:}])+(?:=(?:\\\\[:}\\\\]|[^:}])+)?)+)?)?})|(\\{(?:\\\\[{\\\\]|[^{])*))?");
-    private static final Pattern ARGUMENT = compile("\\G:((?:\\\\[=:}\\\\]|[^=:}])+)(?:=((?:\\\\[:}\\\\]|[^:}])+))?");
+    private static final char MACRO_BEGIN = '{';
+    private static final char MACRO_END = '}';
+    private static final char LABEL_SEP = '#';
+    private static final char SECTION_SEP = ':';
+    private static final char ARG_VAL_SEP = '=';
+    static final char ESCAPE = '\\';
 
-    private static final int GROUP_TEXT_PREFIX = 1;
-    private static final int GROUP_WHOLE_MACRO = 2;
-    private static final int GROUP_INDEX = 3;
-    private static final int GROUP_NAME = 4;
-    private static final int GROUP_PARAMS = 5;
-    private static final int GROUP_BROKEN_MACRO = 6;
-
-    private static final int GROUP_PARAM_NAME = 1;
-    private static final int GROUP_PARAM_VALUE = 2;
-
-    /**
-     * Takes a raw input messages and splits it into its lexical parts.
-     *
-     * @param message the raw input message
-     * @return a list of lexical tokens
-     */
-    public static List<Token> tokenize(final String message)
+    public enum TokenType
     {
-        if (message == null)
+        PLAIN_STRING,
+        ESCAPED_STRING,
+        NUMBER,
+        MACRO_BEGIN(Tokenizer.MACRO_BEGIN),
+        MACRO_END(Tokenizer.MACRO_END),
+        LABEL_SEPARATOR(Tokenizer.LABEL_SEP),
+        SECTION_SEPARATOR(Tokenizer.SECTION_SEP),
+        VALUE_SEPARATOR(Tokenizer.ARG_VAL_SEP);
+
+        public final char character;
+
+        TokenType()
         {
-            throw new IllegalArgumentException("message may not be null!");
-        }
-        if (message.isEmpty())
-        {
-            return Collections.emptyList();
-        }
-        if (message.indexOf('{') == -1)
-        {
-            return Collections.<Token>singletonList(new Text(message));
+            this('\0');
         }
 
-        Matcher textMatcher = TEXT_AND_MACRO.matcher(message);
-        Matcher argMatcher = ARGUMENT.matcher("");
-
-        List<Token> components = new ArrayList<Token>();
-        String prefix;
-        String index;
-        String name;
-        String brokenMacroRest;
-        while (textMatcher.find())
+        TokenType(char c)
         {
-            prefix = textMatcher.group(GROUP_TEXT_PREFIX);
-            if (prefix.length() > 0)
+            this.character = c;
+        }
+    }
+
+    public static final class TokenBuffer {
+        public final int[] offsets;
+        public final int[] lengths;
+        public final TokenType[] types;
+        public final int count;
+        public final char[] data;
+
+        public TokenBuffer(int[] offsets, int[] lengths, TokenType[] types, int count, char[] data)
+        {
+            this.offsets = offsets;
+            this.lengths = lengths;
+            this.types = types;
+            this.count = count;
+            this.data = data;
+        }
+
+        @Override
+        public String toString()
+        {
+            StringBuilder s = new StringBuilder();
+            s.append("TokenBuffer(");
+            if (count > 0)
             {
-                components.add(new Text(unescape(prefix, "\\{")));
-            }
-
-            if (textMatcher.start(GROUP_WHOLE_MACRO) != -1)
-            {
-
-                index = textMatcher.group(GROUP_INDEX);
-                name = textMatcher.group(GROUP_NAME);
-                boolean noIndex = index == null;
-                boolean noName = name == null;
-                if (noIndex && noName)
+                s.append('"');
+                s.append(types[0].name());
+                s.append('(');
+                s.append(data, offsets[0], lengths[0]);
+                s.append(')');
+                for (int i = 1; i < count; i++)
                 {
-                    components.add(DEFAULT_MACRO);
+                    s.append(", ");
+                    s.append(types[i].name());
+                    s.append('(');
+                    s.append(data, offsets[i], lengths[i]);
+                    s.append(')');
                 }
-                else
-                {
-                    if (noIndex)
+            }
+            s.append(')');
+
+            return s.toString();
+        }
+    }
+
+    public static TokenBuffer tokenize(final String message)
+    {
+        char[] buf = message.toCharArray();
+
+        // currently in an unclosed macro?
+        boolean insideMacro = false;
+        // seen a label in the currently open macro ?
+        boolean hasLabel = false;
+
+        int[] starts = new int[buf.length];
+        int[] lengths = new int[buf.length];
+        TokenType[] types = new TokenType[buf.length];
+        int tokenCount = 0;
+
+        int offset = 0;
+        int lastBeginMacro = -1;
+        char c;
+        while (offset < buf.length)
+        {
+            c = buf[offset];
+            switch (c)
+            {
+                case MACRO_BEGIN:
+                    insideMacro = true;
+                    hasLabel = false;
+                    lastBeginMacro = tokenCount;
+
+                    types[tokenCount] = TokenType.MACRO_BEGIN;
+                    starts[tokenCount] = offset;
+                    lengths[tokenCount] = 1;
+                    tokenCount++;
+                    offset++;
+                    break;
+                case MACRO_END:
+                    insideMacro = false;
+
+                    types[tokenCount] = TokenType.MACRO_END;
+                    starts[tokenCount] = offset;
+                    lengths[tokenCount] = 1;
+                    tokenCount++;
+                    offset++;
+                    break;
+                case LABEL_SEP:
+                    hasLabel = true;
+                    types[tokenCount] = TokenType.LABEL_SEPARATOR;
+                    starts[tokenCount] = offset;
+                    lengths[tokenCount] = 1;
+                    tokenCount++;
+                    offset++;
+                    break;
+                case SECTION_SEP:
+                    types[tokenCount] = TokenType.SECTION_SEPARATOR;
+                    starts[tokenCount] = offset;
+                    lengths[tokenCount] = 1;
+                    tokenCount++;
+                    offset++;
+                    break;
+                case ARG_VAL_SEP:
+                    types[tokenCount] = TokenType.VALUE_SEPARATOR;
+                    starts[tokenCount] = offset;
+                    lengths[tokenCount] = 1;
+                    tokenCount++;
+                    offset++;
+                    break;
+                // either text or a number
+                default:
+                    int start = offset;
+                    TokenType type;
+                    // the current char can't be the end
+                    offset++;
+
+                    if (insideMacro && isNonZeroDigit(c))
                     {
-                        if (textMatcher.start(GROUP_PARAMS) == -1 && isInt(name))
+                        type = TokenType.NUMBER;
+                        while (offset < buf.length && isDigit(buf[offset]))
                         {
-                            components.add(new IndexedDefaultMacro(toInt(name)));
-                        }
-                        else
-                        {
-                            components.add(new NamedMacro(name, parseArguments(textMatcher.group(GROUP_PARAMS), argMatcher)));
+                            offset++;
                         }
                     }
                     else
                     {
-                        components.add(new CompleteMacro(toInt(index), name, parseArguments(textMatcher.group(GROUP_PARAMS), argMatcher)));
+                        type = TokenType.PLAIN_STRING;
+                        boolean escaped = false;
+
+                        if (offset < buf.length)
+                        {
+                            c = buf[offset];
+                            while (!stringEnd(c, insideMacro, escaped, hasLabel))
+                            {
+                                escaped = c == ESCAPE;
+                                if (escaped && type == TokenType.PLAIN_STRING)
+                                {
+                                    type = TokenType.ESCAPED_STRING;
+                                }
+                                offset++;
+                                if (offset >= buf.length)
+                                {
+                                    break;
+                                }
+                                c = buf[offset];
+                            }
+                        }
                     }
+                    int length = offset - start;
+                    if (length > 0)
+                    {
+                        starts[tokenCount] = start;
+                        lengths[tokenCount] = length;
+                        types[tokenCount] = type;
+                        tokenCount++;
+                    }
+            }
+        }
+
+        if (insideMacro)
+        {
+            TokenType replacementType = TokenType.PLAIN_STRING;
+            for (int i = lastBeginMacro + 1; i < tokenCount; ++i)
+            {
+                if (types[i] == TokenType.ESCAPED_STRING)
+                {
+                    replacementType = TokenType.ESCAPED_STRING;
+                    break;
                 }
-
             }
-
-            brokenMacroRest = textMatcher.group(GROUP_BROKEN_MACRO);
-            if (brokenMacroRest != null)
+            types[lastBeginMacro] = replacementType;
+            lengths[lastBeginMacro] = buf.length - starts[lastBeginMacro];
+            tokenCount = lastBeginMacro + 1;
+            int beforeLastBeginMacro = lastBeginMacro - 1;
+            if (beforeLastBeginMacro >= 0 && replacementType == types[beforeLastBeginMacro])
             {
-                components.add(new InvalidMacro(unescape(brokenMacroRest, "\\{")));
-            }
-            if (textMatcher.hitEnd())
-            {
-                break;
+                lengths[beforeLastBeginMacro] += lengths[lastBeginMacro];
+                tokenCount--;
             }
         }
 
-        return components;
+        final TokenBuffer tokenBuf = new TokenBuffer(starts, lengths, types, tokenCount, buf);
+        System.out.println("Input:  <" + message + ">");
+        System.out.println("Output: <" + tokenBuf + ">");
+        throw new IllegalStateException("TODO");
     }
 
-    /**
-     * Converts the given string into an integer using Horner's method.
-     * No validation is done on the input. This method will produce numbers, even if the input is not a valid decimal
-     * number.
-     *
-     * @param s an input string consisting of decimal digits
-     * @return the integer representation of the input string if possible
-     */
-    private static int toInt(String s)
+    private static boolean stringEnd(char c, boolean insideMacro, boolean escaped, boolean hasLabel)
     {
-        int len = s.length();
-        if (len == 1)
+        if (insideMacro)
         {
-            return s.charAt(0) - '0';
-        }
-
-        int out = 0;
-        for (int i = len - 1, factor = 1; i >= 0; --i, factor *= 10)
-        {
-            out += (s.charAt(i) - '0') * factor;
-        }
-        return out;
-    }
-
-    /**
-     * Checks the given string is a valid unsigned integer.
-     *
-     * @param s the input
-     * @return true if the input is a valid unsigned integer.
-     */
-    private static boolean isInt(String s)
-    {
-        int len = s.length();
-        if (len == 0)
-        {
-            return false;
-        }
-        if (len == 1)
-        {
-            return isDigit(s.charAt(0));
+            return !escaped && (
+                c == SECTION_SEP ||
+                c == MACRO_END ||
+                c == ARG_VAL_SEP ||
+                (!hasLabel && c == LABEL_SEP)
+            );
         }
         else
         {
-            if (!isNonZeroDigit(s.charAt(0)))
-            {
-                return false;
-            }
-            for (int i = 1; i < len; ++i)
-            {
-                if (!isDigit(s.charAt(i)))
-                {
-                    return false;
-                }
-            }
-            return true;
+            return !escaped && c == MACRO_BEGIN;
         }
     }
 
@@ -222,41 +283,6 @@ public class Tokenizer
     }
 
     /**
-     * Decomposes the given arguments string to the separate arguments using the given {@link Matcher}.
-     *
-     * @param params the arguments string
-     * @param matcher the {@link Matcher} with the pattern to use
-     * @return the list og arguments
-     */
-    private static List<Argument> parseArguments(String params, Matcher matcher)
-    {
-        if (params == null || params.isEmpty())
-        {
-            return Collections.emptyList();
-        }
-        List<Argument> args = new ArrayList<Argument>(1);
-
-        matcher.reset(params);
-        String name;
-        String value;
-        while (matcher.find())
-        {
-            name = unescape(matcher.group(GROUP_PARAM_NAME), "=:}\\");
-            value = matcher.group(GROUP_PARAM_VALUE);
-            if (value == null)
-            {
-                args.add(new Value(name));
-            }
-            else
-            {
-                args.add(new Parameter(name, unescape(value, ":}")));
-            }
-        }
-
-        return args;
-    }
-
-    /**
      * Strips escaping backslashes from the given input string.
      *
      * @param input the input string with escaping backslashes
@@ -277,7 +303,7 @@ public class Tokenizer
             for (i = 0; i < input.length() - 1; ++i)
             {
                 c = input.charAt(i);
-                if (c == '\\')
+                if (c == ESCAPE)
                 {
                     n = input.charAt(i + 1);
                     if (charset.indexOf(n) == -1)

@@ -26,8 +26,8 @@ import org.cubeengine.dirigent.parser.component.Component;
 import org.cubeengine.dirigent.context.Context;
 import org.cubeengine.dirigent.parser.component.TextComponent;
 import org.cubeengine.dirigent.parser.component.UnresolvableMacro;
-import org.cubeengine.dirigent.parser.token.Macro;
-import org.cubeengine.dirigent.parser.token.NamedMacro;
+import org.cubeengine.dirigent.parser.element.Macro;
+import org.cubeengine.dirigent.parser.element.NamedMacro;
 
 /**
  * Builds a String using a {@link StringBuilder}

@@ -35,17 +35,16 @@ import org.cubeengine.dirigent.formatter.StringFormatter;
 import org.cubeengine.dirigent.formatter.argument.Arguments;
 import org.cubeengine.dirigent.parser.MacroResolutionResult;
 import org.cubeengine.dirigent.parser.MacroResolutionState;
-import org.cubeengine.dirigent.parser.Text;
-import org.cubeengine.dirigent.parser.Tokenizer;
+import org.cubeengine.dirigent.parser.Parser;
 import org.cubeengine.dirigent.parser.component.Component;
 import org.cubeengine.dirigent.parser.component.ComponentGroup;
 import org.cubeengine.dirigent.parser.component.ResolvedMacro;
 import org.cubeengine.dirigent.parser.component.TextComponent;
 import org.cubeengine.dirigent.parser.component.UnresolvableMacro;
-import org.cubeengine.dirigent.parser.token.Indexed;
-import org.cubeengine.dirigent.parser.token.Macro;
-import org.cubeengine.dirigent.parser.token.NamedMacro;
-import org.cubeengine.dirigent.parser.token.Token;
+import org.cubeengine.dirigent.parser.element.Element;
+import org.cubeengine.dirigent.parser.element.Indexed;
+import org.cubeengine.dirigent.parser.element.Macro;
+import org.cubeengine.dirigent.parser.element.NamedMacro;
 
 /**
  * Basic implementation of Dirigent providing:
@@ -95,8 +94,8 @@ public abstract class AbstractDirigent<MessageT> implements Dirigent<MessageT>
     @Override
     public MessageT compose(Context context, String source, Object... inputs)
     {
-        List<Token> tokens = Tokenizer.tokenize(source);
-        ComponentGroup message = resolve(tokens, context, inputs);
+        List<Element> elements = Parser.parse(source);
+        ComponentGroup message = resolve(elements, context, inputs);
         return compose(message, context);
     }
 
@@ -157,19 +156,19 @@ public abstract class AbstractDirigent<MessageT> implements Dirigent<MessageT>
     }
 
     /**
-     * Iterates through the provided {@link Token}s and converts them to {@link Component}s. Therefore the method uses
+     * Iterates through the provided {@link Element}s and converts them to {@link Component}s. Therefore the method uses
      * the registered {@link Formatter} and runs global {@link PostProcessor}s.
      *
-     * @param tokens The parsed tokens.
+     * @param elements The parsed elements.
      * @param context The compose context.
      * @param inputs The message input parameters.
      *
-     * @return A {@link ComponentGroup} holding all the {@link Component}s representing the input {@link Token}s.
+     * @return A {@link ComponentGroup} holding all the {@link Component}s representing the input {@link Element}s.
      */
     @SuppressWarnings("unchecked")
-    private ComponentGroup resolve(List<Token> tokens, Context context, Object[] inputs)
+    private ComponentGroup resolve(List<Element> elements, Context context, Object[] inputs)
     {
-        if (tokens.isEmpty())
+        if (elements.isEmpty())
         {
             return ComponentGroup.EMPTY;
         }
@@ -177,23 +176,23 @@ public abstract class AbstractDirigent<MessageT> implements Dirigent<MessageT>
         List<Component> list = new ArrayList<Component>();
         int implicitArgCounter = 0;
 
-        for (Token token : tokens)
+        for (Element element : elements)
         {
             Component out;
             Arguments arguments = Arguments.NONE;
-            if (token instanceof TextComponent)
+            if (element instanceof TextComponent)
             {
-                out = (Component)token;
+                out = (Component)element;
             }
-            else if (token instanceof Macro)
+            else if (element instanceof Macro)
             {
-                Macro macro = (Macro)token;
+                Macro macro = (Macro)element;
 
                 int argIndex;
                 boolean explicitIndex;
                 if (macro instanceof Indexed)
                 {
-                    argIndex = ((Indexed)token).getIndex();
+                    argIndex = ((Indexed)element).getIndex();
                     explicitIndex = true;
                 }
                 else
@@ -234,7 +233,7 @@ public abstract class AbstractDirigent<MessageT> implements Dirigent<MessageT>
             else
             {
                 throw new IllegalStateException(
-                    "The message contains Tokens that are not Text or Macro: " + token.getClass().getName());
+                    "The message contains Tokens that are not Text or Macro: " + element.getClass().getName());
             }
 
             list.add(applyPostProcessors(out, context, arguments));

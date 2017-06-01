@@ -20,21 +20,60 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.cubeengine.dirigent.parser.token;
+package org.cubeengine.dirigent.parser.element;
 
 /**
- * An empty (no name, no index) macro.
+ * A macro with position, but no name.
  */
-public class DefaultMacro implements Macro
+public class IndexedDefaultMacro extends DefaultMacro implements Indexed
 {
     /**
-     * A constant instance representing this macro.
+     * The position index of the message input parameter which shall be formatted with this macro.
      */
-    public static final DefaultMacro DEFAULT_MACRO = new DefaultMacro();
+    private final int index;
+
+    /**
+     * Constructor.
+     *
+     * @param index The position index of the message input parameter which shall be formatted with this macro.
+     */
+    public IndexedDefaultMacro(int index)
+    {
+        this.index = index;
+    }
+
+    @Override
+    public int getIndex()
+    {
+        return index;
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (!(o instanceof IndexedDefaultMacro))
+        {
+            return false;
+        }
+
+        final IndexedDefaultMacro that = (IndexedDefaultMacro)o;
+
+        return getIndex() == that.getIndex();
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return getIndex();
+    }
 
     @Override
     public String toString()
     {
-        return "DefaultMacro";
+        return "IndexedDefaultMacro{" + "index=" + index + "}";
     }
 }

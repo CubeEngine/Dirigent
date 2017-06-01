@@ -20,57 +20,38 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.cubeengine.dirigent.parser.token;
+package org.cubeengine.dirigent.parser.element;
 
 import java.util.List;
-
-import org.cubeengine.dirigent.formatter.argument.Arguments;
 import org.cubeengine.dirigent.formatter.argument.Argument;
 
 /**
- * A macro with a name and an optional list of arguments.
+ * A complete macro with name, position and optional arguments.
  */
-public class NamedMacro implements Macro
+public class CompleteMacro extends NamedMacro implements Indexed
 {
     /**
-     * The name of the macro.
+     * The position index of the message input parameter which shall be formatted with this macro.
      */
-    private final String name;
-    /**
-     * The arguments of the macro.
-     */
-    private final Arguments args;
+    private int index;
 
     /**
      * Constructor.
      *
+     * @param index The position index of the message input parameter which shall be formatted with this macro.
      * @param name The name of the macros.
      * @param args The arguments of the macro.
      */
-    public NamedMacro(String name, List<Argument> args)
+    public CompleteMacro(int index, String name, List<Argument> args)
     {
-        this.name = name;
-        this.args = Arguments.create(args);
+        super(name, args);
+        this.index = index;
     }
 
-    /**
-     * Returns the name of the macro.
-     *
-     * @return the name.
-     */
-    public String getName()
+    @Override
+    public int getIndex()
     {
-        return name;
-    }
-
-    /**
-     * Returns the arguments of the macro.
-     *
-     * @return the arguments.
-     */
-    public Arguments getArgs()
-    {
-        return args;
+        return index;
     }
 
     @Override
@@ -80,31 +61,31 @@ public class NamedMacro implements Macro
         {
             return true;
         }
-        if (!(o instanceof NamedMacro))
+        if (!(o instanceof CompleteMacro))
+        {
+            return false;
+        }
+        if (!super.equals(o))
         {
             return false;
         }
 
-        final NamedMacro that = (NamedMacro)o;
+        final CompleteMacro that = (CompleteMacro)o;
 
-        if (!getName().equals(that.getName()))
-        {
-            return false;
-        }
-        return getArgs().equals(that.getArgs());
+        return getIndex() == that.getIndex();
     }
 
     @Override
     public int hashCode()
     {
-        int result = getName().hashCode();
-        result = 31 * result + getArgs().hashCode();
+        int result = super.hashCode();
+        result = 31 * result + getIndex();
         return result;
     }
 
     @Override
     public String toString()
     {
-        return "NamedMacro{" + "name='" + name + '\'' + ", args=" + args + '}';
+        return "CompleteMacro{" + "index=" + index + ", name='" + getName() + '\'' + ", args=" + getArgs() + "}";
     }
 }

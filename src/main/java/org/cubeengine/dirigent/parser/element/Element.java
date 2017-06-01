@@ -20,67 +20,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.cubeengine.dirigent.parser;
-
-import org.cubeengine.dirigent.parser.component.TextComponent;
-import org.cubeengine.dirigent.parser.element.Element;
+package org.cubeengine.dirigent.parser.element;
 
 /**
- * A simple component and token for static strings.
+ * A part of the input message. Implementations will add further meaning.
  */
-public class Text implements Element, TextComponent
+public interface Element
 {
-    /**
-     * The actual text.
-     */
-    private String string;
-
-    /**
-     * Constructor.
-     *
-     * @param string The actual text.
-     */
-    public Text(String string)
-    {
-        this.string = String.valueOf(string);
-    }
-
-    /**
-     * Returns the actual text.
-     *
-     * @return the text.
-     */
-    public String getText()
-    {
-        return string;
-    }
-
-    @Override
-    public boolean equals(Object o)
-    {
-        if (this == o)
-        {
-            return true;
-        }
-        if (!(o instanceof Text))
-        {
-            return false;
-        }
-
-        final Text text = (Text)o;
-
-        return getText().equals(text.getText());
-    }
-
-    @Override
-    public int hashCode()
-    {
-        return getText().hashCode();
-    }
-
-    @Override
-    public String toString()
-    {
-        return "Text{" + "string='" + string + '\'' + '}';
-    }
 }
