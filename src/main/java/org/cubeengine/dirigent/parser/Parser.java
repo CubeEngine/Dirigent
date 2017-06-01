@@ -35,6 +35,25 @@ import org.cubeengine.dirigent.parser.element.NamedMacro;
 
 import static java.util.Collections.emptyList;
 
+/**
+ * Grammar:
+ *
+ * message   -> parts
+ * parts     -> part+
+ * part      -> text | macro
+ * macro     -> '{' body? '}'
+ * body      -> indexed | named
+ * indexed   -> index (':' named)?
+ * named     -> name label? arguments
+ * label     -> '#' string
+ * arguments -> (':' argument)*
+ * argument  -> (name '=')? value
+ * text      -> string
+ * value     -> string
+ * name      -> string
+ * index     -> NUMBER
+ * string    -> PLAIN_STRING | ESCAPED_STRING | NUMBER
+ */
 public class Parser
 {
     public static List<Element> parse(String message) {
