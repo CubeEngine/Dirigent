@@ -1,3 +1,25 @@
+/*
+ * The MIT License
+ * Copyright © 2013 Cube Island
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 package org.cubeengine.dirigent.parser;
 
 import java.util.ArrayList;
@@ -5,8 +27,6 @@ import java.util.List;
 import org.cubeengine.dirigent.formatter.argument.Argument;
 import org.cubeengine.dirigent.formatter.argument.Parameter;
 import org.cubeengine.dirigent.formatter.argument.Value;
-import org.cubeengine.dirigent.parser.Tokenizer.TokenBuffer;
-import org.cubeengine.dirigent.parser.Tokenizer.TokenType;
 import org.cubeengine.dirigent.parser.element.CompleteMacro;
 import org.cubeengine.dirigent.parser.element.DefaultMacro;
 import org.cubeengine.dirigent.parser.element.Element;
@@ -237,21 +257,26 @@ public class Parser
         }
         StringBuilder stripped = new StringBuilder();
         int end = offset + length;
-        char c;
-        boolean escaped = false;
+        char c, n;
         for (int i = offset; i < end; ++i)
         {
             c = input.charAt(i);
-            if (!escaped && c == Tokenizer.ESCAPE)
+            if (c == Tokenizer.ESCAPE && i + 1 < end)
             {
-                escaped = true;
-                continue;
+                n = input.charAt(++i);
+                if (Tokenizer.needsEscaping(n, insideMacro, true) || n == Tokenizer.ESCAPE)
+                {
+                    stripped.append(n);
+                }
+                else
+                {
+                    stripped.append(c).append(n);
+                }
             }
             else
             {
-                escaped = false;
+                stripped.append(c);
             }
-            stripped.append(c);
         }
         return stripped.toString();
     }

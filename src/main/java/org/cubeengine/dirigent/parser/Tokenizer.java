@@ -27,79 +27,12 @@ package org.cubeengine.dirigent.parser;
  */
 public class Tokenizer
 {
-    private static final char MACRO_BEGIN = '{';
-    private static final char MACRO_END = '}';
-    private static final char LABEL_SEP = '#';
-    private static final char SECTION_SEP = ':';
-    private static final char VALUE_SEP = '=';
+    static final char MACRO_BEGIN = '{';
+    static final char MACRO_END = '}';
+    static final char LABEL_SEP = '#';
+    static final char SECTION_SEP = ':';
+    static final char VALUE_SEP = '=';
     static final char ESCAPE = '\\';
-
-    public enum TokenType
-    {
-        PLAIN_STRING,
-        ESCAPED_STRING,
-        NUMBER,
-        MACRO_BEGIN(Tokenizer.MACRO_BEGIN),
-        MACRO_END(Tokenizer.MACRO_END),
-        LABEL_SEPARATOR(Tokenizer.LABEL_SEP),
-        SECTION_SEPARATOR(Tokenizer.SECTION_SEP),
-        VALUE_SEPARATOR(Tokenizer.VALUE_SEP);
-
-        public final char character;
-
-        TokenType()
-        {
-            this('\0');
-        }
-
-        TokenType(char c)
-        {
-            this.character = c;
-        }
-    }
-
-    public static final class TokenBuffer {
-        public final int[] offsets;
-        public final int[] lengths;
-        public final TokenType[] types;
-        public final int count;
-        public final String data;
-
-        public TokenBuffer(int[] offsets, int[] lengths, TokenType[] types, int count, String data)
-        {
-            this.offsets = offsets;
-            this.lengths = lengths;
-            this.types = types;
-            this.count = count;
-            this.data = data;
-        }
-
-        @Override
-        public String toString()
-        {
-            StringBuilder s = new StringBuilder();
-            s.append("TokenBuffer(");
-            if (count > 0)
-            {
-                s.append('"');
-                s.append(types[0].name());
-                s.append('(');
-                s.append(data, offsets[0], offsets[0] + lengths[0]);
-                s.append(')');
-                for (int i = 1; i < count; i++)
-                {
-                    s.append(", ");
-                    s.append(types[i].name());
-                    s.append('(');
-                    s.append(data, offsets[i], offsets[i] + lengths[i]);
-                    s.append(')');
-                }
-            }
-            s.append(')');
-
-            return s.toString();
-        }
-    }
 
     public static TokenBuffer tokenize(final String input)
     {
@@ -261,18 +194,21 @@ public class Tokenizer
 
     private static boolean stringEnd(char c, boolean insideMacro, boolean escaped, boolean hasLabel)
     {
+        return !escaped && needsEscaping(c, insideMacro, hasLabel);
+    }
+
+    static boolean needsEscaping(char c, boolean insideMacro, boolean hasLabel)
+    {
         if (insideMacro)
         {
-            return !escaped && (
-                c == SECTION_SEP ||
-                c == MACRO_END ||
-                c == VALUE_SEP ||
-                (!hasLabel && c == LABEL_SEP)
-            );
+            return c == Tokenizer.MACRO_END ||
+                c == Tokenizer.SECTION_SEP ||
+                (!hasLabel && c == Tokenizer.LABEL_SEP) ||
+                c == Tokenizer.VALUE_SEP;
         }
         else
         {
-            return !escaped && c == MACRO_BEGIN;
+            return c == Tokenizer.MACRO_BEGIN;
         }
     }
 
