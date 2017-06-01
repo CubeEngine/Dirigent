@@ -22,22 +22,6 @@
  */
 package org.cubeengine.dirigent.parser;
 
-import java.util.Arrays;
-import java.util.List;
-import org.cubeengine.dirigent.parser.element.CompleteMacro;
-import org.cubeengine.dirigent.parser.element.IndexedDefaultMacro;
-import org.cubeengine.dirigent.parser.element.NamedMacro;
-import org.cubeengine.dirigent.formatter.argument.Argument;
-import org.cubeengine.dirigent.formatter.argument.Value;
-import org.cubeengine.dirigent.formatter.argument.Parameter;
-import org.cubeengine.dirigent.parser.element.Element;
-import org.junit.Test;
-
-import static java.util.Arrays.asList;
-import static org.cubeengine.dirigent.parser.Tokenizer.tokenize;
-import static org.cubeengine.dirigent.parser.element.DefaultMacro.DEFAULT_MACRO;
-import static org.junit.Assert.assertEquals;
-
 public class TokenizerTest
 {
 }
