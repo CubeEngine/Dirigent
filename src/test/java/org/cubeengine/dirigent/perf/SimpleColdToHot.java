@@ -3,6 +3,7 @@ package org.cubeengine.dirigent.perf;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.cubeengine.dirigent.Component;
 import org.cubeengine.dirigent.parser.Parser;
 import org.cubeengine.dirigent.parser.component.Text;
 import org.cubeengine.dirigent.parser.component.macro.CompleteMacro;
@@ -24,7 +25,8 @@ public class SimpleColdToHot
     {
         List<Class<?>> classes = asList(Parser.class, Macro.class, DefaultMacro.class, NamedMacro.class,
                                         IndexedDefaultMacro.class, Indexed.class, CompleteMacro.class, Argument.class,
-                                        Flag.class, Parameter.class, Pattern.class, Matcher.class, Text.class);
+                                        Flag.class, Parameter.class, Pattern.class, Matcher.class, Text.class,
+                                        Component.class);
         System.out.println("Classes:");
         System.out.println(classes);
         String msg = "text and a macro {1:name#with index and comment:and parameter=with value:multiple:and one=more} more text";
