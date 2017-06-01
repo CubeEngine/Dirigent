@@ -22,26 +22,31 @@
  */
 package org.cubeengine.dirigent.parser;
 
+import static org.cubeengine.dirigent.parser.TokenKind.STRING;
+import static org.cubeengine.dirigent.parser.TokenKind.STATIC;
+
 public enum TokenType
 {
-    PLAIN_STRING,
-    ESCAPED_STRING,
-    NUMBER,
-    MACRO_BEGIN(Tokenizer.MACRO_BEGIN),
-    MACRO_END(Tokenizer.MACRO_END),
-    LABEL_SEPARATOR(Tokenizer.LABEL_SEP),
-    SECTION_SEPARATOR(Tokenizer.SECTION_SEP),
-    VALUE_SEPARATOR(Tokenizer.VALUE_SEP);
+    PLAIN_STRING(STRING),
+    ESCAPED_STRING(STRING),
+    NUMBER(STRING),
+    MACRO_BEGIN(STATIC, Tokenizer.MACRO_BEGIN),
+    MACRO_END(STATIC, Tokenizer.MACRO_END),
+    LABEL_SEPARATOR(STATIC, Tokenizer.LABEL_SEP),
+    SECTION_SEPARATOR(STATIC, Tokenizer.SECTION_SEP),
+    VALUE_SEPARATOR(STATIC, Tokenizer.VALUE_SEP);
 
+    public final TokenKind kind;
     public final char character;
 
-    TokenType()
+    TokenType(TokenKind kind)
     {
-        this('\0');
+        this(kind, '\0');
     }
 
-    TokenType(char c)
+    TokenType(TokenKind kind, char c)
     {
+        this.kind = kind;
         this.character = c;
     }
 }

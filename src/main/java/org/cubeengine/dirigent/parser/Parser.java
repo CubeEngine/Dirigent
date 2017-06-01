@@ -47,8 +47,6 @@ public class Parser
             return emptyList();
         }
         TokenBuffer buf = Tokenizer.tokenize(message);
-        System.out.println("Input: " + message);
-        System.out.println(buf);
         List<Element> elements = new ArrayList<Element>();
         parseParts(buf, elements);
 
@@ -67,6 +65,7 @@ public class Parser
         {
             if (prevOffset == offset)
             {
+                // TODO remove me once stable
                 throw new IllegalStateException("Detected endless loop!");
             }
             prevOffset = offset;
@@ -78,7 +77,7 @@ public class Parser
     {
         if (is(buf, offset, TokenType.MACRO_BEGIN))
         {
-            return parseMacro(buf, offset, elements);
+            return parseMacro(buf, offset + 1, elements);
         }
         else
         {
@@ -102,9 +101,6 @@ public class Parser
 
     private static int parseMacro(TokenBuffer buf, int offset, List<Element> elements)
     {
-        // first is MACRO_BEGIN
-        offset++;
-
         switch (buf.types[offset])
         {
             case MACRO_END:
@@ -119,21 +115,17 @@ public class Parser
 
     private static int parseIndexedMacro(TokenBuffer buf, int offset, List<Element> elements)
     {
-        if (is(buf, offset, TokenType.NUMBER))
+        int index = makeInt(buf, offset);
+        offset++;
+        if (is(buf, offset, TokenType.MACRO_END))
         {
-            int index = makeInt(buf, offset);
-            offset++;
-            if (is(buf, offset, TokenType.MACRO_END))
-            {
-                elements.add(new IndexedDefaultMacro(index));
-                return offset + 1;
-            }
-            else
-            {
-                return parseNamedMacroWithIndex(buf, offset + 1, elements, index);
-            }
+            elements.add(new IndexedDefaultMacro(index));
+            return offset + 1;
         }
-        return offset;
+        else
+        {
+            return parseNamedMacroWithIndex(buf, offset + 1, elements, index);
+        }
     }
 
     private static int parseNamedMacro(TokenBuffer buf, int offset, List<Element> elements)
@@ -152,6 +144,7 @@ public class Parser
         if (is(buf, offset, TokenType.LABEL_SEPARATOR))
         {
             offset++;
+            // the label does not require text after it, so {a#:b} would have an empty label and be correct
             if (isString(buf, offset))
             {
                 offset++;
@@ -160,11 +153,15 @@ public class Parser
         List<Argument> args;
         if (is(buf, offset, TokenType.SECTION_SEPARATOR))
         {
-            args = new ArrayList<Argument>();
-            offset = parseArguments(buf, offset, args);
-            if (args.isEmpty())
+            List<Argument> parsedArgs = new ArrayList<Argument>();
+            offset = parseArguments(buf, offset, parsedArgs);
+            if (parsedArgs.isEmpty())
             {
                 args = emptyList();
+            }
+            else
+            {
+                args = parsedArgs;
             }
         }
         else
@@ -215,7 +212,7 @@ public class Parser
 
     private static boolean isString(TokenBuffer buf, int offset)
     {
-        return is(buf, offset, TokenType.ESCAPED_STRING) || is(buf, offset, TokenType.PLAIN_STRING);
+        return buf.types[offset].kind == TokenKind.STRING;
     }
 
     private static String makeString(TokenBuffer buf, int offset, boolean insideMacro)

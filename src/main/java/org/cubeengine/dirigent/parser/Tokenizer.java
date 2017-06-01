@@ -59,6 +59,7 @@ public class Tokenizer
         {
             if (offset == prevOffset)
             {
+                // TODO remove me once stable
                 throw new IllegalStateException("Detected endless loop!");
             }
             prevOffset = offset;
