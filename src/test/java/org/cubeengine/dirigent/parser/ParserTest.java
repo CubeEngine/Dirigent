@@ -135,8 +135,44 @@ public class ParserTest
             parse("illegal macro {starts#lab\\}el:has arguments but wont end"));
 
         assertEquals(
-            elems(txt("illegal macro "), named("first some static text and {second")),
-            parse("illegal macro {first some static text and {second}"));
+            elems(txt("illegal macro { text and "), named("second")),
+            parse("illegal macro { text and {second}"));
+
+        assertEquals(
+            elems(txt("illegal macro {0 text and "), named("second")),
+            parse("illegal macro {0 text and {second}"));
+
+        assertEquals(
+            elems(txt("illegal macro {text and "), named("second")),
+            parse("illegal macro {text and {second}"));
+
+        assertEquals(
+            elems(txt("illegal macro {0:text and "), named("second")),
+            parse("illegal macro {0:text and {second}"));
+
+        assertEquals(
+            elems(txt("illegal macro {0:text#label and "), named("second")),
+            parse("illegal macro {0:text#label and {second}"));
+
+        assertEquals(
+            elems(txt("illegal macro {0:text#label:arg and "), named("second")),
+            parse("illegal macro {0:text#label:arg and {second}"));
+
+        assertEquals(
+            elems(txt("illegal macro {text#label:arg and "), named("second")),
+            parse("illegal macro {text#label:arg and {second}"));
+
+        assertEquals(
+            elems(txt("illegal macro {text#label and "), named("second")),
+            parse("illegal macro {text#label and {second}"));
+
+        assertEquals(
+            elems(txt("illegal macro {text:arg and "), named("second")),
+            parse("illegal macro {text:arg and {second}"));
+
+        assertEquals(
+            elems(txt("illegal macro {0:text:arg and "), named("second")),
+            parse("illegal macro {0:text:arg and {second}"));
     }
 
     @Test
@@ -161,6 +197,16 @@ public class ParserTest
             parse("escaping {in#la#be\\}l:and#\\}\\=\\:\\\\arg}"));
     }
 
+    @Test
+    public void testStripBackslashes()
+    {
+        assertEquals("\\", convertAndUnescape("\\"));
+        assertEquals("sta\\:tic", convertAndUnescape("sta\\:tic"));
+        assertEquals("static", convertAndUnescape("static"));
+        assertEquals("static \\\\ tex\\:t\\", convertAndUnescape("static \\\\\\\\ tex\\:t\\\\"));
+        assertEquals("static \\\\ tex\\:t\\", convertAndUnescape("static \\\\\\\\ tex\\:t\\\\"));
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void testNullMessage()
     {
@@ -182,15 +228,5 @@ public class ParserTest
     private static String convertAndUnescape(String s)
     {
         return unescape(s, 0, s.length(), false);
-    }
-
-    @Test
-    public void testStripBackslashes()
-    {
-        assertEquals("\\", convertAndUnescape("\\"));
-        assertEquals("sta\\:tic", convertAndUnescape("sta\\:tic"));
-        assertEquals("static", convertAndUnescape("static"));
-        assertEquals("static \\\\ tex\\:t\\", convertAndUnescape("static \\\\\\\\ tex\\:t\\\\"));
-        assertEquals("static \\\\ tex\\:t\\", convertAndUnescape("static \\\\\\\\ tex\\:t\\\\"));
     }
 }
