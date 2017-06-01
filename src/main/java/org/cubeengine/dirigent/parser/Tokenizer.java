@@ -259,8 +259,6 @@ public class Tokenizer
         }
 
         final TokenBuffer tokenBuf = new TokenBuffer(starts, lengths, types, tokenCount, buf);
-        System.out.println("Input:  <" + message + ">");
-        System.out.println("Output: <" + tokenBuf + ">");
 
         return tokenBuf;
     }
