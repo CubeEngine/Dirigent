@@ -25,6 +25,7 @@ package org.cubeengine.dirigent.formatter;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
+import java.util.Currency;
 import java.util.Locale;
 import org.cubeengine.dirigent.parser.component.Component;
 import org.cubeengine.dirigent.context.Context;
@@ -112,7 +113,13 @@ public class NumberFormatter extends AbstractFormatter<Number>
     protected String parseNumberToString(Number number, Context context, Arguments args)
     {
         final NumberFormat numberFormat = parseFormatter(context, args);
-        numberFormat.setCurrency(context.get(Contexts.CURRENCY));
+
+        final Currency currency = context.get(Contexts.CURRENCY);
+        if (currency != null)
+        {
+            numberFormat.setCurrency(currency);
+        }
+
         return numberFormat.format(number);
     }
 

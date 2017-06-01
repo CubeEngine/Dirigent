@@ -73,9 +73,17 @@ public class Contexts
         new DefaultProvider<Currency>()
         {
             @Override
-            public Currency defaultValue(Context context)
+            public Currency defaultValue(final Context context)
             {
-                return Currency.getInstance(context.get(LOCALE));
+                try
+                {
+                    return Currency.getInstance(context.get(LOCALE));
+                }
+                catch (final IllegalArgumentException e)
+                {
+                    // the locale doesn't have a currency.
+                    return null;
+                }
             }
         });
 
@@ -98,20 +106,7 @@ public class Contexts
      */
     public static Context createContext(Locale locale)
     {
-        return createContext(locale, TimeZone.getDefault());
-    }
-
-    /**
-     * Creates a new context holding the specified {@link Locale}.
-     *
-     * @param locale The locale for this context
-     * @param timeZone the timezone for this context
-     *
-     * @return the context.
-     */
-    public static Context createContext(Locale locale, TimeZone timeZone)
-    {
-        return createContext(LOCALE.with(locale), TIMEZONE.with(timeZone), CURRENCY.with(Currency.getInstance(locale)));
+        return createContext(LOCALE.with(locale));
     }
 
     /**

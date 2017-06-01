@@ -29,6 +29,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
+import org.cubeengine.dirigent.context.Contexts;
 import org.cubeengine.dirigent.parser.component.Component;
 import org.cubeengine.dirigent.context.Context;
 import org.cubeengine.dirigent.formatter.argument.Argument;
@@ -86,7 +87,7 @@ public abstract class AbstractDateTimeFormatterTest
                              final String defaultStyle, final String dateStyle, final String timeStyle,
                              final String format)
     {
-        final Context context = createContext(locale, timeZone);
+        final Context context = createContext(Contexts.LOCALE.with(locale), Contexts.TIMEZONE.with(timeZone));
         final Arguments args = createArguments(defaultStyle, dateStyle, timeStyle, format);
 
         final Component component = formatter.format(date, context, args);
