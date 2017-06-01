@@ -62,7 +62,6 @@ public class ParserTest
     @Test
     public void testReadMessage()
     {
-        parse("{0}");
         assertEquals(elems(txt("only text")), parse("only text"));
         assertEquals(elems(DEFAULT_MACRO), parse("{}"));
         assertEquals(elems(named("name")), parse("{name}"));
@@ -160,7 +159,7 @@ public class ParserTest
     
     private static String convertAndUnescape(String s)
     {
-        return unescape(s.toCharArray(), 0, s.length());
+        return unescape(s, 0, s.length(), false);
     }
 
     @Test

@@ -63,9 +63,9 @@ public class Tokenizer
         public final int[] lengths;
         public final TokenType[] types;
         public final int count;
-        public final char[] data;
+        public final String data;
 
-        public TokenBuffer(int[] offsets, int[] lengths, TokenType[] types, int count, char[] data)
+        public TokenBuffer(int[] offsets, int[] lengths, TokenType[] types, int count, String data)
         {
             this.offsets = offsets;
             this.lengths = lengths;
@@ -84,14 +84,14 @@ public class Tokenizer
                 s.append('"');
                 s.append(types[0].name());
                 s.append('(');
-                s.append(data, offsets[0], lengths[0]);
+                s.append(data, offsets[0], offsets[0] + lengths[0]);
                 s.append(')');
                 for (int i = 1; i < count; i++)
                 {
                     s.append(", ");
                     s.append(types[i].name());
                     s.append('(');
-                    s.append(data, offsets[i], lengths[i]);
+                    s.append(data, offsets[i], offsets[i] + lengths[i]);
                     s.append(')');
                 }
             }
@@ -101,26 +101,28 @@ public class Tokenizer
         }
     }
 
-    public static TokenBuffer tokenize(final String message)
+    public static TokenBuffer tokenize(final String input)
     {
-        char[] buf = message.toCharArray();
 
         // currently in an unclosed macro?
         boolean insideMacro = false;
         // seen a label in the currently open macro ?
         boolean hasLabel = false;
+        // should the next character be interpreted as text no matter what?
         boolean textExpected = false;
+        // seen a label separator
+        boolean hasSections = false;
 
-        int[] starts = new int[buf.length];
-        int[] lengths = new int[buf.length];
-        TokenType[] types = new TokenType[buf.length];
+        int[] starts = new int[input.length()];
+        int[] lengths = new int[input.length()];
+        TokenType[] types = new TokenType[input.length()];
         int tokenCount = 0;
 
         int offset = 0;
         int prevOffset = -1;
         int lastBeginMacro = -1;
         char c;
-        while (offset < buf.length)
+        while (offset < input.length())
         {
             if (offset == prevOffset)
             {
@@ -128,13 +130,14 @@ public class Tokenizer
             }
             prevOffset = offset;
 
-            c = buf[offset];
+            c = input.charAt(offset);
             switch (c)
             {
                 case MACRO_BEGIN:
                     insideMacro = true;
                     hasLabel = false;
                     lastBeginMacro = tokenCount;
+                    hasSections = false;
 
                     types[tokenCount] = TokenType.MACRO_BEGIN;
                     starts[tokenCount] = offset;
@@ -163,6 +166,7 @@ public class Tokenizer
                     break;
                 case SECTION_SEP:
                     textExpected = true;
+                    hasSections = true;
 
                     types[tokenCount] = TokenType.SECTION_SEPARATOR;
                     starts[tokenCount] = offset;
@@ -186,43 +190,32 @@ public class Tokenizer
             {
                 textExpected = false;
                 int start = offset;
-                TokenType type;
+                TokenType type = TokenType.PLAIN_STRING;
+
                 // the current char can't be the end
                 offset++;
+                boolean hasEscaping;
+                boolean isNumeric = insideMacro && !hasSections && isDigit(c);
 
-                if (insideMacro && isDigit(c))
+                if (offset < input.length())
                 {
-                    type = TokenType.NUMBER;
-                    if (isNonZeroDigit(c))
+                    hasEscaping = c == ESCAPE;
+                    c = input.charAt(offset);
+                    while (!stringEnd(c, insideMacro, hasEscaping, hasLabel))
                     {
-                        while (offset < buf.length && isDigit(buf[offset]))
-                        {
-                            offset++;
-                        }
-                    }
-                }
-                else
-                {
-                    type = TokenType.PLAIN_STRING;
-                    boolean escaped = false;
+                        isNumeric = isNumeric && isDigit(c);
 
-                    if (offset < buf.length)
-                    {
-                        c = buf[offset];
-                        while (!stringEnd(c, insideMacro, escaped, hasLabel))
+                        if (hasEscaping && type == TokenType.PLAIN_STRING)
                         {
-                            escaped = c == ESCAPE;
-                            if (escaped && type == TokenType.PLAIN_STRING)
-                            {
-                                type = TokenType.ESCAPED_STRING;
-                            }
-                            offset++;
-                            if (offset >= buf.length)
-                            {
-                                break;
-                            }
-                            c = buf[offset];
+                            type = TokenType.ESCAPED_STRING;
                         }
+                        hasEscaping = c == ESCAPE;
+                        offset++;
+                        if (offset >= input.length())
+                        {
+                            break;
+                        }
+                        c = input.charAt(offset);
                     }
                 }
                 int length = offset - start;
@@ -230,7 +223,7 @@ public class Tokenizer
                 {
                     starts[tokenCount] = start;
                     lengths[tokenCount] = length;
-                    types[tokenCount] = type;
+                    types[tokenCount] = isInt(input, start, length, isNumeric) ? TokenType.NUMBER : type;
                     tokenCount++;
                 }
             }
@@ -248,7 +241,7 @@ public class Tokenizer
                 }
             }
             types[lastBeginMacro] = replacementType;
-            lengths[lastBeginMacro] = buf.length - starts[lastBeginMacro];
+            lengths[lastBeginMacro] = input.length() - starts[lastBeginMacro];
             tokenCount = lastBeginMacro + 1;
             int beforeLastBeginMacro = lastBeginMacro - 1;
             if (beforeLastBeginMacro >= 0 && replacementType == types[beforeLastBeginMacro])
@@ -258,9 +251,12 @@ public class Tokenizer
             }
         }
 
-        final TokenBuffer tokenBuf = new TokenBuffer(starts, lengths, types, tokenCount, buf);
+        return new TokenBuffer(starts, lengths, types, tokenCount, input);
+    }
 
-        return tokenBuf;
+    private static boolean isInt(String input, int offset, int length, boolean numeric)
+    {
+        return numeric && (length == 1 || isNonZeroDigit(input.charAt(offset)));
     }
 
     private static boolean stringEnd(char c, boolean insideMacro, boolean escaped, boolean hasLabel)

@@ -27,8 +27,10 @@ public class Parser
             return emptyList();
         }
         TokenBuffer buf = Tokenizer.tokenize(message);
+        System.out.println("Input: " + message);
+        System.out.println(buf);
         List<Element> elements = new ArrayList<Element>();
-        parseParts(buf, 0, elements);
+        parseParts(buf, elements);
 
         if (elements.isEmpty())
         {
@@ -37,8 +39,9 @@ public class Parser
         return elements;
     }
 
-    public static void parseParts(TokenBuffer buf, int offset, List<Element> elements)
+    private static void parseParts(TokenBuffer buf, List<Element> elements)
     {
+        int offset = 0;
         int prevOffset = -1;
         while (offset < buf.count)
         {
@@ -51,7 +54,7 @@ public class Parser
         }
     }
 
-    public static int parsePart(TokenBuffer buf, int offset, List<Element> elements)
+    private static int parsePart(TokenBuffer buf, int offset, List<Element> elements)
     {
         if (is(buf, offset, TokenType.MACRO_BEGIN))
         {
@@ -63,11 +66,11 @@ public class Parser
         }
     }
 
-    public static int parseText(TokenBuffer buf, int offset, List<Element> elements)
+    private static int parseText(TokenBuffer buf, int offset, List<Element> elements)
     {
         if (isString(buf, offset))
         {
-            elements.add(new Text(makeString(buf, offset)));
+            elements.add(new Text(makeString(buf, offset, false)));
             return offset + 1;
         }
         else
@@ -77,7 +80,7 @@ public class Parser
         }
     }
 
-    public static int parseMacro(TokenBuffer buf, int offset, List<Element> elements)
+    private static int parseMacro(TokenBuffer buf, int offset, List<Element> elements)
     {
         // first is MACRO_BEGIN
         offset++;
@@ -94,7 +97,7 @@ public class Parser
         }
     }
 
-    public static int parseIndexedMacro(TokenBuffer buf, int offset, List<Element> elements)
+    private static int parseIndexedMacro(TokenBuffer buf, int offset, List<Element> elements)
     {
         if (is(buf, offset, TokenType.NUMBER))
         {
@@ -113,17 +116,17 @@ public class Parser
         return offset;
     }
 
-    public static int parseNamedMacro(TokenBuffer buf, int offset, List<Element> elements)
+    private static int parseNamedMacro(TokenBuffer buf, int offset, List<Element> elements)
     {
         return parseNamedMacroWithIndex(buf, offset, elements, -1);
     }
 
-    public static int parseNamedMacroWithIndex(TokenBuffer buf, int offset, List<Element> elements, int index)
+    private static int parseNamedMacroWithIndex(TokenBuffer buf, int offset, List<Element> elements, int index)
     {
         String name = "";
         if (isString(buf, offset))
         {
-            name = makeString(buf, offset);
+            name = makeString(buf, offset, true);
             offset++;
         }
         if (is(buf, offset, TokenType.LABEL_SEPARATOR))
@@ -159,7 +162,7 @@ public class Parser
         return offset + 1;
     }
 
-    public static int parseArguments(TokenBuffer buf, int offset, List<Argument> args)
+    private static int parseArguments(TokenBuffer buf, int offset, List<Argument> args)
     {
         while (!is(buf, offset, TokenType.MACRO_END))
         {
@@ -168,14 +171,14 @@ public class Parser
         return offset;
     }
 
-    public static int parseArgument(TokenBuffer buf, int offset, List<Argument> args)
+    private static int parseArgument(TokenBuffer buf, int offset, List<Argument> args)
     {
-        String name = makeString(buf, offset);
+        String name = makeString(buf, offset, true);
         offset++;
         if (is(buf, offset, TokenType.VALUE_SEPARATOR))
         {
             offset++;
-            args.add(new Parameter(name, makeString(buf, offset)));
+            args.add(new Parameter(name, makeString(buf, offset, true)));
             return offset + 1;
         }
         else
@@ -195,19 +198,20 @@ public class Parser
         return is(buf, offset, TokenType.ESCAPED_STRING) || is(buf, offset, TokenType.PLAIN_STRING);
     }
 
-    public static String makeString(TokenBuffer buf, int offset)
+    private static String makeString(TokenBuffer buf, int offset, boolean insideMacro)
     {
+        final int dataOffset = buf.offsets[offset];
         if (is(buf, offset, TokenType.ESCAPED_STRING))
         {
-            return unescape(buf.data, buf.offsets[offset], buf.lengths[offset]);
+            return unescape(buf.data, dataOffset, buf.lengths[offset], insideMacro);
         }
         else
         {
-            return new String(buf.data, buf.offsets[offset], buf.lengths[offset]);
+            return buf.data.substring(dataOffset, dataOffset + buf.lengths[offset]);
         }
     }
 
-    public static int makeInt(TokenBuffer buf, int offset)
+    private static int makeInt(TokenBuffer buf, int offset)
     {
         return toInt(buf.data, buf.offsets[offset], buf.lengths[offset]);
     }
@@ -216,10 +220,12 @@ public class Parser
      * Strips escaping backslashes from the given input string.
      *
      * @param input the input string with escaping backslashes
-     * @param charset the set of characters that need escaping
+     * @param offset base offset in the input
+     * @param length the number of characters to interpret
+     * @param insideMacro whether the sequence is inside a macro
      * @return the unescaped string
      */
-    static String unescape(char[] data, int offset, int length)
+    static String unescape(String input, int offset, int length, boolean insideMacro)
     {
         if (length == 0)
         {
@@ -227,7 +233,7 @@ public class Parser
         }
         if (length == 1)
         {
-            return "" + data[offset];
+            return "" + input.charAt(offset);
         }
         StringBuilder stripped = new StringBuilder();
         int end = offset + length;
@@ -235,7 +241,7 @@ public class Parser
         boolean escaped = false;
         for (int i = offset; i < end; ++i)
         {
-            c = data[i];
+            c = input.charAt(i);
             if (!escaped && c == Tokenizer.ESCAPE)
             {
                 escaped = true;
@@ -256,20 +262,22 @@ public class Parser
      * No validation is done on the input. This method will produce numbers, even if the input is not a valid decimal
      * number.
      *
-     * @param s an input string consisting of decimal digits
+     * @param input an input string consisting of decimal digits
+     * @param offset the base offset in the input
+     * @param length the number of characters to interpret
      * @return the integer representation of the input string if possible
      */
-    private static int toInt(char[] data, int offset, int length)
+    private static int toInt(String input, int offset, int length)
     {
         if (length == 1)
         {
-            return data[offset] - '0';
+            return input.charAt(offset) - '0';
         }
 
         int out = 0;
         for (int i = offset + length - 1, factor = 1; i >= offset; --i, factor *= 10)
         {
-            out += (data[i] - '0') * factor;
+            out += (input.charAt(i) - '0') * factor;
         }
         return out;
     }
