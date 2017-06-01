@@ -203,13 +203,13 @@ public class Tokenizer
                     c = input.charAt(offset);
                     while (!stringEnd(c, insideMacro, hasEscaping, hasLabel))
                     {
+                        hasEscaping = !hasEscaping && c == ESCAPE;
                         isNumeric = isNumeric && isDigit(c);
 
                         if (hasEscaping && type == TokenType.PLAIN_STRING)
                         {
                             type = TokenType.ESCAPED_STRING;
                         }
-                        hasEscaping = c == ESCAPE;
                         offset++;
                         if (offset >= input.length())
                         {
