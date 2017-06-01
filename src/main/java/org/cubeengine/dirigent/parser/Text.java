@@ -30,6 +30,8 @@ import org.cubeengine.dirigent.parser.element.Element;
  */
 public class Text implements Element, TextComponent
 {
+    public static final Text EMPTY = new Text("");
+
     /**
      * The actual text.
      */
@@ -82,5 +84,14 @@ public class Text implements Element, TextComponent
     public String toString()
     {
         return "Text{" + "string='" + string + '\'' + '}';
+    }
+
+    public static Text create(String s)
+    {
+        if (s.isEmpty())
+        {
+            return EMPTY;
+        }
+        return new Text(s);
     }
 }

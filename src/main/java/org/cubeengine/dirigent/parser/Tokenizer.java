@@ -31,7 +31,7 @@ public class Tokenizer
     private static final char MACRO_END = '}';
     private static final char LABEL_SEP = '#';
     private static final char SECTION_SEP = ':';
-    private static final char ARG_VAL_SEP = '=';
+    private static final char VALUE_SEP = '=';
     static final char ESCAPE = '\\';
 
     public enum TokenType
@@ -43,7 +43,7 @@ public class Tokenizer
         MACRO_END(Tokenizer.MACRO_END),
         LABEL_SEPARATOR(Tokenizer.LABEL_SEP),
         SECTION_SEPARATOR(Tokenizer.SECTION_SEP),
-        VALUE_SEPARATOR(Tokenizer.ARG_VAL_SEP);
+        VALUE_SEPARATOR(Tokenizer.VALUE_SEP);
 
         public final char character;
 
@@ -109,6 +109,7 @@ public class Tokenizer
         boolean insideMacro = false;
         // seen a label in the currently open macro ?
         boolean hasLabel = false;
+        boolean textExpected = false;
 
         int[] starts = new int[buf.length];
         int[] lengths = new int[buf.length];
@@ -116,10 +117,17 @@ public class Tokenizer
         int tokenCount = 0;
 
         int offset = 0;
+        int prevOffset = -1;
         int lastBeginMacro = -1;
         char c;
         while (offset < buf.length)
         {
+            if (offset == prevOffset)
+            {
+                throw new IllegalStateException("Detected endless loop!");
+            }
+            prevOffset = offset;
+
             c = buf[offset];
             switch (c)
             {
@@ -145,6 +153,8 @@ public class Tokenizer
                     break;
                 case LABEL_SEP:
                     hasLabel = true;
+                    textExpected = true;
+
                     types[tokenCount] = TokenType.LABEL_SEPARATOR;
                     starts[tokenCount] = offset;
                     lengths[tokenCount] = 1;
@@ -152,66 +162,77 @@ public class Tokenizer
                     offset++;
                     break;
                 case SECTION_SEP:
+                    textExpected = true;
+
                     types[tokenCount] = TokenType.SECTION_SEPARATOR;
                     starts[tokenCount] = offset;
                     lengths[tokenCount] = 1;
                     tokenCount++;
                     offset++;
                     break;
-                case ARG_VAL_SEP:
+                case VALUE_SEP:
+                    textExpected = true;
+
                     types[tokenCount] = TokenType.VALUE_SEPARATOR;
                     starts[tokenCount] = offset;
                     lengths[tokenCount] = 1;
                     tokenCount++;
                     offset++;
                     break;
-                // either text or a number
                 default:
-                    int start = offset;
-                    TokenType type;
-                    // the current char can't be the end
-                    offset++;
+                    textExpected = true;
+            }
+            if (textExpected)
+            {
+                textExpected = false;
+                int start = offset;
+                TokenType type;
+                // the current char can't be the end
+                offset++;
 
-                    if (insideMacro && isNonZeroDigit(c))
+                if (insideMacro && isDigit(c))
+                {
+                    type = TokenType.NUMBER;
+                    if (isNonZeroDigit(c))
                     {
-                        type = TokenType.NUMBER;
                         while (offset < buf.length && isDigit(buf[offset]))
                         {
                             offset++;
                         }
                     }
-                    else
-                    {
-                        type = TokenType.PLAIN_STRING;
-                        boolean escaped = false;
+                }
+                else
+                {
+                    type = TokenType.PLAIN_STRING;
+                    boolean escaped = false;
 
-                        if (offset < buf.length)
+                    if (offset < buf.length)
+                    {
+                        c = buf[offset];
+                        while (!stringEnd(c, insideMacro, escaped, hasLabel))
                         {
-                            c = buf[offset];
-                            while (!stringEnd(c, insideMacro, escaped, hasLabel))
+                            escaped = c == ESCAPE;
+                            if (escaped && type == TokenType.PLAIN_STRING)
                             {
-                                escaped = c == ESCAPE;
-                                if (escaped && type == TokenType.PLAIN_STRING)
-                                {
-                                    type = TokenType.ESCAPED_STRING;
-                                }
-                                offset++;
-                                if (offset >= buf.length)
-                                {
-                                    break;
-                                }
-                                c = buf[offset];
+                                type = TokenType.ESCAPED_STRING;
                             }
+                            offset++;
+                            if (offset >= buf.length)
+                            {
+                                break;
+                            }
+                            c = buf[offset];
                         }
                     }
-                    int length = offset - start;
-                    if (length > 0)
-                    {
-                        starts[tokenCount] = start;
-                        lengths[tokenCount] = length;
-                        types[tokenCount] = type;
-                        tokenCount++;
-                    }
+                }
+                int length = offset - start;
+                if (length > 0)
+                {
+                    starts[tokenCount] = start;
+                    lengths[tokenCount] = length;
+                    types[tokenCount] = type;
+                    tokenCount++;
+                }
             }
         }
 
@@ -240,7 +261,8 @@ public class Tokenizer
         final TokenBuffer tokenBuf = new TokenBuffer(starts, lengths, types, tokenCount, buf);
         System.out.println("Input:  <" + message + ">");
         System.out.println("Output: <" + tokenBuf + ">");
-        throw new IllegalStateException("TODO");
+
+        return tokenBuf;
     }
 
     private static boolean stringEnd(char c, boolean insideMacro, boolean escaped, boolean hasLabel)
@@ -250,7 +272,7 @@ public class Tokenizer
             return !escaped && (
                 c == SECTION_SEP ||
                 c == MACRO_END ||
-                c == ARG_VAL_SEP ||
+                c == VALUE_SEP ||
                 (!hasLabel && c == LABEL_SEP)
             );
         }
@@ -280,52 +302,5 @@ public class Tokenizer
     private static boolean isDigit(char c)
     {
         return c >= '0' && c <= '9';
-    }
-
-    /**
-     * Strips escaping backslashes from the given input string.
-     *
-     * @param input the input string with escaping backslashes
-     * @param charset the set of characters that need escaping
-     * @return the unescaped string
-     */
-    static String unescape(String input, String charset)
-    {
-        if (input.indexOf('\\') == -1 || input.length() <= 1)
-        {
-            return input;
-        }
-        else
-        {
-            StringBuilder stripped = new StringBuilder();
-            char c, n;
-            int i;
-            for (i = 0; i < input.length() - 1; ++i)
-            {
-                c = input.charAt(i);
-                if (c == ESCAPE)
-                {
-                    n = input.charAt(i + 1);
-                    if (charset.indexOf(n) == -1)
-                    {
-                        stripped.append(c);
-                    }
-                    else
-                    {
-                        stripped.append(n);
-                        ++i;
-                    }
-                }
-                else
-                {
-                    stripped.append(c);
-                }
-            }
-            if (i < input.length())
-            {
-                stripped.append(input.charAt(i));
-            }
-            return stripped.toString();
-        }
     }
 }
