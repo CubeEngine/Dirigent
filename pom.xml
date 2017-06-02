@@ -76,7 +76,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jdkVersion>1.6</jdkVersion>
         <releaseProfile>release</releaseProfile>
-        <pitest.version>1.2.0</pitest.version>
     </properties>
 
     <dependencies>
@@ -152,7 +151,7 @@
                 <!-- execute the goal mutationCoverage to produce it -->
                 <groupId>org.pitest</groupId>
                 <artifactId>pitest-maven</artifactId>
-                <version>${pitest.version}</version>
+                <version>1.2.0</version>
                 <configuration>
                     <targetClasses>
                         <param>org.cubeengine.dirigent*</param>
