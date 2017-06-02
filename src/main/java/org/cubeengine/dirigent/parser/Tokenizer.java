@@ -39,8 +39,8 @@ public class Tokenizer
 
         // currently in an unclosed macro?
         boolean insideMacro = false;
-        // seen a label in the currently open macro ?
-        boolean hasLabel = false;
+        // is the tokenizer after the label position in the currently open macro ?
+        boolean afterLabel = false;
         // should the next character be interpreted as text no matter what?
         boolean textExpected = false;
         // seen a label separator
@@ -69,7 +69,7 @@ public class Tokenizer
             {
                 case MACRO_BEGIN:
                     insideMacro = true;
-                    hasLabel = false;
+                    afterLabel = false;
                     lastBeginMacro = tokenCount;
                     hasSections = false;
 
@@ -89,7 +89,7 @@ public class Tokenizer
                     offset++;
                     break;
                 case LABEL_SEP:
-                    hasLabel = true;
+                    afterLabel = true;
                     textExpected = true;
 
                     types[tokenCount] = TokenType.LABEL_SEPARATOR;
@@ -100,6 +100,7 @@ public class Tokenizer
                     break;
                 case SECTION_SEP:
                     textExpected = true;
+                    afterLabel = tokenCount > 0 && types[tokenCount - 1] != TokenType.NUMBER;
                     hasSections = true;
 
                     types[tokenCount] = TokenType.SECTION_SEPARATOR;
@@ -126,16 +127,13 @@ public class Tokenizer
                 int start = offset;
                 TokenType type = TokenType.PLAIN_STRING;
 
-                // the current char can't be the end
-                offset++;
-                boolean hasEscaping;
-                boolean isNumeric = insideMacro && !hasSections && isDigit(c);
+                boolean hasEscaping = false;
+                boolean isNumeric = insideMacro && !hasSections;
 
                 if (offset < input.length())
                 {
-                    hasEscaping = c == ESCAPE;
                     c = input.charAt(offset);
-                    while (!stringEnd(c, insideMacro, hasEscaping, hasLabel))
+                    while (!stringEnd(c, insideMacro, hasEscaping, afterLabel))
                     {
                         hasEscaping = !hasEscaping && c == ESCAPE;
                         isNumeric = isNumeric && isDigit(c);
@@ -202,10 +200,8 @@ public class Tokenizer
     {
         if (insideMacro)
         {
-            return c == Tokenizer.MACRO_END ||
-                c == Tokenizer.SECTION_SEP ||
-                (!hasLabel && c == Tokenizer.LABEL_SEP) ||
-                c == Tokenizer.VALUE_SEP;
+            return c == Tokenizer.MACRO_END || c == Tokenizer.SECTION_SEP || (!hasLabel && c == Tokenizer.LABEL_SEP)
+                || c == Tokenizer.VALUE_SEP;
         }
         else
         {
@@ -217,6 +213,7 @@ public class Tokenizer
      * Checks if the given character is a non-zero decimal digit.
      *
      * @param c the character
+     *
      * @return true if it is a non-zero digit
      */
     private static boolean isNonZeroDigit(char c)
@@ -228,6 +225,7 @@ public class Tokenizer
      * Checks if the given character is a deciaml digit.
      *
      * @param c the character
+     *
      * @return true if it is a decimal digit
      */
     private static boolean isDigit(char c)

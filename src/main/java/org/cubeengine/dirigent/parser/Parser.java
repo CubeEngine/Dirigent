@@ -56,7 +56,8 @@ import static java.util.Collections.emptyList;
  */
 public class Parser
 {
-    public static List<Element> parse(String message) {
+    public static List<Element> parse(String message)
+    {
         if (message == null)
         {
             throw new IllegalArgumentException("message may not be null!");
@@ -209,8 +210,14 @@ public class Parser
 
     private static int parseArgument(TokenBuffer buf, int offset, List<Argument> args)
     {
-        String name = makeString(buf, offset, true);
-        offset++;
+        final String name;
+        if (!isString(buf, offset)) {
+            name = "";
+        } else {
+            name = makeString(buf, offset, true);
+            offset++;
+        }
+
         if (is(buf, offset, TokenType.VALUE_SEPARATOR))
         {
             offset++;
@@ -259,6 +266,7 @@ public class Parser
      * @param offset base offset in the input
      * @param length the number of characters to interpret
      * @param insideMacro whether the sequence is inside a macro
+     *
      * @return the unescaped string
      */
     static String unescape(String input, int offset, int length, boolean insideMacro)
@@ -313,6 +321,7 @@ public class Parser
      * @param input an input string consisting of decimal digits
      * @param offset the base offset in the input
      * @param length the number of characters to interpret
+     *
      * @return the integer representation of the input string if possible
      */
     private static int toInt(String input, int offset, int length)

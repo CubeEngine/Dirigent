@@ -117,6 +117,14 @@ public class ParserTest
         assertEquals(
             elems(txt("empty "), named(" ")),
             parse("empty { }"));
+
+        assertEquals(
+            elems(txt("msg "), named("number", arg("format", "#.0"))),
+            parse("msg {number:format=#.0}"));
+
+        assertEquals(
+            elems(txt("msg "), named("number", arg("format", "#,###.0"))),
+            parse("msg {number:format=#,###.0}"));
     }
 
     @Test
@@ -203,34 +211,37 @@ public class ParserTest
 
     @Test
     public void testEmptyPartsOfAMacro() {
-        // TODO have a look at the tests; are they correct?
         assertEquals(
-            elems(txt("empty {0:}")),
-            parse("empty {0:}"));
+            elems(txt("empty "), complete(0, ""), txt(" empty")),
+            parse("empty {0:} empty"));
 
         assertEquals(
-            elems(txt("empty {name#}")),
-            parse("empty {name#}"));
+            elems(txt("empty "), named("name"), txt(" empty")),
+            parse("empty {name#} empty"));
 
         assertEquals(
-            elems(txt("empty {name#moep:}")),
-            parse("empty {name#moep:}"));
+            elems(txt("empty "), named("name", arg("")), txt(" empty")),
+            parse("empty {name#moep:} empty"));
 
         assertEquals(
-            elems(txt("empty {name:}")),
-            parse("empty {name:}"));
+            elems(txt("empty "), named("name", arg("")), txt(" empty")),
+            parse("empty {name:} empty"));
 
         assertEquals(
-            elems(txt("empty "), named("name", arg(":"))),
-            parse("empty {name::}"));
+            elems(txt("empty "), named("name", arg(""), arg("")), txt(" empty")),
+            parse("empty {name::} empty"));
 
         assertEquals(
-            elems(txt("empty "), named("name")),
-            parse("empty {name#:}"));
+            elems(txt("empty "), named("name", arg("")), txt(" empty")),
+            parse("empty {name#:} empty"));
 
         assertEquals(
-            elems(txt("empty "), named("name", arg("arg"))),
-            parse("empty {name#:arg}"));
+            elems(txt("empty "), named("name", arg("arg")), txt(" empty")),
+            parse("empty {name#:arg} empty"));
+
+        assertEquals(
+            elems(txt("empty "), named("name", arg("", "arg")), txt(" empty")),
+            parse("empty {name#:=arg} empty"));
     }
 
     @Test
