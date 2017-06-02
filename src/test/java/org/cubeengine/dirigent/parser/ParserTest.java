@@ -113,6 +113,10 @@ public class ParserTest
         assertEquals(
             elems(txt("text and a macro "), complete(1, "name", arg("and parameter", "with value"), arg("multiple"), arg("and one", "more")), txt(" more text")),
             parse("text and a macro {1:name#with index and comment:and parameter=with value:multiple:and one=more} more text"));
+
+        assertEquals(
+            elems(txt("empty "), named(" ")),
+            parse("empty { }"));
     }
 
     @Test
@@ -195,6 +199,34 @@ public class ParserTest
         assertEquals(
             elems(txt("escaping "), named("in", arg("and#}=:\\arg"))),
             parse("escaping {in#la#be\\}l:and#\\}\\=\\:\\\\arg}"));
+    }
+
+    @Test
+    public void testEmptyPartsOfAMacro() {
+        // TODO have a look at the tests; are they correct?
+        assertEquals(
+            elems(txt("empty {0:}")),
+            parse("empty {0:}"));
+
+        assertEquals(
+            elems(txt("empty {name#}")),
+            parse("empty {name#}"));
+
+        assertEquals(
+            elems(txt("empty {name#moep:}")),
+            parse("empty {name#moep:}"));
+
+        assertEquals(
+            elems(txt("empty {name:}")),
+            parse("empty {name:}"));
+
+        assertEquals(
+            elems(txt("empty "), named("name", arg(":"))),
+            parse("empty {name::}"));
+
+        assertEquals(
+            elems(txt("empty "), named("name")),
+            parse("empty {name#:}"));
     }
 
     @Test
