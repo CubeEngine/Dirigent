@@ -227,6 +227,10 @@ public class ParserTest
         assertEquals(
             elems(txt("empty "), named("name")),
             parse("empty {name#:}"));
+
+        assertEquals(
+            elems(txt("empty "), named("name", arg("arg"))),
+            parse("empty {name#:arg}"));
     }
 
     @Test
@@ -256,7 +260,7 @@ public class ParserTest
     {
         assertEquals(elems(named("1a")), parse("{1a}"));
     }
-    
+
     private static String convertAndUnescape(String s)
     {
         return unescape(s, 0, s.length(), false);
