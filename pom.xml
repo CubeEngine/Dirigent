@@ -76,6 +76,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jdkVersion>1.6</jdkVersion>
         <releaseProfile>release</releaseProfile>
+        <pitest.version>1.2.0</pitest.version>
     </properties>
 
     <dependencies>
@@ -147,6 +148,38 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <!-- execute the goal mutationCoverage to produce it -->
+                <groupId>org.pitest</groupId>
+                <artifactId>pitest-maven</artifactId>
+                <version>${pitest.version}</version>
+                <configuration>
+                    <targetClasses>
+                        <param>org.cubeengine.dirigent*</param>
+                    </targetClasses>
+                    <targetTests>
+                        <param>org.cubeengine.dirigent*</param>
+                    </targetTests>
+                    <verbose>false</verbose>
+                    <failWhenNoMutations>false</failWhenNoMutations>
+                    <withHistory>true</withHistory>
+                    <mutators>
+                        <mutator>CONDITIONALS_BOUNDARY</mutator>
+                        <mutator>NEGATE_CONDITIONALS</mutator>
+                        <mutator>REMOVE_CONDITIONALS</mutator>
+                        <mutator>MATH</mutator>
+                        <mutator>INCREMENTS</mutator>
+                        <mutator>INVERT_NEGS</mutator>
+                        <mutator>INLINE_CONSTS</mutator>
+                        <mutator>RETURN_VALS</mutator>
+                        <mutator>VOID_METHOD_CALLS</mutator>
+                        <mutator>NON_VOID_METHOD_CALLS</mutator>
+                        <mutator>CONSTRUCTOR_CALLS</mutator>
+                        <mutator>EXPERIMENTAL_MEMBER_VARIABLE</mutator>
+                        <mutator>EXPERIMENTAL_SWITCH</mutator>
+                    </mutators>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
@@ -202,6 +235,25 @@
                                 <phase>verify</phase>
                                 <goals>
                                     <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>mutation</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.pitest</groupId>
+                        <artifactId>pitest-maven</artifactId>
+                        <executions>
+                            <execution>
+                                <id>coverage</id>
+                                <goals>
+                                    <goal>mutationCoverage</goal>
                                 </goals>
                             </execution>
                         </executions>
