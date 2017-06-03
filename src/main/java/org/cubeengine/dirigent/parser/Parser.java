@@ -23,6 +23,7 @@
 package org.cubeengine.dirigent.parser;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.cubeengine.dirigent.formatter.argument.Argument;
 import org.cubeengine.dirigent.formatter.argument.Parameter;
@@ -56,6 +57,55 @@ import static java.util.Collections.emptyList;
  */
 public class Parser
 {
+    private static final char MACRO_BEGIN = '{';
+    private static final char MACRO_END = '}';
+    private static final char LABEL_SEP = '#';
+    private static final char SECTION_SEP = ':';
+    private static final char VALUE_SEP = '=';
+    private static final char ESCAPE = '\\';
+
+    // these sets are in ascending char order as per int code
+    private static final char[] TEXT_FOLLOW = {MACRO_BEGIN};
+    private static final char[] SECTION_FOLLOW = {SECTION_SEP, MACRO_END};
+    private static final char[] INDEX_FOLLOW = SECTION_FOLLOW;
+    private static final char[] MACRO_NAME_FOLLOW = {LABEL_SEP, SECTION_SEP, MACRO_END};
+    private static final char[] LABEL_FOLLOW = SECTION_FOLLOW;
+    private static final char[] PARAM_NAME_FOLLOW = {SECTION_SEP, VALUE_SEP, MACRO_END};
+
+    private static final class State
+    {
+        private final String in;
+        private final List<Element> out;
+        private int offset = 0;
+
+        public State(String in, List<Element> out)
+        {
+            this.in = in;
+            this.out = out;
+        }
+
+        boolean outOfInput()
+        {
+            return offset >= in.length();
+        }
+
+        void output(Element e)
+        {
+            out.add(e);
+        }
+
+        @Override
+        public String toString()
+        {
+            String elems = "Elements: " + out;
+            if (outOfInput())
+            {
+                return elems;
+            }
+            return "State: offset=" + this.offset + ", char=" + this.in.charAt(offset) + ", " + elems;
+        }
+    }
+
     public static List<Element> parse(String message)
     {
         if (message == null)
@@ -66,118 +116,256 @@ public class Parser
         {
             return emptyList();
         }
-        TokenBuffer buf = Tokenizer.tokenize(message);
-        List<Element> elements = new ArrayList<Element>();
-        parseParts(buf, elements);
+        State s = new State(message, new ArrayList<Element>(1));
+        parseParts(s);
 
         //System.out.println(message);
-        //System.out.println(buf);
+        //System.out.println(s.out);
 
-        if (elements.isEmpty())
+        return shakeIt(s.out);
+    }
+
+    private static List<Element> shakeIt(List<Element> in)
+    {
+        if (in.isEmpty())
         {
             return emptyList();
         }
-        return elements;
-    }
-
-    private static void parseParts(TokenBuffer buf, List<Element> elements)
-    {
-        int offset = 0;
-        int prevOffset = -1;
-        while (offset < buf.count)
+        if (in.size() == 1)
         {
-            if (prevOffset == offset)
+            return in;
+        }
+        List<Element> out = new ArrayList<Element>(in.size());
+        Element current, last;
+        for (int i = 0; i < in.size(); ++i)
+        {
+            current = in.get(i);
+            if (current instanceof Text && out.size() > 0)
             {
-                // TODO remove me once stable
-                throw new IllegalStateException("Detected endless loop!");
+                int outLastIndex = out.size() - 1;
+                last = out.get(outLastIndex);
+                if (last instanceof Text)
+                {
+                    out.set(outLastIndex, Text.append((Text)last, (Text)current));
+                }
+                else
+                {
+                    out.add(current);
+                }
             }
-            prevOffset = offset;
-            offset = parsePart(buf, offset, elements);
-        }
-    }
-
-    private static int parsePart(TokenBuffer buf, int offset, List<Element> elements)
-    {
-        if (is(buf, offset, TokenType.MACRO_BEGIN))
-        {
-            return parseMacro(buf, offset + 1, elements);
-        }
-        else
-        {
-            return parseText(buf, offset, elements);
-        }
-    }
-
-    private static int parseText(TokenBuffer buf, int offset, List<Element> elements)
-    {
-        if (isString(buf, offset))
-        {
-            elements.add(new Text(makeString(buf, offset, false)));
-            return offset + 1;
-        }
-        else
-        {
-            elements.add(Text.EMPTY);
-            return offset;
-        }
-    }
-
-    private static int parseMacro(TokenBuffer buf, int offset, List<Element> elements)
-    {
-        switch (buf.types[offset])
-        {
-            case MACRO_END:
-                elements.add(DefaultMacro.DEFAULT_MACRO);
-                return offset + 1;
-            case NUMBER:
-                return parseIndexedMacro(buf, offset, elements);
-            default:
-                return parseNamedMacro(buf, offset, elements);
-        }
-    }
-
-    private static int parseIndexedMacro(TokenBuffer buf, int offset, List<Element> elements)
-    {
-        int index = makeInt(buf, offset);
-        offset++;
-        if (is(buf, offset, TokenType.MACRO_END))
-        {
-            elements.add(new IndexedDefaultMacro(index));
-            return offset + 1;
-        }
-        else
-        {
-            return parseNamedMacroWithIndex(buf, offset + 1, elements, index);
-        }
-    }
-
-    private static int parseNamedMacro(TokenBuffer buf, int offset, List<Element> elements)
-    {
-        return parseNamedMacroWithIndex(buf, offset, elements, -1);
-    }
-
-    private static int parseNamedMacroWithIndex(TokenBuffer buf, int offset, List<Element> elements, int index)
-    {
-        String name = "";
-        if (isString(buf, offset))
-        {
-            name = makeString(buf, offset, true);
-            offset++;
-        }
-        if (is(buf, offset, TokenType.LABEL_SEPARATOR))
-        {
-            offset++;
-            // the label does not require text after it, so {a#:b} would have an empty label and be correct
-            if (isString(buf, offset))
+            else
             {
-                offset++;
+                out.add(current);
             }
+        }
+
+        if (out.size() == in.size())
+        {
+            return in;
+        }
+        return out;
+    }
+
+    private static void parseParts(State s)
+    {
+        while (!s.outOfInput())
+        {
+            parsePart(s);
+        }
+    }
+
+    private static void parsePart(State s)
+    {
+        if (is(s, MACRO_BEGIN))
+        {
+            parseMacro(s);
+        }
+        else
+        {
+            parseText(s, false);
+        }
+    }
+
+    private static void parseText(State s, boolean forceFirst)
+    {
+        s.output(Text.create(readUntil(s, TEXT_FOLLOW, forceFirst)));
+    }
+
+    private static boolean isOneOf(char c, char[] chars)
+    {
+        if (chars.length == 1)
+        {
+            return c == chars[0];
+        }
+        return Arrays.binarySearch(chars, c) >= 0;
+    }
+
+    private static String readUntil(State s, char[] endChars, boolean forceFirst)
+    {
+        final int length = s.in.length();
+        if (s.offset >= length)
+        {
+            return "";
+        }
+        int start = s.offset;
+        if (forceFirst)
+        {
+            ++s.offset;
+        }
+        StringBuilder builder = null;
+        char current, next;
+        while (s.offset < length)
+        {
+            current = s.in.charAt(s.offset);
+            if (isOneOf(current, endChars))
+            {
+                break;
+            }
+            if (current == ESCAPE && s.offset + 1 < length)
+            {
+                next = s.in.charAt(s.offset + 1);
+                if (next == ESCAPE || isOneOf(next, endChars))
+                {
+                    if (builder == null)
+                    {
+                        builder = new StringBuilder((s.offset - start) + 1);
+                    }
+                    builder.append(s.in, start, s.offset).append(next);
+                    // skip ESCAPE and next
+                    s.offset += 2;
+                    start = s.offset;
+                }
+                else
+                {
+                    ++s.offset;
+                }
+            }
+            else
+            {
+                ++s.offset;
+            }
+        }
+        if (builder == null)
+        {
+            return s.in.substring(start, s.offset);
+        }
+        else
+        {
+            if (start != s.offset)
+            {
+                builder.append(s.in, start, s.offset);
+            }
+            return builder.toString();
+        }
+    }
+
+    private static void parseMacro(State s)
+    {
+        // skip MACRO_BEGIN
+        int start = s.offset++;
+        if (is(s, MACRO_END))
+        {
+            s.output(DefaultMacro.DEFAULT_MACRO);
+            ++s.offset;
+        }
+        else if (ParserHelper.isDigit(s.in.charAt(s.offset)))
+        {
+            parseIndexedMacro(s, start);
+        }
+        else
+        {
+            parseNamedMacro(s, start);
+        }
+    }
+
+    private static void parseIndexedMacro(State s, int start)
+    {
+        int index = readIndex(s);
+        if (index == -1)
+        {
+            s.offset = start + 1;
+            parseNamedMacro(s, start);
+        }
+        else
+        {
+            if (is(s, MACRO_END))
+            {
+                s.out.add(new IndexedDefaultMacro(index));
+                // skip MACRO_END
+                ++s.offset;
+            }
+            else
+            {
+                // skip SECTION_SEP
+                ++s.offset;
+                parseNamedMacroWithIndex(s, start, index);
+            }
+        }
+    }
+
+    private static int readIndex(State s)
+    {
+        int start = s.offset;
+        char current;
+        boolean numeric = true;
+        while (s.offset < s.in.length())
+        {
+            current = s.in.charAt(s.offset);
+            if (isOneOf(current, INDEX_FOLLOW))
+            {
+                break;
+            }
+            ++s.offset;
+            numeric = numeric && ParserHelper.isDigit(current);
+        }
+        int len = s.offset - start;
+        if (len == 0)
+        {
+            return -1;
+        }
+        if (!numeric)
+        {
+            return -1;
+        }
+        if (len > 1 && !ParserHelper.isNonZeroDigit(s.in.charAt(start)))
+        {
+            return -1;
+        }
+        return ParserHelper.toInt(s.in, start, len);
+    }
+
+    private static void parseNamedMacro(State s, int start)
+    {
+        parseNamedMacroWithIndex(s, start, -1);
+    }
+
+    private static void parseNamedMacroWithIndex(State s, int start, int index)
+    {
+        String name = readUntil(s, MACRO_NAME_FOLLOW, true);
+        if (is(s, LABEL_SEP))
+        {
+            // skip LABEL_SEP
+            ++s.offset;
+            readUntil(s, LABEL_FOLLOW, false);
+        }
+        if (s.outOfInput())
+        {
+            // backtrack
+            s.offset = start;
+            parseText(s, true);
+            return;
         }
         List<Argument> args;
-        if (is(buf, offset, TokenType.SECTION_SEPARATOR))
+        if (is(s, SECTION_SEP))
         {
             List<Argument> parsedArgs = new ArrayList<Argument>();
-            offset = parseArguments(buf, offset, parsedArgs);
+            if (!parseArguments(s, parsedArgs))
+            {
+                // parsing arguments failed, backtrack
+                s.offset = start;
+                parseText(s, true);
+                return;
+            }
             if (parsedArgs.isEmpty())
             {
                 args = emptyList();
@@ -191,154 +379,65 @@ public class Parser
         {
             args = emptyList();
         }
-        if (index == -1)
+        if (is(s, MACRO_END))
         {
-            elements.add(new NamedMacro(name, args));
+            if (index == -1)
+            {
+                s.output(new NamedMacro(name, args));
+            }
+            else
+            {
+                s.output(new CompleteMacro(index, name, args));
+            }
+            // skip MACRO_END
+            ++s.offset;
         }
         else
         {
-            elements.add(new CompleteMacro(index, name, args));
+            s.offset = start;
+            parseText(s, true);
         }
-        return offset + 1;
     }
 
-    private static int parseArguments(TokenBuffer buf, int offset, List<Argument> args)
+    private static boolean parseArguments(State s, List<Argument> args)
     {
-        while (!is(buf, offset, TokenType.MACRO_END))
+        while (is(s, SECTION_SEP))
         {
-            offset = parseArgument(buf, offset + 1, args);
+            // skip SECTION_SEP
+            ++s.offset;
+            if (!parseArgument(s, args))
+            {
+                return false;
+            }
         }
-        return offset;
+        return true;
     }
 
-    private static int parseArgument(TokenBuffer buf, int offset, List<Argument> args)
+    private static boolean parseArgument(State s, List<Argument> args)
     {
-        final String name;
-        if (!isString(buf, offset)) {
-            name = "";
-        } else {
-            name = makeString(buf, offset, true);
-            offset++;
-        }
-
-        if (is(buf, offset, TokenType.VALUE_SEPARATOR))
+        final String name = readUntil(s, PARAM_NAME_FOLLOW, false);
+        if (is(s, VALUE_SEP))
         {
-            offset++;
-            args.add(new Parameter(name, makeString(buf, offset, true)));
-            return offset + 1;
+            // skip VALUE_SEP
+            ++s.offset;
+            if (name.isEmpty())
+            {
+                return false;
+            }
+            else
+            {
+                args.add(new Parameter(name, readUntil(s, SECTION_FOLLOW, false)));
+            }
         }
         else
         {
             args.add(new Value(name));
-            return offset;
         }
+        return true;
     }
 
-    private static boolean is(TokenBuffer buf, int offset, TokenType t)
+    private static boolean is(State s, char c)
     {
-        return buf.types[offset] == t;
-    }
-
-    private static boolean isString(TokenBuffer buf, int offset)
-    {
-        return buf.types[offset].kind == TokenKind.STRING;
-    }
-
-    private static String makeString(TokenBuffer buf, int offset, boolean insideMacro)
-    {
-        final int dataOffset = buf.offsets[offset];
-        if (is(buf, offset, TokenType.ESCAPED_STRING))
-        {
-            return unescape(buf.data, dataOffset, buf.lengths[offset], insideMacro);
-        }
-        else
-        {
-            return buf.data.substring(dataOffset, dataOffset + buf.lengths[offset]);
-        }
-    }
-
-    private static int makeInt(TokenBuffer buf, int offset)
-    {
-        return toInt(buf.data, buf.offsets[offset], buf.lengths[offset]);
-    }
-
-    /**
-     * Strips escaping backslashes from the given input string.
-     *
-     * @param input the input string with escaping backslashes
-     * @param offset base offset in the input
-     * @param length the number of characters to interpret
-     * @param insideMacro whether the sequence is inside a macro
-     *
-     * @return the unescaped string
-     */
-    static String unescape(String input, int offset, int length, boolean insideMacro)
-    {
-        if (length == 0)
-        {
-            return "";
-        }
-        if (length == 1)
-        {
-            return "" + input.charAt(offset);
-        }
-        // TODO decide if valid: if outside macro, but starts with {, unescape as if inside macro
-        // this is based on the idea of invalid macros and should be reconsidered.
-        // TODO this prevents the tokenizer from merging adjcacent strings when backtracking
-        if (!insideMacro && input.charAt(offset) == Tokenizer.MACRO_BEGIN)
-        {
-            insideMacro = true;
-        }
-        StringBuilder stripped = new StringBuilder();
-        int end = offset + length;
-        char c, n;
-        for (int i = offset; i < end; ++i)
-        {
-            c = input.charAt(i);
-            if (c == Tokenizer.ESCAPE && i + 1 < end)
-            {
-                n = input.charAt(++i);
-                if (Tokenizer.needsEscaping(n, insideMacro, true) || n == Tokenizer.ESCAPE)
-                {
-                    stripped.append(n);
-                }
-                else
-                {
-                    stripped.append(c).append(n);
-                }
-            }
-            else
-            {
-                stripped.append(c);
-            }
-        }
-        return stripped.toString();
-    }
-
-
-    /**
-     * Converts the given string into an integer using Horner's method.
-     * No validation is done on the input. This method will produce numbers, even if the input is not a valid decimal
-     * number.
-     *
-     * @param input an input string consisting of decimal digits
-     * @param offset the base offset in the input
-     * @param length the number of characters to interpret
-     *
-     * @return the integer representation of the input string if possible
-     */
-    private static int toInt(String input, int offset, int length)
-    {
-        if (length == 1)
-        {
-            return input.charAt(offset) - '0';
-        }
-
-        int out = 0;
-        for (int i = offset + length - 1, factor = 1; i >= offset; --i, factor *= 10)
-        {
-            out += (input.charAt(i) - '0') * factor;
-        }
-        return out;
+        return s.offset < s.in.length() && s.in.charAt(s.offset) == c;
     }
 }

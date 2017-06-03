@@ -94,4 +94,9 @@ public class Text implements Element, TextComponent
         }
         return new Text(s);
     }
+
+    public static Text append(Text a, Text b)
+    {
+        return create(a.getText() + b.getText());
+    }
 }

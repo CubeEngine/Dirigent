@@ -202,6 +202,10 @@ public class Arguments
     @Override
     public String toString()
     {
+        if (this == NONE)
+        {
+            return "NoArguments";
+        }
         return "Arguments{" + "values=" + values + ", parameters=" + parameters + '}';
     }
 

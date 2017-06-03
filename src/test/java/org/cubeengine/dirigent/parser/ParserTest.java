@@ -35,7 +35,6 @@ import org.junit.Test;
 
 import static java.util.Arrays.asList;
 import static org.cubeengine.dirigent.parser.Parser.parse;
-import static org.cubeengine.dirigent.parser.Parser.unescape;
 import static org.cubeengine.dirigent.parser.element.DefaultMacro.DEFAULT_MACRO;
 import static org.junit.Assert.assertEquals;
 
@@ -158,11 +157,11 @@ public class ParserTest
             parse("illegal macro {starts:has arguments but wont end"));
 
         assertEquals(
-            elems(txt("illegal macro "), txt("{starts:has arguments }but wont end")),
+            elems(txt("illegal macro {starts:has arguments \\}but wont end")),
             parse("illegal macro {starts:has arguments \\}but wont end"));
 
         assertEquals(
-            elems(txt("illegal macro "), txt("{starts#lab}el:has arguments but wont end")),
+            elems(txt("illegal macro {starts#lab\\}el:has arguments but wont end")),
             parse("illegal macro {starts#lab\\}el:has arguments but wont end"));
 
         assertEquals(
@@ -259,18 +258,8 @@ public class ParserTest
             parse("empty {name#:arg} empty"));
 
         assertEquals(
-            elems(txt("empty "), named("name", arg("", "arg")), txt(" empty")),
+            elems(txt("empty {name#:=arg} empty")),
             parse("empty {name#:=arg} empty"));
-    }
-
-    @Test
-    public void testStripBackslashes()
-    {
-        assertEquals("\\", convertAndUnescape("\\"));
-        assertEquals("sta\\:tic", convertAndUnescape("sta\\:tic"));
-        assertEquals("static", convertAndUnescape("static"));
-        assertEquals("static \\\\ tex\\:t\\", convertAndUnescape("static \\\\\\\\ tex\\:t\\\\"));
-        assertEquals("static \\\\ tex\\:t\\", convertAndUnescape("static \\\\\\\\ tex\\:t\\\\"));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -289,10 +278,5 @@ public class ParserTest
     public void testIntegerValidation()
     {
         assertEquals(elems(named("1a")), parse("{1a}"));
-    }
-
-    private static String convertAndUnescape(String s)
-    {
-        return unescape(s, 0, s.length(), false);
     }
 }
