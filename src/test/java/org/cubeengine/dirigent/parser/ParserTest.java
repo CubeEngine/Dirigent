@@ -67,7 +67,15 @@ public class ParserTest
         assertEquals(
             elems(txt("empty "), named(" ")),
             parse("empty { }"));
+    }
 
+    @Test
+    public void testParseEmptyMessage() {
+        assertEquals(elems(), parse(""));
+    }
+
+    @Test
+    public void testLabelSeparatorInArguments() {
         assertEquals(
             elems(txt("msg "), named("number", arg("format", "#.0"))),
             parse("msg {number:format=#.0}"));
@@ -75,10 +83,21 @@ public class ParserTest
         assertEquals(
             elems(txt("msg "), named("number", arg("format", "#,###.0"))),
             parse("msg {number:format=#,###.0}"));
+
+        assertEquals(
+            elems(txt("msg "), named("number", arg("#,###.0"))),
+            parse("msg {number:#,###.0}"));
     }
 
     @Test
-    public void keyCharactersInTheBeginningOfTheMessage() {
+    public void testValueSeparatorInParameter() {
+        assertEquals(
+            elems(txt("msg "), named("number", arg("param", "arg=arg2"))),
+            parse("msg {number:param=arg=arg2}"));
+    }
+
+    @Test
+    public void testKeyCharactersInTheBeginningOfTheMessage() {
         assertEquals(
             elems(txt("=message")),
             parse("=message"));
@@ -154,6 +173,18 @@ public class ParserTest
         assertEquals(
             elems(txt("illegal macro "), complete(0, "text", arg("arg and {second"))),
             parse("illegal macro {0:text:arg and {second}"));
+
+        assertEquals(elems(txt("illegal macro {")), parse("illegal macro {"));
+
+        assertEquals(elems(txt("illegal macro {12")), parse("illegal macro {12"));
+
+        assertEquals(elems(txt("illegal macro {12:")), parse("illegal macro {12:"));
+
+        assertEquals(elems(txt("illegal macro {name#")), parse("illegal macro {name#"));
+
+        assertEquals(elems(txt("illegal macro {name#:arg")), parse("illegal macro {name#:arg"));
+
+        assertEquals(elems(txt("illegal macro {name#:arg=")), parse("illegal macro {name#:arg="));
     }
 
     @Test
@@ -223,11 +254,16 @@ public class ParserTest
     public void testIntegerConversion()
     {
         assertEquals(elems(indexed(11)), parse("{11}"));
+        assertEquals(elems(indexed(12341)), parse("{12341}"));
     }
 
     @Test
     public void testIntegerValidation()
     {
         assertEquals(elems(named("1a")), parse("{1a}"));
+        assertEquals(elems(indexed(123)), parse("{123}"));
+        assertEquals(elems(named("-123")), parse("{-123}"));
+        assertEquals(elems(named("0123")), parse("{0123}"));
+        assertEquals(elems(named("123453a4443")), parse("{123453a4443}"));
     }
 }
