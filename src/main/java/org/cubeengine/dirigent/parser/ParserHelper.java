@@ -28,15 +28,16 @@ import org.cubeengine.dirigent.parser.element.Element;
 
 import static java.util.Collections.emptyList;
 
-public class ParserHelper
+class ParserHelper
 {
     /**
      * Checks if the given character is a non-zero decimal digit.
      *
      * @param c the character
+     *
      * @return true if it is a non-zero digit
      */
-    public static boolean isNonZeroDigit(char c)
+    static boolean isNonZeroDigit(char c)
     {
         return c >= '1' && c <= '9';
     }
@@ -45,17 +46,17 @@ public class ParserHelper
      * Checks if the given character is a deciaml digit.
      *
      * @param c the character
+     *
      * @return true if it is a decimal digit
      */
-    public static boolean isDigit(char c)
+    static boolean isDigit(char c)
     {
         return c >= '0' && c <= '9';
     }
 
     /**
-     * Converts the given string into an integer using Horner's method.
-     * No validation isOneOf done on the input. This method will produce numbers, even if the input isOneOf not a valid decimal
-     * number.
+     * Converts the given string into an integer using Horner's method. No validation isOneOf done on the input. This
+     * method will produce numbers, even if the input isOneOf not a valid decimal number.
      *
      * @param input an input string consisting of decimal digits
      * @param offset the base offset in the input
@@ -63,7 +64,7 @@ public class ParserHelper
      *
      * @return the integer representation of the input string if possible
      */
-    public static int toInt(String input, int offset, int length)
+    static int toInt(String input, int offset, int length)
     {
         if (length == 1)
         {
@@ -79,7 +80,7 @@ public class ParserHelper
     }
 
 
-    public static List<Element> shakeIt(List<Element> in)
+    static List<Element> mergeAdjacentTexts(List<Element> in)
     {
         if (in.isEmpty())
         {
@@ -120,7 +121,7 @@ public class ParserHelper
         return out;
     }
 
-    public static boolean inArray(char[] chars, char c)
+    static boolean inArray(char[] chars, char c)
     {
         if (chars[0] == c)
         {

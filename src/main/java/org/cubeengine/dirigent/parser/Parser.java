@@ -119,10 +119,7 @@ public class Parser
         State s = new State(message, new ArrayList<Element>(1));
         parseParts(s);
 
-        //System.out.println(message);
-        //System.out.println(s.out);
-
-        return ParserHelper.shakeIt(s.out);
+        return ParserHelper.mergeAdjacentTexts(s.out);
     }
 
     private static void parseParts(State s)
