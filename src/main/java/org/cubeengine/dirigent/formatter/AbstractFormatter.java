@@ -119,7 +119,7 @@ public abstract class AbstractFormatter<T> extends Formatter<T>
     }
 
     @Override
-    public Set<String> names()
+    public Set<String> getNames()
     {
         return this.names;
     }

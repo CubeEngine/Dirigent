@@ -47,7 +47,7 @@ public class ReverseStringFormatter extends Formatter<Object>
     }
 
     @Override
-    public Set<String> names()
+    public Set<String> getNames()
     {
         return null;
     }

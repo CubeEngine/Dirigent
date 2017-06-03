@@ -102,5 +102,5 @@ public abstract class Formatter<T>
      *
      * @return the names
      */
-    public abstract Set<String> names();
+    public abstract Set<String> getNames();
 }

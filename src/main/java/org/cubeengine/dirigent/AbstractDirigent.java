@@ -142,7 +142,7 @@ public abstract class AbstractDirigent<MessageT> implements Dirigent<MessageT>
     @Override
     public Dirigent registerFormatter(Formatter<?> formatter)
     {
-        for (String name : formatter.names())
+        for (String name : formatter.getNames())
         {
             List<Formatter<?>> list = this.formatters.get(name);
             if (list == null)

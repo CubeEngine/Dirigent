@@ -193,7 +193,7 @@ public abstract class ReflectedFormatter extends Formatter<Object>
     }
 
     @Override
-    public Set<String> names()
+    public Set<String> getNames()
     {
         return this.names;
     }
