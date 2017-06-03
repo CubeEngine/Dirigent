@@ -277,10 +277,6 @@ public class Parser
             numeric = numeric && ParserHelper.isDigit(current);
         }
         int len = s.offset - start;
-        if (len == 0)
-        {
-            return -1;
-        }
         if (!numeric)
         {
             return -1;
