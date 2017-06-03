@@ -1,5 +1,11 @@
 package org.cubeengine.dirigent.parser;
 
+import java.util.ArrayList;
+import java.util.List;
+import org.cubeengine.dirigent.parser.element.Element;
+
+import static java.util.Collections.emptyList;
+
 public class ParserHelper
 {
     /**
@@ -48,5 +54,63 @@ public class ParserHelper
             out += (input.charAt(i) - '0') * factor;
         }
         return out;
+    }
+
+
+    public static List<Element> shakeIt(List<Element> in)
+    {
+        if (in.isEmpty())
+        {
+            return emptyList();
+        }
+        if (in.size() == 1)
+        {
+            return in;
+        }
+        List<Element> out = new ArrayList<Element>(in.size());
+        Element current, last;
+        for (int i = 0; i < in.size(); ++i)
+        {
+            current = in.get(i);
+            if (current instanceof Text && out.size() > 0)
+            {
+                int outLastIndex = out.size() - 1;
+                last = out.get(outLastIndex);
+                if (last instanceof Text)
+                {
+                    out.set(outLastIndex, Text.append((Text)last, (Text)current));
+                }
+                else
+                {
+                    out.add(current);
+                }
+            }
+            else
+            {
+                out.add(current);
+            }
+        }
+
+        if (out.size() == in.size())
+        {
+            return in;
+        }
+        return out;
+    }
+
+    public static boolean inArray(char[] chars, char c)
+    {
+        if (chars[0] == c)
+        {
+            return true;
+        }
+        for (int i = 1; i < chars.length; ++i)
+        {
+            if (chars[i] == c)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 }

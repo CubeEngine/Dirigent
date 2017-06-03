@@ -35,6 +35,7 @@ import org.cubeengine.dirigent.parser.element.IndexedDefaultMacro;
 import org.cubeengine.dirigent.parser.element.NamedMacro;
 
 import static java.util.Collections.emptyList;
+import static org.cubeengine.dirigent.parser.ParserHelper.inArray;
 
 /**
  * Grammar:
@@ -122,48 +123,7 @@ public class Parser
         //System.out.println(message);
         //System.out.println(s.out);
 
-        return shakeIt(s.out);
-    }
-
-    private static List<Element> shakeIt(List<Element> in)
-    {
-        if (in.isEmpty())
-        {
-            return emptyList();
-        }
-        if (in.size() == 1)
-        {
-            return in;
-        }
-        List<Element> out = new ArrayList<Element>(in.size());
-        Element current, last;
-        for (int i = 0; i < in.size(); ++i)
-        {
-            current = in.get(i);
-            if (current instanceof Text && out.size() > 0)
-            {
-                int outLastIndex = out.size() - 1;
-                last = out.get(outLastIndex);
-                if (last instanceof Text)
-                {
-                    out.set(outLastIndex, Text.append((Text)last, (Text)current));
-                }
-                else
-                {
-                    out.add(current);
-                }
-            }
-            else
-            {
-                out.add(current);
-            }
-        }
-
-        if (out.size() == in.size())
-        {
-            return in;
-        }
-        return out;
+        return ParserHelper.shakeIt(s.out);
     }
 
     private static void parseParts(State s)
@@ -191,15 +151,6 @@ public class Parser
         s.output(Text.create(readUntil(s, TEXT_FOLLOW, forceFirst)));
     }
 
-    private static boolean isOneOf(char c, char[] chars)
-    {
-        if (chars.length == 1)
-        {
-            return c == chars[0];
-        }
-        return Arrays.binarySearch(chars, c) >= 0;
-    }
-
     private static String readUntil(State s, char[] endChars, boolean forceFirst)
     {
         final int length = s.in.length();
@@ -217,14 +168,14 @@ public class Parser
         while (s.offset < length)
         {
             current = s.in.charAt(s.offset);
-            if (isOneOf(current, endChars))
+            if (inArray(endChars, current))
             {
                 break;
             }
             if (current == ESCAPE && s.offset + 1 < length)
             {
                 next = s.in.charAt(s.offset + 1);
-                if (next == ESCAPE || isOneOf(next, endChars))
+                if (next == ESCAPE || inArray(endChars, next))
                 {
                     if (builder == null)
                     {
@@ -311,7 +262,7 @@ public class Parser
         while (s.offset < s.in.length())
         {
             current = s.in.charAt(s.offset);
-            if (isOneOf(current, INDEX_FOLLOW))
+            if (inArray(INDEX_FOLLOW, current))
             {
                 break;
             }

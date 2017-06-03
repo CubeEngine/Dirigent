@@ -28,6 +28,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Collections.unmodifiableList;
+import static java.util.Collections.unmodifiableMap;
+
 /**
  * A class holding all {@link Argument} objects of a single {@link org.cubeengine.dirigent.parser.element.Macro}.
  * Furthermore it provides a few static helper methods to create a new instance.
@@ -55,17 +58,25 @@ public class Arguments
      */
     public Arguments(List<Argument> rawArgs)
     {
-        List<String> values = new ArrayList<String>();
-        Map<String, String> parameters = new HashMap<String, String>();
+        List<String> values = null;
+        Map<String, String> parameters = null;
         for (final Argument arg : rawArgs)
         {
             if (arg instanceof Value)
             {
+                if (values == null)
+                {
+                    values = new ArrayList<String>(1);
+                }
                 values.add(((Value)arg).get());
             }
             else if (arg instanceof Parameter)
             {
                 Parameter param = (Parameter)arg;
+                if (parameters == null)
+                {
+                    parameters = new HashMap<String, String>(1);
+                }
                 parameters.put(param.getName().toLowerCase(), param.getValue());
             }
             else
@@ -73,8 +84,8 @@ public class Arguments
                 throw new IllegalArgumentException("Unknown Argument instance: " + arg.getClass());
             }
         }
-        this.values = Collections.unmodifiableList(values);
-        this.parameters = Collections.unmodifiableMap(parameters);
+        this.values = values == null ? Collections.<String>emptyList() : unmodifiableList(values);
+        this.parameters = parameters == null ? Collections.<String, String>emptyMap() : unmodifiableMap(parameters);
     }
 
     /**
