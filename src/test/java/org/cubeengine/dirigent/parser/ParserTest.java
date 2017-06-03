@@ -147,43 +147,43 @@ public class ParserTest
             parse("illegal macro {starts#lab\\}el:has arguments but wont end"));
 
         assertEquals(
-            elems(txt("illegal macro { text and "), named("second")),
+            elems(txt("illegal macro "), named(" text and {second")),
             parse("illegal macro { text and {second}"));
 
         assertEquals(
-            elems(txt("illegal macro {0 text and "), named("second")),
+            elems(txt("illegal macro "), named("0 text and {second")),
             parse("illegal macro {0 text and {second}"));
 
         assertEquals(
-            elems(txt("illegal macro {text and "), named("second")),
+            elems(txt("illegal macro "), named("text and {second")),
             parse("illegal macro {text and {second}"));
 
         assertEquals(
-            elems(txt("illegal macro {0:text and "), named("second")),
+            elems(txt("illegal macro "), complete(0, "text and {second")),
             parse("illegal macro {0:text and {second}"));
 
         assertEquals(
-            elems(txt("illegal macro {0:text#label and "), named("second")),
+            elems(txt("illegal macro "), complete(0, "text")),
             parse("illegal macro {0:text#label and {second}"));
 
         assertEquals(
-            elems(txt("illegal macro {0:text#label:arg and "), named("second")),
+            elems(txt("illegal macro "), complete(0, "text", arg("arg and {second"))),
             parse("illegal macro {0:text#label:arg and {second}"));
 
         assertEquals(
-            elems(txt("illegal macro {text#label:arg and "), named("second")),
+            elems(txt("illegal macro "), named("text", arg("arg and {second"))),
             parse("illegal macro {text#label:arg and {second}"));
 
         assertEquals(
-            elems(txt("illegal macro {text#label and "), named("second")),
+            elems(txt("illegal macro "), named("text")),
             parse("illegal macro {text#label and {second}"));
 
         assertEquals(
-            elems(txt("illegal macro {text:arg and "), named("second")),
+            elems(txt("illegal macro "), named("text", arg("arg and {second"))),
             parse("illegal macro {text:arg and {second}"));
 
         assertEquals(
-            elems(txt("illegal macro {0:text:arg and "), named("second")),
+            elems(txt("illegal macro "), complete(0, "text", arg("arg and {second"))),
             parse("illegal macro {0:text:arg and {second}"));
     }
 
