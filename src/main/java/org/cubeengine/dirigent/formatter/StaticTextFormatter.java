@@ -27,7 +27,7 @@ import java.util.HashSet;
 import java.util.Set;
 import org.cubeengine.dirigent.parser.component.Component;
 import org.cubeengine.dirigent.context.Context;
-import org.cubeengine.dirigent.formatter.argument.Arguments;
+import org.cubeengine.dirigent.context.Arguments;
 import org.cubeengine.dirigent.parser.Text;
 
 /**

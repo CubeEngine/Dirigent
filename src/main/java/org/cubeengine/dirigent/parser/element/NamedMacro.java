@@ -22,10 +22,7 @@
  */
 package org.cubeengine.dirigent.parser.element;
 
-import java.util.List;
-
-import org.cubeengine.dirigent.formatter.argument.Arguments;
-import org.cubeengine.dirigent.formatter.argument.Argument;
+import org.cubeengine.dirigent.context.Arguments;
 
 /**
  * A macro with a name and an optional list of arguments.
@@ -47,10 +44,10 @@ public class NamedMacro implements Macro
      * @param name The name of the macros.
      * @param args The arguments of the macro.
      */
-    public NamedMacro(String name, List<Argument> args)
+    public NamedMacro(String name, Arguments args)
     {
         this.name = name;
-        this.args = Arguments.create(args);
+        this.args = args;
     }
 
     /**

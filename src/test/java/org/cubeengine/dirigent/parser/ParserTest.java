@@ -22,64 +22,15 @@
  */
 package org.cubeengine.dirigent.parser;
 
-import java.util.Arrays;
-import java.util.List;
-import org.cubeengine.dirigent.formatter.argument.Argument;
-import org.cubeengine.dirigent.formatter.argument.Parameter;
-import org.cubeengine.dirigent.formatter.argument.Value;
-import org.cubeengine.dirigent.parser.element.CompleteMacro;
-import org.cubeengine.dirigent.parser.element.Element;
-import org.cubeengine.dirigent.parser.element.IndexedDefaultMacro;
-import org.cubeengine.dirigent.parser.element.NamedMacro;
 import org.junit.Test;
 
-import static java.util.Arrays.asList;
+import static org.cubeengine.dirigent.TestHelper.*;
 import static org.cubeengine.dirigent.parser.Parser.parse;
 import static org.cubeengine.dirigent.parser.element.DefaultMacro.DEFAULT_MACRO;
 import static org.junit.Assert.assertEquals;
 
 public class ParserTest
 {
-    public static List<Element> elems(Element... components)
-    {
-        return Arrays.asList(components);
-    }
-
-    public static Element txt(String s)
-    {
-        return new Text(s);
-    }
-
-    public static Element named(String name, Argument... args)
-    {
-        return new NamedMacro(name, asList(args));
-    }
-
-    public static Element indexed(int i)
-    {
-        return new IndexedDefaultMacro(i);
-    }
-
-    public static Element complete(int i, String name, Argument... args)
-    {
-        return new CompleteMacro(i, name, asList(args));
-    }
-
-    public static Argument arg(String name)
-    {
-        return new Value(name);
-    }
-
-    public static Argument arg(String name, String val)
-    {
-        return new Parameter(name, val);
-    }
-
-    public static Element err(String s)
-    {
-        return new InvalidMacro(s);
-    }
-
     @Test
     public void testReadMessage()
     {

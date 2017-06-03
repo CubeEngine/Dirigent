@@ -32,7 +32,7 @@ import org.cubeengine.dirigent.formatter.ConstantFormatter;
 import org.cubeengine.dirigent.formatter.Formatter;
 import org.cubeengine.dirigent.formatter.PostProcessor;
 import org.cubeengine.dirigent.formatter.StringFormatter;
-import org.cubeengine.dirigent.formatter.argument.Arguments;
+import org.cubeengine.dirigent.context.Arguments;
 import org.cubeengine.dirigent.parser.MacroResolutionResult;
 import org.cubeengine.dirigent.parser.MacroResolutionState;
 import org.cubeengine.dirigent.parser.Parser;

@@ -26,13 +26,12 @@ import java.util.Currency;
 import java.util.Locale;
 import org.cubeengine.dirigent.parser.component.Component;
 import org.cubeengine.dirigent.context.Context;
-import org.cubeengine.dirigent.formatter.argument.Arguments;
-import org.cubeengine.dirigent.formatter.argument.Parameter;
-import org.cubeengine.dirigent.formatter.argument.Value;
+import org.cubeengine.dirigent.context.Arguments;
 import org.cubeengine.dirigent.parser.Text;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.cubeengine.dirigent.TestHelper.*;
 import static org.cubeengine.dirigent.context.Contexts.*;
 
 /**
@@ -117,11 +116,11 @@ public class NumberFormatterTest
     {
         if (paramValue == null && paramName != null)
         {
-            return Arguments.create(new Value(paramName));
+            return toArgs(arg(paramName));
         }
         else if (paramValue != null && paramName != null)
         {
-            return Arguments.create(new Parameter(paramName, paramValue));
+            return toArgs(arg(paramName, paramValue));
         }
         else
         {

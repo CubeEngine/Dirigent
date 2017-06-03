@@ -24,7 +24,7 @@ package org.cubeengine.dirigent.formatter;
 
 import org.cubeengine.dirigent.parser.component.Component;
 import org.cubeengine.dirigent.context.Context;
-import org.cubeengine.dirigent.formatter.argument.Arguments;
+import org.cubeengine.dirigent.context.Arguments;
 
 /**
  * A post processor can be added to a specific {@link Formatter} or the whole {@link org.cubeengine.dirigent.Dirigent}

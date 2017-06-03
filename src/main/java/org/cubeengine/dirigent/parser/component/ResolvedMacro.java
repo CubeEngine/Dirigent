@@ -23,7 +23,7 @@
 package org.cubeengine.dirigent.parser.component;
 
 import org.cubeengine.dirigent.formatter.Formatter;
-import org.cubeengine.dirigent.formatter.argument.Arguments;
+import org.cubeengine.dirigent.context.Arguments;
 
 /**
  * A Component containing the formatter found for a token

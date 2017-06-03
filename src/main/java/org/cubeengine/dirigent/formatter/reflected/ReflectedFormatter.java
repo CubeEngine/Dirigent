@@ -24,7 +24,6 @@ package org.cubeengine.dirigent.formatter.reflected;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -37,7 +36,7 @@ import java.util.Set;
 import org.cubeengine.dirigent.parser.component.Component;
 import org.cubeengine.dirigent.context.Context;
 import org.cubeengine.dirigent.formatter.Formatter;
-import org.cubeengine.dirigent.formatter.argument.Arguments;
+import org.cubeengine.dirigent.context.Arguments;
 
 import static java.util.Arrays.asList;
 

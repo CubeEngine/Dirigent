@@ -22,12 +22,12 @@
  */
 package org.cubeengine.dirigent.reflected;
 
+import java.util.Collections;
 import java.util.Locale;
 import org.cubeengine.dirigent.context.Context;
 import org.cubeengine.dirigent.context.Contexts;
 import org.cubeengine.dirigent.formatter.Formatter;
-import org.cubeengine.dirigent.formatter.argument.Arguments;
-import org.cubeengine.dirigent.formatter.argument.Value;
+import org.cubeengine.dirigent.context.Arguments;
 import org.cubeengine.dirigent.formatter.reflected.AnnotationMissingException;
 import org.cubeengine.dirigent.formatter.reflected.Format;
 import org.cubeengine.dirigent.formatter.reflected.InvalidFormatMethodException;
@@ -40,6 +40,9 @@ import org.cubeengine.dirigent.reflected.ReflectedFormatterTest.PrioFormatter.Ty
 import org.cubeengine.dirigent.reflected.ReflectedFormatterTest.PrioFormatter.TypeImpl;
 import org.junit.Assert;
 import org.junit.Test;
+
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 
 /**
  * Tests for the {@link ReflectedFormatter}.
@@ -173,7 +176,7 @@ public class ReflectedFormatterTest
     public void testInvokerWithArguments()
     {
         final String msg = "blub";
-        final Arguments arguments = Arguments.create(new Value("arg"));
+        final Arguments arguments = Arguments.create(singletonList("arg"), null);
         final Component component = new WithArguments().process(msg, Contexts.EMPTY, arguments);
         Assert.assertTrue(component instanceof TextComponent);
         Assert.assertEquals(msg + arguments, ((TextComponent)component).getText());
@@ -184,7 +187,7 @@ public class ReflectedFormatterTest
     {
         final String msg = "blub";
         final Locale locale = Locale.GERMANY;
-        final Arguments arguments = Arguments.create(new Value("arg"));
+        final Arguments arguments = Arguments.create(singletonList("arg"), null);
         final Component component = new WithContextAndArguments().process(msg, Contexts.createContext(locale), arguments);
         Assert.assertTrue(component instanceof TextComponent);
         Assert.assertEquals(msg + locale + arguments, ((TextComponent)component).getText());
@@ -195,7 +198,7 @@ public class ReflectedFormatterTest
     {
         final String msg = "blub";
         final Locale locale = Locale.GERMANY;
-        final Arguments arguments = Arguments.create(new Value("arg"));
+        final Arguments arguments = Arguments.create(singletonList("arg"), null);
         final Component component = new WithArgumentsAndContext().process(msg, Contexts.createContext(locale), arguments);
         Assert.assertTrue(component instanceof TextComponent);
         Assert.assertEquals(msg + arguments + locale, ((TextComponent)component).getText());

@@ -20,19 +20,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.cubeengine.dirigent.formatter.argument;
+package org.cubeengine.dirigent.context;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static java.util.Collections.unmodifiableList;
-import static java.util.Collections.unmodifiableMap;
+import static java.util.Collections.*;
 
 /**
- * A class holding all {@link Argument} objects of a single {@link org.cubeengine.dirigent.parser.element.Macro}.
+ * A class holding all arguments of a single {@link org.cubeengine.dirigent.parser.element.Macro}.
  * Furthermore it provides a few static helper methods to create a new instance.
  */
 public class Arguments
@@ -40,58 +37,28 @@ public class Arguments
     /**
      * Static reference of an arguments object without an argument.
      */
-    public static final Arguments NONE = new Arguments(Collections.<Argument>emptyList());
+    public static final Arguments NONE =
+        new Arguments(Collections.<String>emptyList(), Collections.<String, String>emptyMap());
 
-    /**
-     * List of {@link Value} arguments.
-     */
     private final List<String> values;
-    /**
-     * Map of {@link Parameter} arguments.
-     */
     private final Map<String, String> parameters;
 
     /**
-     * Constructor. Splits the arguments into a {@link Value} list and a map for {@link Parameter} arguments.
+     * Constructs a new instance with the given values and parameters.
      *
-     * @param rawArgs The list of arguments.
+     * @param values the list of values
+     * @param params the list of parameters (name-value pairs)
      */
-    public Arguments(List<Argument> rawArgs)
+    public Arguments(List<String> values, Map<String, String> params)
     {
-        List<String> values = null;
-        Map<String, String> parameters = null;
-        for (final Argument arg : rawArgs)
-        {
-            if (arg instanceof Value)
-            {
-                if (values == null)
-                {
-                    values = new ArrayList<String>(1);
-                }
-                values.add(((Value)arg).get());
-            }
-            else if (arg instanceof Parameter)
-            {
-                Parameter param = (Parameter)arg;
-                if (parameters == null)
-                {
-                    parameters = new HashMap<String, String>(1);
-                }
-                parameters.put(param.getName().toLowerCase(), param.getValue());
-            }
-            else
-            {
-                throw new IllegalArgumentException("Unknown Argument instance: " + arg.getClass());
-            }
-        }
-        this.values = values == null ? Collections.<String>emptyList() : unmodifiableList(values);
-        this.parameters = parameters == null ? Collections.<String, String>emptyMap() : unmodifiableMap(parameters);
+        this.values = values;
+        this.parameters = params;
     }
 
     /**
-     * Returns the list of {@link Value} arguments.
+     * Returns the list of values.
      *
-     * @return the list of arguments
+     * @return the list of values
      */
     public List<String> getValues()
     {
@@ -99,9 +66,9 @@ public class Arguments
     }
 
     /**
-     * Returns the {@link Parameter} argument value for given name or {@code null} if not found.
+     * Returns the parameter value for the given name or {@code null} if not found.
      *
-     * @param name The name of the {@link Parameter}.
+     * @param name the name of the parameter
      *
      * @return the value of the argument by name.
      */
@@ -111,10 +78,10 @@ public class Arguments
     }
 
     /**
-     * Returns the {@link Parameter} argument value for given name or the given default if not found.
+     * Returns the parameter value for the given name or the given default if not found.
      *
-     * @param name The name of the {@link Parameter}.
-     * @param def The default value.
+     * @param name the name of the parameter
+     * @param def the default value
      *
      * @return the value of the argument by name or the default value.
      */
@@ -129,7 +96,7 @@ public class Arguments
     }
 
     /**
-     * Returns the unnamed {@link Value} argument at a position or {@code null] if the position is not within bounds.
+     * Returns the unnamed value at a position or {@code null} if the position is not within bounds.
      *
      * @param i The position.
      *
@@ -141,7 +108,7 @@ public class Arguments
     }
 
     /**
-     * Returns the unnamed {@link Value} argument at a position or the default if the position is not within bounds.
+     * Returns the unnamed value at a position or the default if the position is not within bounds.
      *
      * @param i the position
      * @param def the default value
@@ -158,12 +125,12 @@ public class Arguments
     }
 
     /**
-     * Returns whether the list of {@link Value} arguments contains a given value. This might be used to check for
+     * Returns whether the list of values contains a given value. This might be used to check for
      * specific flags.
      *
-     * @param value The value argument to check for.
+     * @param value the value to check for
      *
-     * @return whether the list of {@link Value} arguments contains the given value.
+     * @return whether the list of values contains the given value
      */
     public boolean has(String value)
     {
@@ -174,6 +141,31 @@ public class Arguments
         for (String v : values)
         {
             if (v.equals(value))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Returns whether the list of values contains a given value. This might be used to check for
+     * specific flags.
+     *
+     * @param value the value to check for
+     *
+     * @return whether the list of values contains the given value
+     */
+    public boolean hasIgnoringCase(String value)
+    {
+        if (values.isEmpty())
+        {
+            return false;
+        }
+        value = value.toLowerCase();
+        for (String v : values)
+        {
+            if (v.toLowerCase().equals(value))
             {
                 return true;
             }
@@ -231,31 +223,28 @@ public class Arguments
     }
 
     /**
-     * Creates a new object with the specified argument.
-     *
-     * @param arg The argument.
-     *
-     * @return the created object.
-     */
-    public static Arguments create(Argument arg)
-    {
-        return create(Collections.singletonList(arg));
-    }
-
-    /**
      * Creates a new object with the list of arguments. It checks for the number of argument entries and creates an
      * empty arguments object if necessary.
      *
-     * @param args The list of arguments.
+     * @param values values without name
+     * @param params parameters (name-value pairs)
      *
-     * @return the created object.
+     * @return the created object
      */
-    public static Arguments create(List<Argument> args)
+    public static Arguments create(List<String> values, Map<String, String> params)
     {
-        if (args == null || args.isEmpty())
+        if (values == null)
+        {
+            values = emptyList();
+        }
+        if (params == null)
+        {
+            params = emptyMap();
+        }
+        if (values.isEmpty() && params.isEmpty())
         {
             return NONE;
         }
-        return new Arguments(args);
+        return new Arguments(values, params);
     }
 }

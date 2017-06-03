@@ -22,8 +22,7 @@
  */
 package org.cubeengine.dirigent.parser.element;
 
-import java.util.List;
-import org.cubeengine.dirigent.formatter.argument.Argument;
+import org.cubeengine.dirigent.context.Arguments;
 
 /**
  * A complete macro with name, position and optional arguments.
@@ -42,7 +41,7 @@ public class CompleteMacro extends NamedMacro implements Indexed
      * @param name The name of the macros.
      * @param args The arguments of the macro.
      */
-    public CompleteMacro(int index, String name, List<Argument> args)
+    public CompleteMacro(int index, String name, Arguments args)
     {
         super(name, args);
         this.index = index;

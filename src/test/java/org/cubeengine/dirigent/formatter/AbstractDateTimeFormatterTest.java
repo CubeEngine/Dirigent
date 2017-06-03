@@ -22,23 +22,21 @@
  */
 package org.cubeengine.dirigent.formatter;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 import org.cubeengine.dirigent.context.Contexts;
 import org.cubeengine.dirigent.parser.component.Component;
 import org.cubeengine.dirigent.context.Context;
-import org.cubeengine.dirigent.formatter.argument.Argument;
-import org.cubeengine.dirigent.formatter.argument.Arguments;
-import org.cubeengine.dirigent.formatter.argument.Parameter;
-import org.cubeengine.dirigent.formatter.argument.Value;
+import org.cubeengine.dirigent.context.Arguments;
 import org.cubeengine.dirigent.parser.Text;
 import org.junit.Assert;
 
+import static org.cubeengine.dirigent.TestHelper.*;
 import static org.cubeengine.dirigent.context.Contexts.createContext;
 
 /**
@@ -99,25 +97,25 @@ public abstract class AbstractDateTimeFormatterTest
     private Arguments createArguments(final String defaultStyle, final String dateStyle, final String timeStyle,
                                       final String format)
     {
-        final List<Argument> arguments = new LinkedList<Argument>();
+        final List<Object> arguments = new ArrayList<Object>();
 
         if (defaultStyle != null)
         {
-            arguments.add(new Value(defaultStyle));
+            arguments.add(arg(defaultStyle));
         }
         if (dateStyle != null)
         {
-            arguments.add(new Parameter(DateTimeFormatter.DATE_PARAM_NAME, dateStyle));
+            arguments.add(arg(DateTimeFormatter.DATE_PARAM_NAME, dateStyle));
         }
         if (timeStyle != null)
         {
-            arguments.add(new Parameter(DateTimeFormatter.TIME_PARAM_NAME, timeStyle));
+            arguments.add(arg(DateTimeFormatter.TIME_PARAM_NAME, timeStyle));
         }
         if (format != null)
         {
-            arguments.add(new Parameter(DateTimeFormatter.FORMAT_PARAM_NAME, format));
+            arguments.add(arg(DateTimeFormatter.FORMAT_PARAM_NAME, format));
         }
 
-        return Arguments.create(arguments);
+        return toArgs(arguments.toArray());
     }
 }

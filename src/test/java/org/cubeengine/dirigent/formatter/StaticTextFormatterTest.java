@@ -24,12 +24,12 @@ package org.cubeengine.dirigent.formatter;
 
 import java.util.Locale;
 import org.cubeengine.dirigent.parser.component.Component;
-import org.cubeengine.dirigent.formatter.argument.Arguments;
+import org.cubeengine.dirigent.context.Arguments;
 import org.cubeengine.dirigent.parser.Text;
-import org.cubeengine.dirigent.formatter.argument.Value;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.cubeengine.dirigent.TestHelper.*;
 import static org.cubeengine.dirigent.context.Contexts.createContext;
 
 /**
@@ -61,7 +61,7 @@ public class StaticTextFormatterTest
         }
         else
         {
-            arguments = Arguments.create(new Value(argument));
+            arguments = toArgs(arg(argument));
         }
 
         final Component component = staticTextFormatter.format(createContext(locale), arguments);

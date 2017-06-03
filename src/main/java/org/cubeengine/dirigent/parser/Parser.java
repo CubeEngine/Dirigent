@@ -23,11 +23,10 @@
 package org.cubeengine.dirigent.parser;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
-import org.cubeengine.dirigent.formatter.argument.Argument;
-import org.cubeengine.dirigent.formatter.argument.Parameter;
-import org.cubeengine.dirigent.formatter.argument.Value;
+import java.util.Map;
+import org.cubeengine.dirigent.context.Arguments;
 import org.cubeengine.dirigent.parser.element.CompleteMacro;
 import org.cubeengine.dirigent.parser.element.DefaultMacro;
 import org.cubeengine.dirigent.parser.element.Element;
@@ -306,29 +305,21 @@ public class Parser
             parseText(s, true);
             return;
         }
-        List<Argument> args;
+        final Arguments args;
         if (is(s, SECTION_SEP))
         {
-            List<Argument> parsedArgs = new ArrayList<Argument>();
-            if (!parseArguments(s, parsedArgs))
+            args = parseArguments(s);
+            if (args == null)
             {
                 // parsing arguments failed, backtrack
                 s.offset = start;
                 parseText(s, true);
                 return;
             }
-            if (parsedArgs.isEmpty())
-            {
-                args = emptyList();
-            }
-            else
-            {
-                args = parsedArgs;
-            }
         }
         else
         {
-            args = emptyList();
+            args = Arguments.NONE;
         }
         if (is(s, MACRO_END))
         {
@@ -350,41 +341,43 @@ public class Parser
         }
     }
 
-    private static boolean parseArguments(State s, List<Argument> args)
+    private static Arguments parseArguments(State s)
     {
+        List<String> values = null;
+        Map<String, String> params = null;
         while (is(s, SECTION_SEP))
         {
             // skip SECTION_SEP
             ++s.offset;
-            if (!parseArgument(s, args))
-            {
-                return false;
-            }
-        }
-        return true;
-    }
 
-    private static boolean parseArgument(State s, List<Argument> args)
-    {
-        final String name = readUntil(s, PARAM_NAME_FOLLOW, false);
-        if (is(s, VALUE_SEP))
-        {
-            // skip VALUE_SEP
-            ++s.offset;
-            if (name.isEmpty())
+            final String name = readUntil(s, PARAM_NAME_FOLLOW, false);
+            if (is(s, VALUE_SEP))
             {
-                return false;
+                // skip VALUE_SEP
+                ++s.offset;
+                if (name.isEmpty())
+                {
+                    return null;
+                }
+                else
+                {
+                    if (params == null)
+                    {
+                        params = new HashMap<String, String>(1);
+                    }
+                    params.put(name.toLowerCase(), readUntil(s, SECTION_FOLLOW, false));
+                }
             }
             else
             {
-                args.add(new Parameter(name, readUntil(s, SECTION_FOLLOW, false)));
+                if (values == null)
+                {
+                    values = new ArrayList<String>(1);
+                }
+                values.add(name);
             }
         }
-        else
-        {
-            args.add(new Value(name));
-        }
-        return true;
+        return Arguments.create(values, params);
     }
 
     private static boolean is(State s, char c)

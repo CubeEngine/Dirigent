@@ -37,7 +37,7 @@ import org.cubeengine.dirigent.formatter.PostProcessor;
 import org.cubeengine.dirigent.formatter.StaticTextFormatter;
 import org.cubeengine.dirigent.formatter.StringFormatter;
 import org.cubeengine.dirigent.formatter.TimeFormatter;
-import org.cubeengine.dirigent.formatter.argument.Arguments;
+import org.cubeengine.dirigent.context.Arguments;
 import org.cubeengine.dirigent.parser.Text;
 import org.cubeengine.dirigent.parser.component.Component;
 import org.junit.Assert;

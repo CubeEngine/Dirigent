@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Set;
 import org.cubeengine.dirigent.parser.component.Component;
 import org.cubeengine.dirigent.context.Context;
-import org.cubeengine.dirigent.formatter.argument.Arguments;
+import org.cubeengine.dirigent.context.Arguments;
 
 /**
  * Formatters are used to format message parameters. In general a specific formatter can be used for a specific object
