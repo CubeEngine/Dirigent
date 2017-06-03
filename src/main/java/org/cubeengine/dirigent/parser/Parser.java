@@ -213,18 +213,26 @@ public class Parser
     {
         // skip MACRO_BEGIN
         int start = s.offset++;
-        if (is(s, MACRO_END))
+        if (s.outOfInput())
         {
-            s.output(DefaultMacro.DEFAULT_MACRO);
-            ++s.offset;
-        }
-        else if (ParserHelper.isDigit(s.in.charAt(s.offset)))
-        {
-            parseIndexedMacro(s, start);
+            s.offset = start;
+            parseText(s, true);
         }
         else
         {
-            parseNamedMacro(s, start);
+            if (is(s, MACRO_END))
+            {
+                s.output(DefaultMacro.DEFAULT_MACRO);
+                ++s.offset;
+            }
+            else if (ParserHelper.isDigit(s.in.charAt(s.offset)))
+            {
+                parseIndexedMacro(s, start);
+            }
+            else
+            {
+                parseNamedMacro(s, start);
+            }
         }
     }
 
