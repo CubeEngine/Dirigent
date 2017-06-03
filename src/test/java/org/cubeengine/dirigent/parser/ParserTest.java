@@ -212,7 +212,7 @@ public class ParserTest
     @Test
     public void testEmptyPartsOfAMacro() {
         assertEquals(
-            elems(txt("empty "), complete(0, ""), txt(" empty")),
+            elems(txt("empty {0:} empty")),
             parse("empty {0:} empty"));
 
         assertEquals(

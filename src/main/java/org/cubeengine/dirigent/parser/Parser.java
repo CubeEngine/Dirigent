@@ -70,6 +70,9 @@ public class Parser
         List<Element> elements = new ArrayList<Element>();
         parseParts(buf, elements);
 
+        //System.out.println(message);
+        //System.out.println(buf);
+
         if (elements.isEmpty())
         {
             return emptyList();
