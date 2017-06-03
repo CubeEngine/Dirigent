@@ -128,6 +128,25 @@ public class ParserTest
     }
 
     @Test
+    public void keyCharactersInTheBeginningOfTheMessage() {
+        assertEquals(
+            elems(txt("=message")),
+            parse("=message"));
+
+        assertEquals(
+            elems(txt("}message")),
+            parse("}message"));
+
+        assertEquals(
+            elems(txt("#message")),
+            parse("#message"));
+
+        assertEquals(
+            elems(txt(":message")),
+            parse(":message"));
+    }
+
+    @Test
     public void testInvalidTokens()
     {
         assertEquals(
