@@ -74,6 +74,22 @@ public class ArgumentsTest
     }
 
     @Test
+    public void testGetOrElseIndex()
+    {
+        final Arguments arguments = create();
+
+        Assert.assertEquals("default", arguments.getOrElse(-1, "default"));
+
+        List<String> values = arguments.getValues();
+        for (int i = 0; i < values.size(); i++)
+        {
+            Assert.assertEquals(values.get(i), arguments.getOrElse(i, "default"));
+        }
+
+        Assert.assertEquals("default", arguments.getOrElse(values.size(), "default"));
+    }
+
+    @Test
     public void testHas()
     {
         final Arguments arguments = create();

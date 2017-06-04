@@ -22,60 +22,32 @@
  */
 package org.cubeengine.dirigent.parser;
 
-import org.cubeengine.dirigent.parser.component.TextComponent;
-import org.cubeengine.dirigent.parser.element.Element;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
- * <p>
- *     Show the original text of an invalid macro.
- *     Gets added to the Message when an invalid macro is encountered.
- * </p>
- * <p>
- *     An invalid macro is a text sequence that begins with an unescaped opening curly brace suggesting a macro,
- *     but never sees a valid closing curly brace.
- * </p>
+ * Tests the {@link Text} class.
  */
-public class InvalidMacro implements Element, TextComponent
+public class TextTest
 {
-    private final String text;
-
-    public InvalidMacro(String text)
+    @Test
+    public void testCreate()
     {
-        this.text = text;
+        final String text = "I'm the text";
+        Assert.assertEquals(text, Text.create(text).getText());
     }
 
-    @Override
-    public String getText()
+    @Test
+    public void testCreateEmpty()
     {
-        return text;
+        Assert.assertEquals(Text.EMPTY, Text.create(""));
     }
 
-    @Override
-    public boolean equals(Object o)
-    {
-        if (this == o)
-        {
-            return true;
-        }
-        if (!(o instanceof InvalidMacro))
-        {
-            return false;
-        }
+    @Test
+    public void testAppend() {
+        final String first = "first Text";
+        final String second = "second Text";
 
-        final InvalidMacro that = (InvalidMacro)o;
-
-        return text.equals(that.text);
-    }
-
-    @Override
-    public int hashCode()
-    {
-        return text.hashCode();
-    }
-
-    @Override
-    public String toString()
-    {
-        return "InvalidMacro{" + "text='" + text + '\'' + '}';
+        Assert.assertEquals(first + second, Text.append(Text.create(first), Text.create(second)).getText());
     }
 }
