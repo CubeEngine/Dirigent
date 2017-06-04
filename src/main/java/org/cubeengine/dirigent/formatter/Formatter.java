@@ -91,10 +91,12 @@ public abstract class Formatter<T>
      * Adds a PostProcessor to this Formatter
      *
      * @param pp the PostProcessor to add
+     * @return fluent interface.
      */
-    public final void addPostProcessor(PostProcessor pp)
+    public final Formatter<T> addPostProcessor(PostProcessor pp)
     {
         postProcessors.add(pp);
+        return this;
     }
 
     /**

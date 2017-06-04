@@ -31,6 +31,7 @@ import org.cubeengine.dirigent.context.Contexts;
 import org.cubeengine.dirigent.formatter.CurrencyFormatter;
 import org.cubeengine.dirigent.formatter.DateFormatter;
 import org.cubeengine.dirigent.formatter.DateTimeFormatter;
+import org.cubeengine.dirigent.formatter.Formatter;
 import org.cubeengine.dirigent.formatter.IntegerFormatter;
 import org.cubeengine.dirigent.formatter.NumberFormatter;
 import org.cubeengine.dirigent.formatter.PercentFormatter;
@@ -234,11 +235,9 @@ public class StringBuilderDirigentTest
     @Test
     public void testPostProcessorAtFormatterLevel() throws Exception
     {
-        IntegerFormatter integerFormatter = new IntegerFormatter();
-        integerFormatter.addPostProcessor(new WrappingPostProcessor("<", ">"));
-
-        StaticTextFormatter staticTextFormatter = new StaticTextFormatter();
-        staticTextFormatter.addPostProcessor(new WrappingPostProcessor(Text.EMPTY, Text.create("(!)")));
+        Formatter<?> integerFormatter = new IntegerFormatter().addPostProcessor(new WrappingPostProcessor("<", ">"));
+        Formatter<?> staticTextFormatter = new StaticTextFormatter().addPostProcessor(
+            new WrappingPostProcessor(Text.EMPTY, Text.create("(!)")));
 
         Dirigent<String> dirigent = new StringBuilderDirigent().registerFormatter(integerFormatter).registerFormatter(
             staticTextFormatter).registerFormatter(new NumberFormatter());
