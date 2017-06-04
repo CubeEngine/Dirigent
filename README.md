@@ -184,3 +184,5 @@ The registration of post processors has handled on two levels:
 2. Per `Formatter` instance using `Formatter#addPostProcessor(PostProcessor)`
 
 Post processors, just like formatters, may return custom component implementations, but note that own implementations might require specific handling in the `MessageBuilder`, so you have to overwrite it. Instead, using a `TextComponent` (or the implementation `Text`) or a `ComponentGroup` might be enough as well. `ComponentGroup`s allow arbitrary nesting of components and as such are very powerful.
+
+The Dirigent frameworks provides a `WrappingPostProcessor` wrapping an input component with static components using a `ComponentGroup`. 

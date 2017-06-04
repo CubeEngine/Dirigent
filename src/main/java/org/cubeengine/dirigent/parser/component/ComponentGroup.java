@@ -22,6 +22,7 @@
  */
 package org.cubeengine.dirigent.parser.component;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -38,6 +39,11 @@ public class ComponentGroup implements Component
     public ComponentGroup(List<Component> components)
     {
         this.components = Collections.unmodifiableList(components);
+    }
+
+    public ComponentGroup(Component... components)
+    {
+        this(Arrays.asList(components));
     }
 
     /**
