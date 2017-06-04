@@ -69,6 +69,20 @@ public class DateTimeFormatterTest extends AbstractDateTimeFormatterTest
                     DateTimeFormatter.FULL_STYLE, null);
         checkFormat("25.05.17 15:13 Uhr UTC", date, Locale.GERMANY, DateTimeFormatter.SHORT_STYLE, null,
                     DateTimeFormatter.FULL_STYLE);
+        checkFormat("25. Mai 2017 15:13", date, Locale.GERMANY, DateTimeFormatter.SHORT_STYLE,
+                    DateTimeFormatter.LONG_STYLE, DateTimeFormatter.SHORT_STYLE);
+    }
+
+    @Test
+    public void testFormatIndividualStyleWithWrongParameterValue()
+    {
+        final Date date = createDate();
+
+        checkFormat("25. Mai 2017 15:13", date, Locale.GERMANY, DateTimeFormatter.SHORT_STYLE,
+                    DateTimeFormatter.LONG_STYLE, "blub");
+
+        checkFormat("25. Mai 2017 15:13 Uhr UTC", date, Locale.GERMANY, DateTimeFormatter.FULL_STYLE,
+                    DateTimeFormatter.LONG_STYLE, "blub");
     }
 
     @Test

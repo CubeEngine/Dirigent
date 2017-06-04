@@ -23,13 +23,14 @@
 package org.cubeengine.dirigent.formatter;
 
 import java.util.Locale;
-import org.cubeengine.dirigent.parser.component.Component;
 import org.cubeengine.dirigent.context.Arguments;
 import org.cubeengine.dirigent.parser.Text;
+import org.cubeengine.dirigent.parser.component.Component;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static org.cubeengine.dirigent.TestHelper.*;
+import static org.cubeengine.dirigent.TestHelper.arg;
+import static org.cubeengine.dirigent.TestHelper.toArgs;
 import static org.cubeengine.dirigent.context.Contexts.createContext;
 
 /**
@@ -47,9 +48,15 @@ public class StaticTextFormatterTest
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testInputValidation()
+    public void testInputValidationNull()
     {
         new StaticTextFormatter((String[])null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testInputValidationEmpty()
+    {
+        new StaticTextFormatter(new String[0]);
     }
 
     private void checkFormat(final String expected, final Locale locale, final String argument)
