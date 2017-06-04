@@ -133,14 +133,14 @@ public abstract class AbstractDirigent<MessageT> implements Dirigent<MessageT>
     }
 
     @Override
-    public Dirigent addPostProcessor(PostProcessor postProcessor)
+    public Dirigent<MessageT> addPostProcessor(PostProcessor postProcessor)
     {
         postProcessors.add(postProcessor);
         return this;
     }
 
     @Override
-    public Dirigent registerFormatter(Formatter<?> formatter)
+    public Dirigent<MessageT> registerFormatter(Formatter<?> formatter)
     {
         for (String name : formatter.getNames())
         {

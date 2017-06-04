@@ -63,7 +63,7 @@ public interface Dirigent<MessageT>
      *
      * @return fluent interface
      */
-    Dirigent registerFormatter(Formatter<?> formatter);
+    Dirigent<MessageT> registerFormatter(Formatter<?> formatter);
 
     /**
      * Adds a new {@link PostProcessor} to run over all MessageComponents.
@@ -72,7 +72,7 @@ public interface Dirigent<MessageT>
      *
      * @return fluent interface
      */
-    Dirigent addPostProcessor(PostProcessor postProcessor);
+    Dirigent<MessageT> addPostProcessor(PostProcessor postProcessor);
 
     /**
      * Finds a {@link Formatter} for given name and input parameter.
