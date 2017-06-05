@@ -93,6 +93,12 @@ public class ContextTest
     }
 
     @Test
+    public void testGetWithContextPropertyWithDefaultDefaultProvider() {
+        ContextProperty<String> contextProperty = new ContextProperty<String>();
+        Assert.assertNull(Contexts.EMPTY.get(contextProperty));
+    }
+
+    @Test
     public void testSetSingleProperty()
     {
         Locale.setDefault(Locale.US);

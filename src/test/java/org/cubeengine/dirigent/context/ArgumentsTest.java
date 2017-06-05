@@ -23,6 +23,7 @@
 package org.cubeengine.dirigent.context;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +45,13 @@ public class ArgumentsTest
     public void testCreate()
     {
         Assert.assertEquals(Arguments.NONE, Arguments.create());
+    }
+
+    @Test
+    public void testCreateWithEmptyArgs()
+    {
+        Assert.assertEquals(Arguments.NONE,
+                            Arguments.create(Collections.<String>emptyList(), Collections.<String, String>emptyMap()));
     }
 
     @Test
