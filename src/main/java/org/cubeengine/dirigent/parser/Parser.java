@@ -39,21 +39,21 @@ import static org.cubeengine.dirigent.parser.ParserHelper.inArray;
 /**
  * Grammar:
  *
- * message   -> parts
- * parts     -> part+
- * part      -> text | macro
- * macro     -> '{' body? '}'
- * body      -> indexed | named
- * indexed   -> index (':' named)?
- * named     -> name label? arguments
- * label     -> '#' string
- * arguments -> (':' argument)*
- * argument  -> (name '=')? value
- * text      -> string
- * value     -> string
- * name      -> string
- * index     -> NUMBER
- * string    -> PLAIN_STRING | ESCAPED_STRING | NUMBER
+ * message   := parts
+ * parts     := part+
+ * part      := text | macro
+ * macro     := '{' body? '}'
+ * body      := indexed | named
+ * indexed   := index (':' named)?
+ * named     := name label? arguments
+ * label     := '#' string
+ * arguments := (':' argument)*
+ * argument  := (name '=')? value
+ * text      := string
+ * value     := string
+ * name      := string
+ * index     := NUMBER
+ * string    := PLAIN_STRING | ESCAPED_STRING | NUMBER
  */
 public class Parser
 {
