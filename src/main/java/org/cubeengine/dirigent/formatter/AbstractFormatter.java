@@ -94,22 +94,25 @@ public abstract class AbstractFormatter<T> extends Formatter<T>
      * Loads the class information from the generic type of the specified class.
      *
      * @param thisClass The class.
-     * @param <T>       The parameter object type.
+     * @param <T> The parameter object type.
      *
      * @return the class information.
      */
     @SuppressWarnings("unchecked")
     private static <T> Class<T> getGenericType(Class<?> thisClass)
     {
-        Type genericSuperclass = thisClass.getGenericSuperclass();
-        if (genericSuperclass instanceof ParameterizedType)
+        Type type = thisClass;
+        do
         {
-            return (Class<T>)((ParameterizedType)genericSuperclass).getActualTypeArguments()[0];
+            type = ((Class<?>)type).getGenericSuperclass();
+            if (type instanceof ParameterizedType)
+            {
+                return (Class<T>)((ParameterizedType)type).getActualTypeArguments()[0];
+            }
         }
-        else
-        {
-            return (Class<T>)Object.class;
-        }
+        while (type instanceof Class<?> && !type.equals(AbstractFormatter.class));
+
+        return (Class<T>)Object.class;
     }
 
     @Override

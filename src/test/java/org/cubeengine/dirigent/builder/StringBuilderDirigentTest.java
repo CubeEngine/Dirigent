@@ -125,7 +125,7 @@ public class StringBuilderDirigentTest
     }
 
     @Test
-    public void testDateTimeFormatterIntegraion() throws Exception
+    public void testDateTimeFormatterIntegration() throws Exception
     {
         final Calendar calendar = GregorianCalendar.getInstance();
         calendar.set(2017, Calendar.JANUARY, 3, 21, 18, 0);
@@ -181,6 +181,12 @@ public class StringBuilderDirigentTest
     public void testFormatterUnapplicableParameterType() throws Exception
     {
         assertEquals("msg: {{unresolved: number}}", compose("msg: {number}", "string"));
+        assertEquals("msg: {{unresolved: integer}}", compose("msg: {integer}", "string"));
+        assertEquals("msg: {{unresolved: currency}}", compose("msg: {currency}", "string"));
+        assertEquals("msg: {{unresolved: percent}}", compose("msg: {percent}", "string"));
+        assertEquals("msg: {{unresolved: datetime}}", compose("msg: {datetime}", "string"));
+        assertEquals("msg: {{unresolved: date}}", compose("msg: {date}", "string"));
+        assertEquals("msg: {{unresolved: time}}", compose("msg: {time}", "string"));
     }
 
     @Test
