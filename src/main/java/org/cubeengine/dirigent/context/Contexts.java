@@ -26,9 +26,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Currency;
-import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Locale;
-import java.util.Map;
 import java.util.TimeZone;
 
 /**
@@ -39,7 +38,7 @@ public class Contexts
     /**
      * A reference of a simple empty context.
      */
-    public static final Context EMPTY = new Context(Collections.<ContextProperty<?>, Object>emptyMap());
+    public static final Context EMPTY = ImmutableContext.create(Collections.<ContextProperty<?>, Object>emptyMap());
 
     /**
      * This property identifies a {@link Locale} instance in a context.
@@ -130,11 +129,11 @@ public class Contexts
      */
     public static Context createContext(Collection<PropertyMapping<?>> mappings)
     {
-        Map<ContextProperty<?>, Object> properties = new HashMap<ContextProperty<?>, Object>(mappings.size());
+        IdentityHashMap<ContextProperty<?>, Object> properties = new IdentityHashMap<ContextProperty<?>, Object>(mappings.size());
         for (final PropertyMapping<?> mapping : mappings)
         {
             properties.put(mapping.property, mapping.value);
         }
-        return new Context(properties);
+        return ImmutableContext.createUnsafe(properties);
     }
 }
