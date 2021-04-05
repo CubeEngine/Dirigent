@@ -25,7 +25,7 @@ package org.cubeengine.dirigent.parser;
 import org.junit.Test;
 
 import static org.cubeengine.dirigent.TestHelper.*;
-import static org.cubeengine.dirigent.parser.Parser.parse;
+import static org.cubeengine.dirigent.parser.Parser.*;
 import static org.cubeengine.dirigent.parser.element.DefaultMacro.DEFAULT_MACRO;
 import static org.junit.Assert.assertEquals;
 
@@ -265,5 +265,20 @@ public class ParserTest
         assertEquals(elems(named("-123")), parse("{-123}"));
         assertEquals(elems(named("0123")), parse("{0123}"));
         assertEquals(elems(named("123453a4443")), parse("{123453a4443}"));
+    }
+
+    @Test
+    public void testEscapeArgumentValue() {
+        assertEquals("a\\:\\=\\}b{", escapeArgumentValue("a:=}b{"));
+    }
+
+    @Test
+    public void testEscapeParameterName() {
+        assertEquals("a\\:\\=\\}b{", escapeParameterName("a:=}b{"));
+    }
+
+    @Test
+    public void testParameterValue() {
+        assertEquals("a\\:=\\}b{", escapeParameterValue("a:=}b{"));
     }
 }

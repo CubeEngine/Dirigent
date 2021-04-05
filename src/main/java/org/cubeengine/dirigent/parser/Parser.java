@@ -385,4 +385,39 @@ public class Parser
     {
         return s.offset < s.in.length() && s.in.charAt(s.offset) == c;
     }
+
+    /**
+     * Escapes the given string so that it is safe to be used as a positional argument value.
+     *
+     * @param s the string to be escaped
+     * @return the escaped string
+     */
+    public static String escapeArgumentValue(String s) {
+        return s.replace("" + SECTION_SEP, "" + ESCAPE + SECTION_SEP)
+                .replace("" + VALUE_SEP, "" + ESCAPE + VALUE_SEP)
+                .replace("" + MACRO_END, "" + ESCAPE + MACRO_END);
+    }
+
+    /**
+     * Escapes the given string so that it is safe to be used as a named parameter name.
+     *
+     * @param s the string to be escaped
+     * @return the escaped string
+     */
+    public static String escapeParameterName(String s) {
+        return s.replace("" + SECTION_SEP, "" + ESCAPE + SECTION_SEP)
+                .replace("" + VALUE_SEP, "" + ESCAPE + VALUE_SEP)
+                .replace("" + MACRO_END, "" + ESCAPE + MACRO_END);
+    }
+
+    /**
+     * Escapes the given string so that it is safe to be used as a named parameter value.
+     *
+     * @param s the string to be escaped
+     * @return the escaped string
+     */
+    public static String escapeParameterValue(String s) {
+        return s.replace("" + SECTION_SEP, "" + ESCAPE + SECTION_SEP)
+                .replace("" + MACRO_END, "" + ESCAPE + MACRO_END);
+    }
 }
