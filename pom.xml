@@ -116,7 +116,6 @@
                     <encoding>${project.build.sourceEncoding}</encoding>
                     <source>${jdkVersion}</source>
                     <target>${jdkVersion}</target>
-                    <optimize>true</optimize>
                     <showDeprecation>true</showDeprecation>
                     <showWarnings>true</showWarnings>
                 </configuration>
@@ -127,10 +126,14 @@
                 <version>4.6</version>
                 <configuration>
                     <strictCheck>true</strictCheck>
-                    <header>com/mycila/maven/plugin/license/templates/MIT.txt</header>
-                    <includes>
-                        <include>**/*.java</include>
-                    </includes>
+                    <licenseSets>
+                        <licenseSet>
+                            <header>com/mycila/maven/plugin/license/templates/MIT.txt</header>
+                            <includes>
+                                <include>**/*.java</include>
+                            </includes>
+                        </licenseSet>
+                    </licenseSets>
                     <properties>
                         <owner>Cube Island</owner>
                     </properties>
